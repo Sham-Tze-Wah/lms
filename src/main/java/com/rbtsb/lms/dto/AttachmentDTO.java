@@ -1,5 +1,6 @@
 package com.rbtsb.lms.dto;
 
+import com.rbtsb.lms.pojo.EmployeePojo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,10 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class AttachmentDTO {
-    @Id
     private String fileId;
     private String fileName;
     private String directory;
     private List<File> files;
-    private String empId;
+    private EmployeePojo employeePojo;
 }

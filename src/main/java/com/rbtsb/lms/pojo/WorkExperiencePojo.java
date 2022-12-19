@@ -14,4 +14,5 @@ public class WorkExperiencePojo {
     private String companyName;
     private Date dateJoined;
     private Date dateLeave;
+    private EmployeePojo employeePojo;
 }

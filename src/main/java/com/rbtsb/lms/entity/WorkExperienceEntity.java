@@ -1,6 +1,7 @@
 package com.rbtsb.lms.entity;
 
 import com.rbtsb.lms.constant.Position;
+import com.rbtsb.lms.util.SqlDataType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,13 +20,13 @@ public class WorkExperienceEntity {
     @Column(name="exp_id")
     private String expId;
 
-    @Column(name="work_title")
+    @Column(name="work_title",  length= SqlDataType.VARCHAR64)
     private Position workTitle;
 
-    @Column(name="year_exp")
+    @Column(name="year_exp",  length= SqlDataType.VARCHAR30)
     private String yearsOfExperience;
 
-    @Column(name="company_name")
+    @Column(name="company_name",  length= SqlDataType.VARCHAR64)
     private String companyName;
 
     @Column(name = "date_joined") //in format of dd/mm/yyyy
@@ -35,4 +36,8 @@ public class WorkExperienceEntity {
     @Column(name = "date_leave") //in format of dd/mm/yyyy
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateLeave;
+
+    @ManyToOne
+    @JoinColumn(name="emp_id", referencedColumnName = "emp_id")
+    private EmployeeEntity employeeEntity;
 }

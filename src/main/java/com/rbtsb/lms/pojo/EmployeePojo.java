@@ -2,6 +2,7 @@ package com.rbtsb.lms.pojo;
 
 import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.constant.Role;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.util.Date;

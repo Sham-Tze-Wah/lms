@@ -1,12 +1,15 @@
 package com.rbtsb.lms.pojo;
 
+import com.rbtsb.lms.constant.Course;
+import com.rbtsb.lms.constant.Qualification;
 import lombok.Data;
 
 @Data
 public class EducationPojo {
     //education pojo
     private String educationId;
-    private String qualification;
+    private Qualification qualification;
     private String institute;
-    private String course;
+    private Course course;
+    private EmployeePojo employeePojo;
 }

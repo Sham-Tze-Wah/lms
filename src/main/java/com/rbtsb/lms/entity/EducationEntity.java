@@ -1,10 +1,9 @@
 package com.rbtsb.lms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.rbtsb.lms.constant.Course;
+import com.rbtsb.lms.constant.Qualification;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,20 +20,22 @@ public class EducationEntity {
     @Column(name="education_id", unique = true, nullable = false)
     //@GeneratedValue(generator = "uuid") //you need to make the dao throw error as it is generated and set into entity.
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
-
     @NonNull
     @JsonIgnore
     private String educationId;
 
-    @Id
+    @Enumerated(value=EnumType.STRING)
     @Column(name="qualification")
-    private String qualification;
+    private Qualification qualification;
 
-    @Id
     @Column(name="institute")
     private String institute;
 
-    @Id
+    @Enumerated(value=EnumType.STRING)
     @Column(name="course")
-    private String course;
+    private Course course;
+    
+    @ManyToOne()
+    @JoinColumn(name="emp_id", referencedColumnName="emp_id")
+    private EmployeeEntity employeeEntity;
 }
