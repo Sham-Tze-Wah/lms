@@ -5,24 +5,24 @@ import com.rbtsb.lms.constant.LeaveStatus;
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.util.SqlDataType;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.persistence.*;
+
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="Leave")
+@Table(name="LeaveApplicaion")
 @Entity
 @Data
 public class LeaveEntity {
     @Id
-    @Column(name="emp_id", unique = true, nullable = false)
+    @Column(name="leave_id", unique = true)
     //@GeneratedValue(generator = "uuid") //you need to make the dao throw error as it is generated and set into entity.
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @NonNull
     @JsonIgnore
     private int leaveId;
 
@@ -37,10 +37,6 @@ public class LeaveEntity {
     private String description;
 
     @ManyToOne()
-    @JoinColumn(name="file_id", referencedColumnName = "file_id")
-    private AttachmentDTO attachment;
-
-    @ManyToOne()
     @JoinColumn(name="emp_id", referencedColumnName = "emp_id")
-    private EmployeePojo employeePojo;
+    private EmployeeEntity employeeEntity;
 }

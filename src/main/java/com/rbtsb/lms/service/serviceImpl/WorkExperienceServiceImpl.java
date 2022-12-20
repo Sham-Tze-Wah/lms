@@ -1,11 +1,17 @@
 package com.rbtsb.lms.service.serviceImpl;
 
+import com.rbtsb.lms.dto.LeaveDTO;
+import com.rbtsb.lms.entity.LeaveEntity;
+import com.rbtsb.lms.entity.WorkExperienceEntity;
 import com.rbtsb.lms.pojo.WorkExperiencePojo;
 import com.rbtsb.lms.repo.WorkExperienceRepo;
 import com.rbtsb.lms.service.WorkExperienceService;
+import com.rbtsb.lms.service.mapper.LeaveMapper;
+import com.rbtsb.lms.service.mapper.WorkExpMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +28,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
                 if(!workExperiencePojo.getCompanyName().equalsIgnoreCase("")){
                     if(!workExperiencePojo.getYearsOfExperience().equalsIgnoreCase("")){
                         if(!workExperiencePojo.getDateJoined().equals(null)){
-                            workExperienceRepo.saveAndFlush(workExperiencePojo);
+                            workExperienceRepo.saveAndFlush(WorkExpMapper.pojoToEntity(workExperiencePojo));
                             return "Insert successfully.";
                         }
                         else{
@@ -49,12 +55,24 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
 
     @Override
     public List<WorkExperiencePojo> getAllWorkExperience() {
-        return workExperienceRepo.findAll();
+        List<WorkExperienceEntity> workExpEntities = workExperienceRepo.findAll();
+        List<WorkExperiencePojo> leavePojoList = new ArrayList<>();
+        workExpEntities.forEach(workExperienceEntity -> {
+            leavePojoList.add(WorkExpMapper.entityToPojo(workExperienceEntity));
+        });
+
+        if(!leavePojoList.isEmpty()){
+            return leavePojoList;
+        }
+        else{
+            return null;
+        }
     }
 
     @Override
     public String updateWorkExperienceByEmpId(String empId, WorkExperiencePojo workExperiencePojo) {
-        WorkExperiencePojo workExperiencePojoFromDB = workExperienceRepo.selectWorkExperienceByEmpId(empId);
+        WorkExperiencePojo workExperiencePojoFromDB = WorkExpMapper.
+                entityToPojo(workExperienceRepo.selectWorkExperienceByEmpId(empId));
         if(!workExperiencePojoFromDB.equals(null)){
             if(!workExperiencePojo.getWorkTitle().equals(null)){
                 if(!workExperiencePojo.getYearsOfExperience().equalsIgnoreCase("")){
@@ -67,7 +85,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
                                 workExperiencePojoFromDB.setDateLeave(workExperiencePojo.getDateLeave());
                                 workExperiencePojoFromDB.setCompanyName(workExperiencePojo.getCompanyName());
                                 workExperiencePojoFromDB.setEmployeePojo(workExperiencePojo.getEmployeePojo());
-                                workExperienceRepo.saveAndFlush(workExperiencePojoFromDB);
+                                workExperienceRepo.saveAndFlush(WorkExpMapper.pojoToEntity(workExperiencePojoFromDB));
                                 return "Updated successfully";
                             }
                             else{
@@ -98,7 +116,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
 
     @Override
     public String deleteWorkExperienceById(String id) {
-        Optional<WorkExperiencePojo> workExp = workExperienceRepo.findById(id);
+        Optional<WorkExperienceEntity> workExp = workExperienceRepo.findById(id);
         if(workExp.isPresent()){
             workExperienceRepo.delete(workExp.get());
             return "work deleted successfully.";

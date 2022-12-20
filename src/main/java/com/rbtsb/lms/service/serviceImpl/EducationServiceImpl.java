@@ -1,12 +1,19 @@
 package com.rbtsb.lms.service.serviceImpl;
 
+import com.rbtsb.lms.dto.AttachmentDTO;
+import com.rbtsb.lms.entity.AttachmentEntity;
+import com.rbtsb.lms.entity.EducationEntity;
 import com.rbtsb.lms.pojo.EducationPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.repo.EducationRepo;
 import com.rbtsb.lms.service.EducationService;
+import com.rbtsb.lms.service.mapper.AttachmentMapper;
+import com.rbtsb.lms.service.mapper.EducationMapper;
+import com.rbtsb.lms.service.mapper.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +29,7 @@ public class EducationServiceImpl implements EducationService {
             if(!educationPojo.getInstitute().equalsIgnoreCase("")){
                 if(!educationPojo.getCourse().toString().equalsIgnoreCase("")){
                     if(!educationPojo.getEmployeePojo().equals(null)){
-                        educationRepo.saveAndFlush(educationPojo);
+                        educationRepo.saveAndFlush(EducationMapper.pojoToEntity(educationPojo));
                         return "Insert successfully.";
                     }
                     else{
@@ -44,12 +51,24 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public List<EducationPojo> getAllEducation() {
-        return educationRepo.findAll();
+        List<EducationEntity> educationEntities = educationRepo.findAll();
+        List<EducationPojo> educationPojoList = new ArrayList<>();
+        educationEntities.forEach(educationEntity -> {
+            educationPojoList.add(EducationMapper.entityToPojo(educationEntity));
+        });
+
+        if(!educationPojoList.isEmpty()){
+            return educationPojoList;
+        }
+        else{
+            return null;
+        }
+
     }
 
     @Override
     public String updateEducationByEmpId(String empId, EducationPojo educationPojo) {
-        EducationPojo educationPojoFromDB = educationRepo.selectEducationByEmpId(empId);
+        EducationEntity educationPojoFromDB = educationRepo.selectEducationByEmpId(empId);
 
         if(!educationPojo.equals(null)){
             if(!educationPojo.getQualification().equals(null)){
@@ -59,7 +78,7 @@ public class EducationServiceImpl implements EducationService {
                             educationPojoFromDB.setQualification(educationPojo.getQualification());
                             educationPojoFromDB.setInstitute(educationPojo.getInstitute());
                             educationPojoFromDB.setCourse(educationPojo.getCourse());
-                            educationPojoFromDB.setEmployeePojo(educationPojo.getEmployeePojo());
+                            educationPojoFromDB.setEmployeeEntity(EmployeeMapper.pojoToEntity(educationPojo.getEmployeePojo()));
                             educationRepo.saveAndFlush(educationPojoFromDB);
                             return "Updated successfully";
                         }
@@ -90,8 +109,9 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public String deleteEducationById(String id) {
-        Optional<EducationPojo> educationPojo = educationRepo.findById(id);
-        if(educationPojo.isPresent()){
+        Optional<EducationEntity> educationEntity = educationRepo.findById(id);
+
+        if(educationEntity.isPresent()){
             educationRepo.deleteById(id);
             return "Deleted successfully.";
         }

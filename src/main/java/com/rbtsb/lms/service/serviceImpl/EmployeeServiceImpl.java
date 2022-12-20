@@ -2,14 +2,19 @@ package com.rbtsb.lms.service.serviceImpl;
 
 
 import com.rbtsb.lms.dto.AttachmentDTO;
+import com.rbtsb.lms.entity.EducationEntity;
+import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.pojo.EducationPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.pojo.WorkExperiencePojo;
 import com.rbtsb.lms.repo.EmployeeRepo;
 import com.rbtsb.lms.service.EmployeeService;
+import com.rbtsb.lms.service.mapper.EducationMapper;
+import com.rbtsb.lms.service.mapper.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,12 +33,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                     if(!employeePojo.getPosition().equals(null)){
                         if(!employeePojo.getRole().equals(null)){
                             if(employeePojo.getDateJoined().equals(null)){
-                                employeeRepo.saveAndFlush(employeePojo);
+                                employeeRepo.saveAndFlush(EmployeeMapper.pojoToEntity(employeePojo));
                                 return "Insert successfully.";
                             }
                             else{
                                 employeePojo.setDateJoined(new Date());
-                                employeeRepo.saveAndFlush(employeePojo);
+                                employeeRepo.saveAndFlush(EmployeeMapper.pojoToEntity(employeePojo));
                                 return "Insert successfully.";
                             }
                         }
@@ -60,14 +65,26 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeePojo> getAllEmployee() {
-        return employeeRepo.findAll();
+        List<EmployeeEntity> employeeEntities = employeeRepo.findAll();
+        List<EmployeePojo> employeePojoList = new ArrayList<>();
+        employeeEntities.forEach(employeeEntity -> {
+            employeePojoList.add(EmployeeMapper.entityToPojo(employeeEntity));
+        });
+
+        if(!employeePojoList.isEmpty()){
+            return employeePojoList;
+        }
+        else{
+            return null;
+        }
+
     }
 
     @Override
     public Optional<EmployeePojo> getEmployeeById(String id) {
-        Optional<EmployeePojo> emp = employeeRepo.findById(id);
+        Optional<EmployeeEntity> emp = employeeRepo.findById(id);
         if(emp.isPresent()){
-            return emp;
+            return Optional.of(EmployeeMapper.entityToPojo(emp.get()));
         }
         else{
             return null;
@@ -76,7 +93,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String updateEmployeeById(String id, EmployeePojo employeePojo) {
-        Optional<EmployeePojo> emp = employeeRepo.findById(id);
+        Optional<EmployeeEntity> emp = employeeRepo.findById(id);
         if(emp.isPresent()){
             if(!employeePojo.getName().equalsIgnoreCase("")){
                 if(!employeePojo.getPhoneNo().equalsIgnoreCase("")){
@@ -97,7 +114,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                                 }
                                 else{
                                     employeePojo.setDateJoined(new Date());
-                                    employeeRepo.saveAndFlush(employeePojo);
+                                    employeeRepo.saveAndFlush(EmployeeMapper.pojoToEntity(employeePojo));
                                     return "Insert successfully.";
                                 }
                             }
@@ -128,7 +145,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String deleteEmployeeById(String id) {
-        Optional<EmployeePojo> emp = employeeRepo.findById(id);
+        Optional<EmployeeEntity> emp = employeeRepo.findById(id);
         if(emp.isPresent()){
             employeeRepo.delete(emp.get());
             return "deleted successfully.";

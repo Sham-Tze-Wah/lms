@@ -1,11 +1,18 @@
 package com.rbtsb.lms.service.serviceImpl;
 
 import com.rbtsb.lms.dto.LeaveDTO;
+import com.rbtsb.lms.entity.EmployeeEntity;
+import com.rbtsb.lms.entity.LeaveEntity;
+import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.repo.LeaveDTORepo;
 import com.rbtsb.lms.service.LeaveService;
+import com.rbtsb.lms.service.mapper.AttachmentMapper;
+import com.rbtsb.lms.service.mapper.EmployeeMapper;
+import com.rbtsb.lms.service.mapper.LeaveMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -21,18 +28,8 @@ public class LeaveServiceImpl implements LeaveService {
 
         if(!leaveDTO.getReason().equalsIgnoreCase("")){
             if(!leaveDTO.getLeaveStatus().equals(null)){
-                if(!leaveDTO.getEmployeePojo().equals(null)){
-                    if(!leaveDTO.getAttachment().equals(null)){
-                        leaveDTORepo.saveAndFlush(leaveDTO);
-                        return "Insert successfully.";
-                    }
-                    else{
-                        return "evidence with attachment must be provided";
-                    }
-                }
-                else {
-                    return "leave does not belongs to any employee.";
-                }
+                leaveDTORepo.saveAndFlush(LeaveMapper.DTOToEntity(leaveDTO));
+                return "Insert successfully.";
             }
             else{
                 return "leave status cannot be null";
@@ -45,32 +42,38 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Override
     public List<LeaveDTO> getAllLeave() {
-        return leaveDTORepo.findAll();
+        List<LeaveEntity> leaveEntities = leaveDTORepo.findAll();
+        List<LeaveDTO> leaveDTOList = new ArrayList<>();
+        leaveEntities.forEach(leaveEntity -> {
+            leaveDTOList.add(LeaveMapper.entityToDTO(leaveEntity));
+        });
+
+        if(!leaveDTOList.isEmpty()){
+            return leaveDTOList;
+        }
+        else{
+            return null;
+        }
     }
 
     @Override
     public String updateLeaveStatus(int id, LeaveDTO leaveDTO) {
-        Optional<LeaveDTO> leave = leaveDTORepo.findById(id);
+        Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
 
         if(leave.isPresent()){
             if(!leaveDTO.getReason().equalsIgnoreCase("")){
                 if(!leaveDTO.getLeaveStatus().equals(null)){
                     if(!leaveDTO.getEmployeePojo().equals(null)){
-                        if(!leaveDTO.getAttachment().equals(null)){
-                            leave.get().setLeaveStatus(leaveDTO.getLeaveStatus());
-                            leave.get().setReason(leaveDTO.getReason());
-                            leave.get().setDescription(leaveDTO.getDescription());
-                            leave.get().setAttachment(leaveDTO.getAttachment());
-                            leave.get().setEmployeePojo(leaveDTO.getEmployeePojo());
-                            leaveDTORepo.saveAndFlush(leave.get());
-                            return "Updated successfully.";
-                        }
-                        else{
-                            return "evidence with attachment must be provided";
-                        }
+                        leave.get().setLeaveId(leaveDTO.getLeaveId());
+                        leave.get().setLeaveStatus(leaveDTO.getLeaveStatus());
+                        leave.get().setReason(leaveDTO.getReason());
+                        leave.get().setDescription(leaveDTO.getDescription());
+                        //leave.get().setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
+                        leaveDTORepo.saveAndFlush(leave.get());
+                        return "Updated successfully.";
                     }
-                    else {
-                        return "leave does not belongs to any employee.";
+                    else{
+                        return "leave application must belongs to at least one employee.";
                     }
                 }
                 else{
@@ -89,7 +92,7 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Override
     public String deleteLeaveById(int id) {
-        Optional<LeaveDTO> leave = leaveDTORepo.findById(id);
+        Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
 
         if(leave.isPresent()){
             leaveDTORepo.deleteById(id);

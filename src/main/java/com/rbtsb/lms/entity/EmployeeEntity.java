@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.constant.Role;
 import com.rbtsb.lms.util.SqlDataType;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -25,7 +25,6 @@ public class EmployeeEntity {
     //@GeneratedValue(generator = "uuid") //you need to make the dao throw error as it is generated and set into entity.
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @NonNull
     @JsonIgnore
     private int empId;
 
@@ -49,7 +48,7 @@ public class EmployeeEntity {
     @Enumerated(value=EnumType.STRING)
     private Position position;
 
-    @Column(name="email", length= SqlDataType.VARCHAR64)
+    @Column(name="role", length= SqlDataType.VARCHAR64)
     @Enumerated(value=EnumType.STRING)
     private Role role;
 
@@ -60,4 +59,6 @@ public class EmployeeEntity {
     @Column(name = "date_leave") //in format of dd/mm/yyyy
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateLeave;
+
+//
 }

@@ -10,6 +10,5 @@ public class LeaveDTO {
     private LeaveStatus leaveStatus;
     private String reason;
     private String description;
-    private AttachmentDTO attachment;
     private EmployeePojo employeePojo;
 }

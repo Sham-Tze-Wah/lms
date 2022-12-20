@@ -2,11 +2,12 @@ package com.rbtsb.lms.entity;
 
 import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.util.SqlDataType;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.util.Date;
 
 @NoArgsConstructor
@@ -14,10 +15,12 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "WorkExperience")
+
 public class WorkExperienceEntity {
 
     @Id
-    @Column(name="exp_id")
+    @Column(name="exp_id", nullable = false, unique = true)
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String expId;
 
     @Column(name="work_title",  length= SqlDataType.VARCHAR64)

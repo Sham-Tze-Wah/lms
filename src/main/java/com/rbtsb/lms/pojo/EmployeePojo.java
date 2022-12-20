@@ -2,7 +2,6 @@ package com.rbtsb.lms.pojo;
 
 import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.constant.Role;
-import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.util.Date;
@@ -11,7 +10,7 @@ import java.util.Date;
 public class EmployeePojo {
 
     //employee pojo
-    private String empId;
+    private int empId;
     private String name;
     private String phoneNo;
     private String email;

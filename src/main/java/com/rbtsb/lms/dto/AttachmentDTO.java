@@ -1,9 +1,8 @@
 package com.rbtsb.lms.dto;
 
+import com.rbtsb.lms.constant.FileType;
+import com.rbtsb.lms.entity.AttachmentEntity;
 import com.rbtsb.lms.pojo.EmployeePojo;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,8 @@ import java.util.List;
 public class AttachmentDTO {
     private String fileId;
     private String fileName;
+    private String fileType;
     private String directory;
-    private List<File> files;
-    private EmployeePojo employeePojo;
+    private byte[] fileData;
+    private LeaveDTO leaveDTO;
 }
