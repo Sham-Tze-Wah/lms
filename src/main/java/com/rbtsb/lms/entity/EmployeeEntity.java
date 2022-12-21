@@ -24,11 +24,10 @@ public class EmployeeEntity {
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
     @GeneratedValue(generator = "emp_gen",strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name="emp_gen", sequenceName="emp_seq", allocationSize=1)
-    @NonNull
     @JsonIgnore
-    private int empId;
+    private int empId = 0;
 
-    @Column(name="name", nullable = false, length = SqlDataType.VARCHAR100)
+    @Column(name="name", nullable = false, unique=true, length = SqlDataType.VARCHAR100)
     @NonNull
     private String name;
 
