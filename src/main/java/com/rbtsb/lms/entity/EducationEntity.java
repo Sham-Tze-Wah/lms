@@ -48,7 +48,7 @@ public class EducationEntity {
     private Course course;
     
     @ManyToOne()
-    @JoinColumn(name="emp_id", referencedColumnName="emp_id")
+    @JoinColumn(name="emp_id", referencedColumnName="emp_id", insertable = false, updatable = false)
     private EmployeeEntity employeeEntity;
 
     @PrePersist
