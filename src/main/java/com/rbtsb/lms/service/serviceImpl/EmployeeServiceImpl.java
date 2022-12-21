@@ -11,6 +11,8 @@ import com.rbtsb.lms.repo.EmployeeRepo;
 import com.rbtsb.lms.service.EmployeeService;
 import com.rbtsb.lms.service.mapper.EducationMapper;
 import com.rbtsb.lms.service.mapper.EmployeeMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,42 +27,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private EmployeeRepo employeeRepo;
 
+    private Logger log = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+
     @Override
     public String insertEmployee(EmployeePojo employeePojo) {
-        if(!employeePojo.getName().equalsIgnoreCase("")){
-            if(!employeePojo.getPhoneNo().equalsIgnoreCase("")){
-                if(!employeePojo.getEmail().equalsIgnoreCase("")){
-                    if(!employeePojo.getPosition().equals(null)){
-                        if(!employeePojo.getRole().equals(null)){
-                            if(employeePojo.getDateJoined().equals(null)){
-                                employeeRepo.saveAndFlush(EmployeeMapper.pojoToEntity(employeePojo));
-                                return "Insert successfully.";
-                            }
-                            else{
-                                employeePojo.setDateJoined(new Date());
-                                employeeRepo.saveAndFlush(EmployeeMapper.pojoToEntity(employeePojo));
-                                return "Insert successfully.";
-                            }
-                        }
-                        else{
-                            return "Role cannot be null.";
-                        }
-                    }
-                    else{
-                        return "Position cannot be null";
-                    }
-                }
-                else {
-                    return "email cannot be null";
-                }
-            }
-            else{
-                return "phone no cannot be null";
-            }
-        }
-        else{
-            return "name cannot be null.";
-        }
+        //System.out.println(employeePojo);
+
+        log.debug("Employee Entity: "+employeePojo.toString());
+        employeeRepo.save(EmployeeMapper.pojoToEntity(employeePojo));
+        return "Insert successfully.";
+
+
     }
 
     @Override
@@ -81,9 +58,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Optional<EmployeePojo> getEmployeeById(String id) {
+    public Optional<EmployeePojo> getEmployeeById(int id) {
         Optional<EmployeeEntity> emp = employeeRepo.findById(id);
+
         if(emp.isPresent()){
+            log.debug("Employee Entity: " + emp.get().toString());
             return Optional.of(EmployeeMapper.entityToPojo(emp.get()));
         }
         else{
@@ -92,7 +71,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public String updateEmployeeById(String id, EmployeePojo employeePojo) {
+    public Optional<EmployeePojo> getEmployeeByName(String name) {
+        return Optional.ofNullable(Optional.of(EmployeeMapper.entityToPojo(employeeRepo.getEmployeeByName(name).get()))).orElse(null);
+    }
+
+    @Override
+    public String updateEmployeeById(int id, EmployeePojo employeePojo) {
         Optional<EmployeeEntity> emp = employeeRepo.findById(id);
         if(emp.isPresent()){
             if(!employeePojo.getName().equalsIgnoreCase("")){
@@ -144,7 +128,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public String deleteEmployeeById(String id) {
+    public String deleteEmployeeById(int id) {
         Optional<EmployeeEntity> emp = employeeRepo.findById(id);
         if(emp.isPresent()){
             employeeRepo.delete(emp.get());
@@ -155,9 +139,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-
-
-
+    @Override
+    public Optional<EmployeePojo> getEmployeePojo(int empId) {
+        Optional<EmployeeEntity> entity = employeeRepo.findById(empId);
+        if(entity.isPresent()){
+            return Optional.of(EmployeeMapper.entityToPojo(entity.get()));
+        }
+        else{
+            return null;
+        }
+    }
 
 
 }

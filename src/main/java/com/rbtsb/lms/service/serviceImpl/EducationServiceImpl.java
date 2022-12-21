@@ -25,28 +25,10 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public String insertEducationByEmpId(EducationPojo educationPojo) {
-        if(!educationPojo.getQualification().toString().equalsIgnoreCase("")){
-            if(!educationPojo.getInstitute().equalsIgnoreCase("")){
-                if(!educationPojo.getCourse().toString().equalsIgnoreCase("")){
-                    if(!educationPojo.getEmployeePojo().equals(null)){
-                        educationRepo.saveAndFlush(EducationMapper.pojoToEntity(educationPojo));
-                        return "Insert successfully.";
-                    }
-                    else{
-                        return "Invalid employee pojo";
-                    }
-                }
-                else{
-                    return "Invalid course";
-                }
-            }
-            else{
-                return "Invalid institute";
-            }
-        }
-        else{
-            return "Invalid qualification";
-        }
+        educationRepo.saveAndFlush(EducationMapper.pojoToEntity(educationPojo));
+        return "Insert successfully.";
+
+
     }
 
     @Override

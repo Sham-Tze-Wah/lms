@@ -5,10 +5,7 @@ import com.rbtsb.lms.constant.LeaveStatus;
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.util.SqlDataType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -17,6 +14,7 @@ import javax.persistence.*;
 @Table(name="LeaveApplicaion")
 @Entity
 @Data
+@Builder
 public class LeaveEntity {
     @Id
     @Column(name="leave_id", unique = true)

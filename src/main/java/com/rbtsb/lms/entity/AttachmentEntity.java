@@ -3,19 +3,18 @@ package com.rbtsb.lms.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rbtsb.lms.constant.FileType;
 import com.rbtsb.lms.util.SqlDataType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="Attachment")
 @Entity
 @Data
+@Builder
 public class AttachmentEntity {
 
     @JsonIgnore
@@ -23,7 +22,7 @@ public class AttachmentEntity {
     @Column(name="file_id", unique = true, nullable = false)
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Id
-    private String fileId;
+    private String fileId = UUID.randomUUID().toString();
 
     @Column(name="file_name", nullable = false, unique=true, length = SqlDataType.VARCHAR30)
     private String fileName;

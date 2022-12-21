@@ -14,10 +14,10 @@ public class JpaConfig {
     public DataSource dataSource()
     {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("org.h2.Driver");
-        dataSourceBuilder.url("jdbc:h2:file:C:/temp/test");
-        dataSourceBuilder.username("sa");
-        dataSourceBuilder.password("");
+        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
+        dataSourceBuilder.url("jdbc:mysql://localhost:3306/lms?allowPublicKeyRetrieval=true&useSSL=FALSE");
+        dataSourceBuilder.username("root");
+        dataSourceBuilder.password("1234");
         return dataSourceBuilder.build();
     }
 }
