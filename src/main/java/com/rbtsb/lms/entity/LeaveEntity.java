@@ -22,6 +22,7 @@ public class LeaveEntity {
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @JsonIgnore
+    @NonNull
     private int leaveId;
 
     @Enumerated(value=EnumType.STRING)

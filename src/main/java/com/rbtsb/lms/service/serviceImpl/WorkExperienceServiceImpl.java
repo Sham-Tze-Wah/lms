@@ -23,34 +23,9 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
 
     @Override
     public String insertWorkExperience(WorkExperiencePojo workExperiencePojo) {
-        if(!workExperiencePojo.equals(null)){
-            if(!workExperiencePojo.getWorkTitle().equals(null)){
-                if(!workExperiencePojo.getCompanyName().equalsIgnoreCase("")){
-                    if(!workExperiencePojo.getYearsOfExperience().equalsIgnoreCase("")){
-                        if(!workExperiencePojo.getDateJoined().equals(null)){
-                            workExperienceRepo.saveAndFlush(WorkExpMapper.pojoToEntity(workExperiencePojo));
-                            return "Insert successfully.";
-                        }
-                        else{
-                            return "date joined cannot be null";
-                        }
-                    }
-                    else{
-                        return "work experience cannot be null. If work less than 1 year, just write 1.";
-                    }
-                }
-                else{
-                    return "company name cannot be null";
-                }
 
-            }
-            else{
-                return "work title cannot be null";
-            }
-        }
-        else{
-            return "requested body cannot be null";
-        }
+        workExperienceRepo.saveAndFlush(WorkExpMapper.pojoToEntity(workExperiencePojo));
+        return "Insert successfully.";
     }
 
     @Override

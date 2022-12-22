@@ -2,10 +2,7 @@ package com.rbtsb.lms.entity;
 
 import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.util.SqlDataType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -23,6 +20,7 @@ public class WorkExperienceEntity {
     @Id
     @Column(name="exp_id", nullable = false, unique = true)
     @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @NonNull
     private String expId = UUID.randomUUID().toString();
 
     @Column(name="work_title",  length= SqlDataType.VARCHAR64)

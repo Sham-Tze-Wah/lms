@@ -25,6 +25,7 @@ public class EmployeeEntity {
     @GeneratedValue(generator = "emp_gen",strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name="emp_gen", sequenceName="emp_seq", allocationSize=1)
     @JsonIgnore
+    @NonNull
     private int empId = 0;
 
     @Column(name="name", nullable = false, unique=true, length = SqlDataType.VARCHAR100)
