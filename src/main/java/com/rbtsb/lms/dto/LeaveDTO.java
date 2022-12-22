@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class LeaveDTO {
     private int leaveId;
-    private LeaveStatus leaveStatus;
+    private LeaveStatus leaveStatus = LeaveStatus.Submitted;
     private String reason;
     private String description;
     private EmployeePojo employeePojo;

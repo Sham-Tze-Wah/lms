@@ -1,6 +1,7 @@
 package com.rbtsb.lms.api;
 
 import com.rbtsb.lms.dto.AttachmentDTO;
+import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.service.AttachmentService;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 
 @RequestMapping("/api/attachment")
 @RestController
@@ -26,7 +28,40 @@ public class AttachmentController {
 
     @PostMapping("/post")
     public ResponseEntity<?> insertAttachment(@RequestBody @Valid @NonNull AttachmentDTO attachmentDTO){
-        return new ResponseEntity<>(attachmentService.insertAttachment(attachmentDTO), HttpStatus.OK);
+        try{
+            if(!attachmentDTO.getLeaveDTO().equals(null)){
+                if(!attachmentDTO.getDirectory().equalsIgnoreCase("")){
+                    if(!attachmentDTO.getFileName().equalsIgnoreCase("")){
+                        if(!attachmentDTO.getFileData().equals(null)){
+
+                            if(!attachmentDTO.getLeaveDTO().equals(null)){
+                                return new ResponseEntity<>(attachmentService.insertAttachment(attachmentDTO), HttpStatus.OK);
+                            }
+                            else{
+                                return new ResponseEntity<>("The attachment is not attached to any leave.",HttpStatus.UNPROCESSABLE_ENTITY);
+                            }
+                        }
+                        else{
+                            return new ResponseEntity<>("attachment cannot be empty", HttpStatus.UNPROCESSABLE_ENTITY);
+                        }
+                    }
+                    else{
+                        return new ResponseEntity<>( "file name cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                }
+                else{
+                    return new ResponseEntity<>( "attachment directory cannot be null.", HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+            }
+            else{
+                return new ResponseEntity<>( "this attachment is not used in any leave application.", HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+        }
+        catch(Exception exception){
+            return new ResponseEntity(exception.toString(),HttpStatus.BAD_REQUEST);
+        }
+
+
     }
 
     @GetMapping("/get")

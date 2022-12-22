@@ -25,28 +25,10 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public String insertAttachment(AttachmentDTO attachmentDTO) {
-        if(!attachmentDTO.getLeaveDTO().equals(null)){
-            if(!attachmentDTO.getDirectory().equalsIgnoreCase("")){
-                if(!attachmentDTO.getFileName().equalsIgnoreCase("")){
-                    if(!attachmentDTO.getFileData().equals(null)){
-                        attachmentRepo.saveAndFlush(AttachmentMapper.DTOToEntity(attachmentDTO));
-                        return "insert successfully";
-                    }
-                    else{
-                        return "attachment cannot be empty";
-                    }
-                }
-                else{
-                    return "file name cannot be null";
-                }
-            }
-            else{
-                return "attachment directory cannot be null.";
-            }
-        }
-        else{
-            return "this attachment is not used in any leave application.";
-        }
+        attachmentRepo.saveAndFlush(AttachmentMapper.DTOToEntity(attachmentDTO));
+        return "insert successfully";
+
+
     }
 
     @Override

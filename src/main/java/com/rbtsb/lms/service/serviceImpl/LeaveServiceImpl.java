@@ -25,19 +25,8 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Override
     public String insertLeave(LeaveDTO leaveDTO) {
-
-        if(!leaveDTO.getReason().equalsIgnoreCase("")){
-            if(!leaveDTO.getLeaveStatus().equals(null)){
-                leaveDTORepo.saveAndFlush(LeaveMapper.DTOToEntity(leaveDTO));
-                return "Insert successfully.";
-            }
-            else{
-                return "leave status cannot be null";
-            }
-        }
-        else{
-            return "reason cannot be null";
-        }
+        leaveDTORepo.saveAndFlush(LeaveMapper.DTOToEntity(leaveDTO));
+        return "Insert successfully.";
     }
 
     @Override
