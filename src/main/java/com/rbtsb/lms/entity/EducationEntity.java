@@ -50,8 +50,8 @@ public class EducationEntity{
     @Column(name="course")
     private Course course;
 
-    @ManyToOne() //
-    @JoinColumn(name="emp_id", referencedColumnName="emp_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER) //
+    @JoinColumn(name="empId", referencedColumnName="emp_id")
     private EmployeeEntity employeeEntity;
 
 //    @PrePersist

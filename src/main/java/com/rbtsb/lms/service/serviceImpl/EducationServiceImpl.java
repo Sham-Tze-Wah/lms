@@ -26,8 +26,7 @@ public class EducationServiceImpl implements EducationService {
     @Override
     public String insertEducationByEmpId(EducationPojo educationPojo) {
         educationRepo.saveAndFlush(EducationMapper.pojoToEntity(educationPojo));
-        return "Insert successfully.";
-
+        return educationPojo.getEmployeePojo().toString() + " Insert successfully.";
 
     }
 

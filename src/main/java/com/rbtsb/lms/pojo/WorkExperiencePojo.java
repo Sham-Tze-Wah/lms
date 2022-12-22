@@ -4,11 +4,12 @@ import com.rbtsb.lms.constant.Position;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 public class WorkExperiencePojo {
     //workexp pojo
-    private String expId;
+    private String expId = UUID.randomUUID().toString();
     private Position workTitle;
     private String yearsOfExperience;
     private String companyName;

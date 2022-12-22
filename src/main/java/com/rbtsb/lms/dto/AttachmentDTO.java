@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class AttachmentDTO {
-    private String fileId;
+    private String fileId = UUID.randomUUID().toString();
     private String fileName;
     private String fileType;
     private String directory;

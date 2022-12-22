@@ -38,9 +38,11 @@ public class EducationController {
             if(!educationPojo.getQualification().toString().equalsIgnoreCase("")){
                 if(!educationPojo.getInstitute().equalsIgnoreCase("")){
                     if(!educationPojo.getCourse().toString().equalsIgnoreCase("")){
+                        Optional<EmployeePojo> empPojo = Optional.ofNullable(employeeService.getEmployeeByName(educationPojo.getEmployeePojo().getName()))
+                                .orElse(null);
+                        educationPojo.getEmployeePojo().setEmpId(empPojo.get().getEmpId());
                         if(!educationPojo.getEmployeePojo().equals(null) &&
-                                Optional.of(employeeService.
-                                        getEmployeeByName(educationPojo.getEmployeePojo().getName())).isPresent()){
+                                empPojo.isPresent()){
                             return new ResponseEntity<>(educationService.insertEducationByEmpId(educationPojo), HttpStatus.OK);
                         }
                         else{

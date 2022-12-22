@@ -62,5 +62,15 @@ public class EmployeeEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateLeave;
 
+    @PrePersist
+    public void onCreate(){
+        if(this.empId!=0){
+            this.empId = empId;
+        }
+        else{
+            this.empId = 0;
+        }
+    }
+
 //
 }
