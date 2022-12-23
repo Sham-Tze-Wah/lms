@@ -10,4 +10,6 @@ public interface GlobalConstant {
     final static String JSON_DATE_FORMAT = "dd/MM/yyyy";
 
     final static String DateTime = "DATETIME";
+
+    final static String ATTACHMENT_PATH = "C:\\Practice\\lms\\src\\main\\resources\\leaveAttachment";
 }

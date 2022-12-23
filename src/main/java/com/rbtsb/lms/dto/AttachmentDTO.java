@@ -15,10 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class AttachmentDTO {
-    private String fileId = UUID.randomUUID().toString();
     private String fileName;
-    private String fileType;
     private String directory;
-    private byte[] fileData;
-    private LeaveDTO leaveDTO;
+    private String leaveReason;
+    private String employeeName;
 }
