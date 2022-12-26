@@ -1,8 +1,10 @@
 package com.rbtsb.lms.service.serviceImpl;
 
 import com.rbtsb.lms.dto.AttachmentDTO;
+import com.rbtsb.lms.dto.LeaveDTO;
 import com.rbtsb.lms.entity.AttachmentEntity;
 import com.rbtsb.lms.repo.AttachmentRepo;
+import com.rbtsb.lms.repo.LeaveDTORepo;
 import com.rbtsb.lms.service.AttachmentService;
 import com.rbtsb.lms.service.mapper.AttachmentMapper;
 import com.rbtsb.lms.service.mapper.LeaveMapper;
@@ -22,6 +24,9 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Autowired
     private AttachmentRepo attachmentRepo;
+
+    @Autowired
+    private LeaveDTORepo leaveDTORepo;
 
     @Override
     public String insertAttachment(AttachmentDTO attachmentDTO) {
@@ -97,17 +102,18 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public String uploadFile(MultipartFile file, AttachmentDTO attachmentDTO) throws IOException {
-        AttachmentDTO attachment = new AttachmentDTO();
+        AttachmentEntity attachment = new AttachmentEntity();
 
         if(!attachmentDTO.equals(null)){
-            attachment.setFileId(attachmentDTO.getFileId());
             attachment.setFileName(file.getOriginalFilename());
             attachment.setDirectory(attachmentDTO.getDirectory());
             attachment.setFileType(file.getContentType());
-            attachment.setLeaveDTO(attachmentDTO.getLeaveDTO());
-
+            Optional<LeaveDTO> leave = leaveDTORepo.findByName(attachmentDTO.getFileName());
+            if(leave.isPresent()){
+                attachment.setLeaveEntity(LeaveMapper.DTOToEntity(leave.get()));
+            }
             attachment.setFileData(FileUtil.compressImage(file.getBytes()));
-            attachmentRepo.saveAndFlush(AttachmentMapper.DTOToEntity(attachment));
+            attachmentRepo.saveAndFlush(attachment);
             return "Upload file successfully.";
         }
         else{
