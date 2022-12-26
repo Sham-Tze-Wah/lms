@@ -52,14 +52,26 @@ public class LeaveServiceImpl implements LeaveService {
         if(leave.isPresent()){
             if(!leaveDTO.getReason().equalsIgnoreCase("")){
                 if(!leaveDTO.getLeaveStatus().equals(null)){
-                    if(!leaveDTO.getEmployeePojo().equals(null)){
-                        leave.get().setLeaveId(leaveDTO.getLeaveId());
-                        leave.get().setLeaveStatus(leaveDTO.getLeaveStatus());
-                        leave.get().setReason(leaveDTO.getReason());
-                        leave.get().setDescription(leaveDTO.getDescription());
-                        //leave.get().setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
-                        leaveDTORepo.saveAndFlush(leave.get());
-                        return "Updated successfully.";
+                    if(!leaveDTO.getEmployeeName().equals(null)){
+                        if(!leaveDTO.getDateLeave().equals(null)){
+                            Optional<Integer> leave_id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(), leaveDTO.getEmployeeName(), leaveDTO.getDateLeave());
+                            if(leave_id.isPresent()){
+                                leave.get().setLeaveId(leave_id.get());
+                                leave.get().setLeaveStatus(leaveDTO.getLeaveStatus());
+                                leave.get().setReason(leaveDTO.getReason());
+                                leave.get().setDescription(leaveDTO.getDescription());
+                                leave.get().setDateLeave(leaveDTO.getDateLeave());
+                                //leave.get().setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
+                                leaveDTORepo.saveAndFlush(leave.get());
+                                return "Updated successfully.";
+                            }
+                            else{
+                                return "Please apply the new leave first before update.";
+                            }
+                        }
+                        else{
+                            return "The leave date must be provided.";
+                        }
                     }
                     else{
                         return "leave application must belongs to at least one employee.";

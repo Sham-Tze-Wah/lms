@@ -12,4 +12,5 @@ public interface LeaveService {
     public String updateLeaveStatus(int id, LeaveDTO leaveDTO);
 
     public String deleteLeaveById(int id);
+
 }
