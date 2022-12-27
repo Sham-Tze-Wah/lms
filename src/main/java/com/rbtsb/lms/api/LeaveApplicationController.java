@@ -30,10 +30,8 @@ public class LeaveApplicationController {
         try{
             if(!leaveDTO.getReason().equalsIgnoreCase("")){
                 if(!leaveDTO.getLeaveStatus().equals(null)){
-                    Optional<EmployeePojo> empPojo = Optional.ofNullable(employeeService.getEmployeeByName(leaveDTO.getEmployeePojo().getName()))
-                            .orElse(null);
-                    leaveDTO.getEmployeePojo().setEmpId(empPojo.get().getEmpId());
-                    if(!leaveDTO.getEmployeePojo().equals(null)){
+                    Optional<EmployeePojo> emp  = employeeService.getEmployeeByName(leaveDTO.getEmployeeName());
+                    if(!leaveDTO.getEmployeeName().equalsIgnoreCase("") && emp.isPresent()){
                         return new ResponseEntity<>(leaveService.insertLeave(leaveDTO), HttpStatus.OK);
                     }
                     else{

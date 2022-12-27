@@ -8,6 +8,7 @@ import com.rbtsb.lms.util.SqlDataType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +35,11 @@ public class LeaveEntity {
 
     @Column(name="description", length= SqlDataType.VARCHAR255)
     private String description;
+
+    @Column(name = "date_leave") //in format of dd/mm/yyyy
+    @Temporal(TemporalType.TIMESTAMP)
+    @NonNull
+    private Date dateLeave = new Date();
 
     @ManyToOne()
     @JoinColumn(name="emp_id", referencedColumnName = "emp_id")

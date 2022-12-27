@@ -16,6 +16,7 @@ import java.util.UUID;
 @Data
 public class AttachmentDTO {
     private String fileName;
+    private String fileType;
     private String directory;
     private String leaveReason;
     private String employeeName;
