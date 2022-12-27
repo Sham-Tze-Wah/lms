@@ -1,6 +1,7 @@
 package com.rbtsb.lms.service;
 
 import com.rbtsb.lms.dto.AttachmentDTO;
+import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.pojo.EducationPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.pojo.WorkExperiencePojo;
@@ -26,7 +27,5 @@ public interface EmployeeService {
 
     public Optional<EmployeePojo> getEmployeePojo(int empId);
 
-
-
-
+    Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName);
 }

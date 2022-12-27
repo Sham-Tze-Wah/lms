@@ -23,9 +23,14 @@ public class LeaveServiceImpl implements LeaveService {
     @Autowired
     private LeaveDTORepo leaveDTORepo;
 
+    @Autowired
+    private LeaveMapper leaveMapper;
+
     @Override
     public String insertLeave(LeaveDTO leaveDTO) {
-        leaveDTORepo.saveAndFlush(LeaveMapper.DTOToEntity(leaveDTO));
+        leaveDTORepo.saveAndFlush(
+                leaveMapper.DTOToEntityCreate(leaveDTO)
+        );
         return "Insert successfully.";
     }
 
@@ -34,7 +39,7 @@ public class LeaveServiceImpl implements LeaveService {
         List<LeaveEntity> leaveEntities = leaveDTORepo.findAll();
         List<LeaveDTO> leaveDTOList = new ArrayList<>();
         leaveEntities.forEach(leaveEntity -> {
-            leaveDTOList.add(LeaveMapper.entityToDTO(leaveEntity));
+            leaveDTOList.add(leaveMapper.entityToDTO(leaveEntity));
         });
 
         if(!leaveDTOList.isEmpty()){

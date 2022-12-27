@@ -1,5 +1,5 @@
 package com.rbtsb.lms.constant;
 
-public class FileType {
-
+public enum FileType {
+    Image, Document, Video, Audio
 }

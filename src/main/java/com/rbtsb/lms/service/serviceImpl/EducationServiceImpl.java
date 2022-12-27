@@ -23,9 +23,15 @@ public class EducationServiceImpl implements EducationService {
     @Autowired
     private EducationRepo educationRepo;
 
+    @Autowired
+    private EducationMapper educationMapper;
+
+    @Autowired
+    private EmployeeMapper employeeMapper;
+
     @Override
     public String insertEducationByEmpId(EducationPojo educationPojo) {
-        educationRepo.saveAndFlush(EducationMapper.pojoToEntity(educationPojo));
+        educationRepo.saveAndFlush(educationMapper.pojoToEntity(educationPojo));
         return educationPojo.getEmployeePojo().toString() + " Insert successfully.";
 
     }
@@ -35,7 +41,7 @@ public class EducationServiceImpl implements EducationService {
         List<EducationEntity> educationEntities = educationRepo.findAll();
         List<EducationPojo> educationPojoList = new ArrayList<>();
         educationEntities.forEach(educationEntity -> {
-            educationPojoList.add(EducationMapper.entityToPojo(educationEntity));
+            educationPojoList.add(educationMapper.entityToPojo(educationEntity));
         });
 
         if(!educationPojoList.isEmpty()){
@@ -59,7 +65,7 @@ public class EducationServiceImpl implements EducationService {
                             educationPojoFromDB.setQualification(educationPojo.getQualification());
                             educationPojoFromDB.setInstitute(educationPojo.getInstitute());
                             educationPojoFromDB.setCourse(educationPojo.getCourse());
-                            educationPojoFromDB.setEmployeeEntity(EmployeeMapper.pojoToEntity(educationPojo.getEmployeePojo()));
+                            educationPojoFromDB.setEmployeeEntity(employeeMapper.pojoToEntity(educationPojo.getEmployeePojo()));
                             educationRepo.saveAndFlush(educationPojoFromDB);
                             return "Updated successfully";
                         }

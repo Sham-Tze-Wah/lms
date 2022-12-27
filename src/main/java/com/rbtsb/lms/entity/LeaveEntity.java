@@ -12,7 +12,7 @@ import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="LeaveApplicaion")
+@Table(name="LeaveApplication")
 @Entity
 @Data
 @Builder

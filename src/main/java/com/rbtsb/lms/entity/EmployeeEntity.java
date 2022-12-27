@@ -26,7 +26,7 @@ public class EmployeeEntity {
     @SequenceGenerator(name="emp_gen", sequenceName="emp_seq", allocationSize=1)
     @JsonIgnore
     @NonNull
-    private int empId = 0;
+    private int empId;
 
     @Column(name="name", nullable = false, unique=true, length = SqlDataType.VARCHAR100)
     @NonNull

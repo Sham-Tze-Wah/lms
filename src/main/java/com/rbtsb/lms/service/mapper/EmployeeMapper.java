@@ -2,9 +2,11 @@ package com.rbtsb.lms.service.mapper;
 
 import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.pojo.EmployeePojo;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EmployeeMapper {
-    public static EmployeePojo entityToPojo(EmployeeEntity employeeEntity){
+    public EmployeePojo entityToPojo(EmployeeEntity employeeEntity){
         EmployeePojo emp = new EmployeePojo();
         emp.setEmpId(employeeEntity.getEmpId());
         emp.setName(employeeEntity.getName());
@@ -19,7 +21,7 @@ public class EmployeeMapper {
         return emp;
     }
 
-    public static EmployeeEntity pojoToEntity(EmployeePojo employeePojo){
+    public EmployeeEntity pojoToEntity(EmployeePojo employeePojo){
         EmployeeEntity emp = new EmployeeEntity();
         emp.setEmpId(employeePojo.getEmpId());
         emp.setName(employeePojo.getName());

@@ -27,6 +27,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private EmployeeRepo employeeRepo;
 
+    @Autowired
+    private EmployeeMapper employeeMapper;
+
     private Logger log = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
     @Override
@@ -34,7 +37,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //System.out.println(employeePojo);
 
         log.debug("Employee Entity: "+employeePojo.toString());
-        employeeRepo.save(EmployeeMapper.pojoToEntity(employeePojo));
+        employeeRepo.save(employeeMapper.pojoToEntity(employeePojo));
         return "Insert successfully.";
 
 
@@ -45,7 +48,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<EmployeeEntity> employeeEntities = employeeRepo.findAll();
         List<EmployeePojo> employeePojoList = new ArrayList<>();
         employeeEntities.forEach(employeeEntity -> {
-            employeePojoList.add(EmployeeMapper.entityToPojo(employeeEntity));
+            employeePojoList.add(employeeMapper.entityToPojo(employeeEntity));
         });
 
         if(!employeePojoList.isEmpty()){
@@ -63,7 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if(emp.isPresent()){
             log.debug("Employee Entity: " + emp.get().toString());
-            return Optional.of(EmployeeMapper.entityToPojo(emp.get()));
+            return Optional.of(employeeMapper.entityToPojo(emp.get()));
         }
         else{
             return null;
@@ -72,7 +75,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Optional<EmployeePojo> getEmployeeByName(String name) {
-        return Optional.ofNullable(Optional.of(EmployeeMapper.entityToPojo(employeeRepo.getEmployeeByName(name).get()))).orElse(null);
+        return Optional.ofNullable(Optional.of(employeeMapper.entityToPojo(employeeRepo.getEmployeeByName(name).get()))).orElse(null);
     }
 
     @Override
@@ -98,7 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                                 }
                                 else{
                                     employeePojo.setDateJoined(new Date());
-                                    employeeRepo.saveAndFlush(EmployeeMapper.pojoToEntity(employeePojo));
+                                    employeeRepo.saveAndFlush(employeeMapper.pojoToEntity(employeePojo));
                                     return "Insert successfully.";
                                 }
                             }
@@ -143,14 +146,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Optional<EmployeePojo> getEmployeePojo(int empId) {
         Optional<EmployeeEntity> entity = employeeRepo.findById(empId);
         if(entity.isPresent()){
-            return Optional.of(EmployeeMapper.entityToPojo(entity.get()));
+            return Optional.of(employeeMapper.entityToPojo(entity.get()));
         }
         else{
             return null;
         }
     }
 
-
+    @Override
+    public Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName) {
+        return employeeRepo.getEmployeeByName(employeeName);
+    }
 
 
 }

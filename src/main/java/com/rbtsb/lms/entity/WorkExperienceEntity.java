@@ -36,9 +36,9 @@ public class WorkExperienceEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateJoined;
 
-    @Column(name = "date_leave") //in format of dd/mm/yyyy
+    @Column(name = "date_resign") //in format of dd/mm/yyyy
     @Temporal(TemporalType.TIMESTAMP)
-    private Date dateLeave;
+    private Date dateResign;
 
     @ManyToOne
     @JoinColumn(name="emp_id", referencedColumnName = "emp_id")

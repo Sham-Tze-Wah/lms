@@ -38,6 +38,9 @@ class EmployeeControllerTest {
     @MockBean
     private EmployeeService employeeService;
 
+    @MockBean
+    private EmployeeMapper employeeMapper;
+
     private EmployeeEntity employeeEntity;
 
     private EmployeePojo employeePojo;
@@ -55,7 +58,7 @@ class EmployeeControllerTest {
                 .dateJoined(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX").parse("2022-12-21T01:57:55.000+00:00"))
                 .build();
 
-        this.employeePojo = EmployeeMapper.entityToPojo(employeeEntity);
+        this.employeePojo = employeeMapper.entityToPojo(employeeEntity);
     }
 
     @Test //positive
@@ -71,7 +74,7 @@ class EmployeeControllerTest {
                 .dateJoined(new Date())
                 .build();
 
-        this.employeePojo = EmployeeMapper.entityToPojo(employeeEntity);
+        this.employeePojo = employeeMapper.entityToPojo(employeeEntity);
 
         Mockito.when(employeeService.insertEmployee(employeePojo))
                 .thenReturn("Insert successfully.");
@@ -165,7 +168,7 @@ class EmployeeControllerTest {
                 .dateJoined(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX").parse("2022-12-21T01:57:55.000+00:00"))
                 .build();
 
-        this.employeePojo = EmployeeMapper.entityToPojo(employeeEntity);
+        this.employeePojo = employeeMapper.entityToPojo(employeeEntity);
 
         Mockito.when(employeeService.getEmployeeById(id))
                 .thenReturn(Optional.of(employeePojo));
