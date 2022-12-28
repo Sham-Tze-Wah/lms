@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -34,10 +35,13 @@ public class AttachmentController {
 
     private Logger log = LoggerFactory.getLogger(AttachmentController.class);
 
+    //@Autowired
+    //private MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+
     @PostMapping("/post")
-    public ResponseEntity<?> insertAttachment(@RequestParam("fileName") String fileName,
-                                              @RequestParam("fileType") FileType fileType,
-                                              @RequestParam("directory") String directory,
+    public ResponseEntity<?> insertAttachment(//@RequestParam("fileName") String fileName,
+                                              //@RequestParam("fileType") FileType fileType,
+                                              //@RequestParam("directory") String directory,
                                               @RequestParam("leaveReason") String leaveReason,
                                               @RequestParam("employeeName") String employeeName,
                                               @RequestParam(value = "dateLeave", required = false) String dateLeave,
@@ -45,57 +49,59 @@ public class AttachmentController {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         try{
             if(!leaveReason.equals(null)){
-                if(!directory.equalsIgnoreCase("")){
-                    if(!fileName.equalsIgnoreCase("") && !attachmentService.getAttachmentByFileName(fileName).isPresent()){
-                        if(!fileType.toString().equalsIgnoreCase("")){
-                            if(!attachmentDTO.getDateLeave().equals(null) || !dateLeave.equals(null)){
-                                Optional<EmployeeEntity> empName = employeeService.getEmployeeByEmployeeName(employeeName);
-                                if(!employeeName.equalsIgnoreCase("") &&
-                                        empName.isPresent()){
-                                    if(!file.isEmpty()){
-                                        attachmentDTO.setFileName(fileName);
-                                        attachmentDTO.setFileType(fileType.toString());
-//                                        try{
-                                            if(dateLeave!= null){
-                                                attachmentDTO.setDateLeave(new SimpleDateFormat("yyyy-mm-dd").parse(dateLeave.toString()));
-                                            }
-//                                        }
-//                                        catch(Exception ex){
+                if(!file.isEmpty()){
+                    String directory = file.getResource().getURL().getPath();
+                    if(!directory.equalsIgnoreCase("")){ //directory
+                        String fileName = file.getOriginalFilename();
+                        if(!fileName.equalsIgnoreCase("") && !attachmentService.getAttachmentByFileName(fileName).isPresent()){
+                            MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+                            String fileType = fileTypeMap.getContentType(file.getName());
+                            if(!fileType.equalsIgnoreCase("")){
+                                if(!attachmentDTO.getDateLeave().equals(null) || !dateLeave.equals(null)){
+                                    Optional<EmployeeEntity> empName = employeeService.getEmployeeByEmployeeName(employeeName);
+                                    if(!employeeName.equalsIgnoreCase("") &&
+                                            empName.isPresent()){
 
+                                        attachmentDTO.setFileName(fileName);
+                                        attachmentDTO.setFileType(fileType);
+
+                                        if(dateLeave!= null){
+                                            attachmentDTO.setDateLeave(new SimpleDateFormat("yyyy-mm-dd").parse(dateLeave.toString()));
+                                        }
+
+                                        attachmentDTO.setDirectory(directory);
+                                        attachmentDTO.setLeaveReason(leaveReason);
+                                        attachmentDTO.setEmployeeName(employeeName);
+                                        return new ResponseEntity<>(
+                                                attachmentService.insertAttachment(
+                                                        attachmentDTO,
+                                                        file
+                                                ), HttpStatus.OK);
 //                                        }
-//                                        finally{
-                                            attachmentDTO.setDirectory(directory);
-                                            attachmentDTO.setLeaveReason(leaveReason);
-                                            attachmentDTO.setEmployeeName(employeeName);
-                                            return new ResponseEntity<>(
-                                                    attachmentService.insertAttachment(
-                                                    attachmentDTO,
-                                                    file
-                                            ), HttpStatus.OK);
-//                                        }
+
                                     }
                                     else{
-                                        return new ResponseEntity<>("the attachment is not attached to any leave.",HttpStatus.UNPROCESSABLE_ENTITY);
+                                        return new ResponseEntity<>("employee cannot be null and must be the company employee.", HttpStatus.UNPROCESSABLE_ENTITY);
                                     }
                                 }
                                 else{
-                                    return new ResponseEntity<>("employee cannot be null and must be the company employee.", HttpStatus.UNPROCESSABLE_ENTITY);
+                                    return new ResponseEntity<>("date leave cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
                                 }
                             }
                             else{
-                                return new ResponseEntity<>("date leave cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
+                                return new ResponseEntity<>("file type cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
                             }
                         }
                         else{
-                            return new ResponseEntity<>("file type cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
+                            return new ResponseEntity<>( "file name cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
                         }
                     }
                     else{
-                        return new ResponseEntity<>( "file name cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
+                        return new ResponseEntity<>( "attachment directory cannot be null.", HttpStatus.UNPROCESSABLE_ENTITY);
                     }
                 }
                 else{
-                    return new ResponseEntity<>( "attachment directory cannot be null.", HttpStatus.UNPROCESSABLE_ENTITY);
+                    return new ResponseEntity<>("the attachment is not attached to any leave.",HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             }
             else{
@@ -116,20 +122,23 @@ public class AttachmentController {
 
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateAttachmentById(@PathVariable("id") String id,
-                                                  @RequestParam("fileName") String fileName,
-                                                  @RequestParam("fileType") FileType fileType,
-                                                  @RequestParam("directory") String directory,
+                                                  //@RequestParam("fileName") String fileName,
+                                                  //@RequestParam("fileType") FileType fileType,
+                                                  //@RequestParam("directory") String directory,
                                                   @RequestParam("leaveReason") String leaveReason,
                                                   @RequestParam("employeeName") String employeeName,
                                                   @RequestParam(value = "dateLeave", required = false) Date dateLeave,
                                                   @RequestParam("image") MultipartFile file) throws IOException{
         AttachmentDTO attachmentDTO = new AttachmentDTO();
-        attachmentDTO.setFileName(fileName);
-        attachmentDTO.setFileType(fileType.toString());
+        attachmentDTO.setFileName(file.getOriginalFilename());
+
+        MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+        attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
+
+        attachmentDTO.setDirectory(file.getResource().getURL().getPath());
         if(!dateLeave.equals(null)){
             attachmentDTO.setDateLeave(dateLeave);
         }
-        attachmentDTO.setDirectory(directory);
         attachmentDTO.setLeaveReason(leaveReason);
         attachmentDTO.setEmployeeName(employeeName);
         return new ResponseEntity<>(attachmentService.updateAttachmentById(id, attachmentDTO, file), HttpStatus.OK);
@@ -142,19 +151,24 @@ public class AttachmentController {
 
     @PostMapping("/post/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("image")MultipartFile file,
-                                         @RequestParam("fileName") String fileName,
-                                         @RequestParam("fileType") FileType fileType,
-                                         @RequestParam("directory") String directory,
+//                                         @RequestParam("fileName") String fileName,
+//                                         @RequestParam("fileType") FileType fileType,
+//                                         @RequestParam("directory") String directory,
                                          @RequestParam("leaveReason") String leaveReason,
                                          @RequestParam("employeeName") String employeeName,
                                          @RequestParam(value = "dateLeave", required = false) Date dateLeave) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
-        attachmentDTO.setFileName(fileName);
-        attachmentDTO.setFileType(fileType.toString());
+        attachmentDTO.setFileName(file.getOriginalFilename());
+
+        MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+        attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
+
+        attachmentDTO.setDirectory(file.getResource().getURL().getPath());
+
         if(!dateLeave.equals(null)){
             attachmentDTO.setDateLeave(dateLeave);
         }
-        attachmentDTO.setDirectory(directory);
+
         attachmentDTO.setLeaveReason(leaveReason);
         attachmentDTO.setEmployeeName(employeeName);
         String uploadImage = attachmentService.uploadFile(file, attachmentDTO);
