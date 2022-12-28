@@ -23,4 +23,6 @@ public interface AttachmentService {
     public byte[] downloadFile(String fileName);
 
     Optional<AttachmentEntity> getAttachmentByFileName(String fileName);
+
+    long getAttachmentLength();
 }

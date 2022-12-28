@@ -1,7 +1,9 @@
 package com.rbtsb.lms.api;
 
 import com.rbtsb.lms.constant.FileType;
+import com.rbtsb.lms.constant.GlobalConstant;
 import com.rbtsb.lms.dto.AttachmentDTO;
+import com.rbtsb.lms.entity.AttachmentEntity;
 import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.service.AttachmentService;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.validation.Valid;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,10 +53,17 @@ public class AttachmentController {
         try{
             if(!leaveReason.equals(null)){
                 if(!file.isEmpty()){
-                    String directory = file.getResource().getURL().getPath();
+                    File tempFile = new File(GlobalConstant.ATTACHMENT_PATH +"\\"+file.getOriginalFilename());
+                    file.transferTo(tempFile);
+                    String directory = tempFile.getAbsolutePath();
                     if(!directory.equalsIgnoreCase("")){ //directory
                         String fileName = file.getOriginalFilename();
-                        if(!fileName.equalsIgnoreCase("") && !attachmentService.getAttachmentByFileName(fileName).isPresent()){
+                        //long num =  attachmentService.getAttachmentLength();
+                        //Optional<AttachmentEntity> ety = attachmentService.getAttachmentByFileName(fileName);
+                        if(!fileName.equalsIgnoreCase("") && (
+                                !attachmentService.getAttachmentByFileName(fileName).isPresent() ||
+                                        attachmentService.getAttachmentLength()==0L
+                        )){
                             MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
                             String fileType = fileTypeMap.getContentType(file.getName());
                             if(!fileType.equalsIgnoreCase("")){
@@ -66,7 +76,7 @@ public class AttachmentController {
                                         attachmentDTO.setFileType(fileType);
 
                                         if(dateLeave!= null){
-                                            attachmentDTO.setDateLeave(new SimpleDateFormat("yyyy-mm-dd").parse(dateLeave.toString()));
+                                            attachmentDTO.setDateLeave(new SimpleDateFormat("yyyy-MM-dd").parse(dateLeave.toString()));
                                         }
 
                                         attachmentDTO.setDirectory(directory);
@@ -89,7 +99,7 @@ public class AttachmentController {
                                 }
                             }
                             else{
-                                return new ResponseEntity<>("file type cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
+                                return new ResponseEntity<>("file type cannot be null or duplicate", HttpStatus.UNPROCESSABLE_ENTITY);
                             }
                         }
                         else{
@@ -108,11 +118,12 @@ public class AttachmentController {
                 return new ResponseEntity<>( "this attachment is not used in any leave application.", HttpStatus.UNPROCESSABLE_ENTITY);
             }
         }
+        catch (IllegalStateException | IOException e) {
+            return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
+        }
         catch(Exception exception){
             return new ResponseEntity(exception.toString(),HttpStatus.BAD_REQUEST);
         }
-
-
     }
 
     @GetMapping("/get")
@@ -163,7 +174,7 @@ public class AttachmentController {
         MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
         attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
 
-        attachmentDTO.setDirectory(file.getResource().getURL().getPath());
+        attachmentDTO.setDirectory(file.getResource().getURI().toString());
 
         if(!dateLeave.equals(null)){
             attachmentDTO.setDateLeave(dateLeave);

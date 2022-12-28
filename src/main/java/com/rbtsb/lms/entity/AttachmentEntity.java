@@ -27,7 +27,7 @@ public class AttachmentEntity {
     @Column(name="file_name", nullable = false, unique=true, length = SqlDataType.VARCHAR30)
     private String fileName;
 
-    @Column(name="file_type", nullable = false, length= SqlDataType.VARCHAR16)
+    @Column(name="file_type", nullable = false, length= SqlDataType.VARCHAR50)
     //@Enumerated(value=EnumType.STRING)
     private String fileType;
 

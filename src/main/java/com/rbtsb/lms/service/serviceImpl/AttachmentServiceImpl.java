@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,19 +49,41 @@ public class AttachmentServiceImpl implements AttachmentService {
     public String insertAttachment(AttachmentDTO attachmentDTO, MultipartFile file) {
 
         try{
-            byte[] files = FileUtil.compressImage(file.getBytes());
-            AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntityCreate(
-                    attachmentDTO,files);
-            attachmentRepo.saveAndFlush(attachmentEntity);
+            String fileExtension = FileUtil.getFileExtension(file.getOriginalFilename());
+            if(!fileExtension.equalsIgnoreCase("")){
+                if(fileExtension.equalsIgnoreCase(".gif") ||
+                        fileExtension.equalsIgnoreCase(".png") ||
+                        fileExtension.equalsIgnoreCase(".jpg") ||
+                        fileExtension.equalsIgnoreCase(".jpeg")
+                ){
+                    byte[] files = FileUtil.compressImage(file.getBytes());
+                    AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntityCreate(
+                            attachmentDTO,files);
+                    attachmentRepo.saveAndFlush(attachmentEntity);
+                }
+                else{
+                    byte[] files = FileUtil.compressFile(file).getBytes();
+                    System.out.println(files.length);
+                    AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntityCreate(
+                            attachmentDTO, files);
+                    attachmentRepo.saveAndFlush(attachmentEntity);
+                }
+            }
+            else{
+                return "file extension should not be null";
+            }
         }
         catch(ParseException parseExp){
             log.error(parseExp.toString());
+            return parseExp.toString();
         }
         catch(IOException ioExp){
             log.error(ioExp.toString());
+            return ioExp.toString();
         }
         catch(Exception ex){
             log.error(ex.toString());
+            return ex.toString();
         }
         return "insert successfully";
     }
@@ -98,7 +121,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                                             attachmentDTO.getEmployeeName(),
                                             DateTimeUtil.yyyyMMddDate(attachmentDTO.getDateLeave())
                                     );
-                                    if(leave_id.isPresent() ){
+                                    if(leave_id.isPresent()){
                                         attachment.get().setFileId(id);
                                         attachment.get().setFileName(attachmentDTO.getFileName());
                                         attachment.get().setFileType(attachmentDTO.getFileType());
@@ -226,7 +249,17 @@ public class AttachmentServiceImpl implements AttachmentService {
         Optional<AttachmentEntity> dbAttachmentEntity = attachmentRepo.findByName(fileName);
 
         if(dbAttachmentEntity.isPresent()){
-            return FileUtil.decompressImage(dbAttachmentEntity.get().getFileData());
+            String fileExtension = FileUtil.getFileExtension(dbAttachmentEntity.get().getFileName());
+            if(fileExtension.equalsIgnoreCase(".gif") ||
+                    fileExtension.equalsIgnoreCase(".png") ||
+                    fileExtension.equalsIgnoreCase(".jpg") ||
+                    fileExtension.equalsIgnoreCase(".jpeg")){
+                return FileUtil.decompressImage(dbAttachmentEntity.get().getFileData());
+            }
+            else{
+                return FileUtil.decompressFile(dbAttachmentEntity.get().getFileName()).getBytes();
+            }
+
         }
         else{
             return null;
@@ -237,5 +270,10 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Optional<AttachmentEntity> getAttachmentByFileName(String fileName) {
         return attachmentRepo.findByName(fileName);
+    }
+
+    @Override
+    public long getAttachmentLength() {
+        return attachmentRepo.count();
     }
 }
