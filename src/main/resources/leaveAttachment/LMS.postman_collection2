@@ -1,0 +1,170 @@
+{
+	"info": {
+		"_postman_id": "791b5f29-5faf-47db-b240-3a29dc77a601",
+		"name": "LMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "PostEmployee",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/emp/add/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"emp",
+						"add",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetEmployee",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/user/get/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user",
+						"get",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostEducation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"qualification\":\"Degree\",\r\n    \"institute\":\"UTAR\",\r\n    \"course\":\"Software Engineering\",\r\n    \"employeeEntity\":{\r\n        \"name\" : \"Ahmad\",\r\n    \"phoneNo\" : \"0123456789\",\r\n    \"email\" : \"ahmad@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n    }\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostEducation2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"qualification\":\"Degree\",\r\n    \"institute\":\"TARUC\",\r\n    \"course\":\"ComputerScience\",\r\n    \"employeePojo\":{\r\n        \"emp_id\" : \"1\",\r\n        \"name\" : \"Ahmad\",\r\n    \"phoneNo\" : \"0123456789\",\r\n    \"email\" : \"ahmad@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n    }\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/emp/add/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"emp",
+						"add",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostWorkExp",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "PostLeave",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "PostAttachment",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Post Attachment 2",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Download image",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "fileName",
+							"value": "bear.jpg",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api/attachment/post/download",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"attachment",
+						"post",
+						"download"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
