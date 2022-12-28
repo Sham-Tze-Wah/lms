@@ -1,5 +1,6 @@
 package com.rbtsb.lms.service.serviceImpl;
 
+import com.rbtsb.lms.constant.LeaveStatus;
 import com.rbtsb.lms.dto.LeaveDTO;
 import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.entity.LeaveEntity;
@@ -102,7 +103,35 @@ public class LeaveServiceImpl implements LeaveService {
 
         if(leave.isPresent()){
             leaveDTORepo.deleteById(id);
-            return "deleted successfully";
+            return "Deleted successfully";
+        }
+        else{
+            return "the id provided is not exist";
+        }
+    }
+
+    @Override
+    public String approveLeaveStatus(int id) {
+        Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
+
+        if(leave.isPresent()){
+            leave.get().setLeaveStatus(LeaveStatus.Approved);
+            leaveDTORepo.saveAndFlush(leave.get());
+            return "Approved status updated successfully.";
+        }
+        else{
+            return "the id provided is not exist";
+        }
+    }
+
+    @Override
+    public String rejectLeaveStatus(int id) {
+        Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
+
+        if(leave.isPresent()){
+            leave.get().setLeaveStatus(LeaveStatus.Rejected);
+            leaveDTORepo.saveAndFlush(leave.get());
+            return "Rejected status updated successfully.";
         }
         else{
             return "the id provided is not exist";

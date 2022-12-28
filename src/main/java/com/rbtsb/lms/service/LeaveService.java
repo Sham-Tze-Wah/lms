@@ -13,4 +13,7 @@ public interface LeaveService {
 
     public String deleteLeaveById(int id);
 
+    String approveLeaveStatus(int id);
+
+    String rejectLeaveStatus(int id);
 }

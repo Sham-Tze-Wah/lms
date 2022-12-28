@@ -161,13 +161,13 @@ public class AttachmentServiceImpl implements AttachmentService {
             }
         }
         catch(IOException ioEx){
-
+            return ioEx.toString();
         }
         catch(ParseException paEx){
-
+            return paEx.toString();
         }
         catch(Exception ex){
-
+            return ex.toString();
         }
         return response.toString();
     }
@@ -210,13 +210,13 @@ public class AttachmentServiceImpl implements AttachmentService {
             }
         }
         catch(IOException ioEx){
-
+            return ioEx.toString();
         }
         catch(ParseException paEx){
-
+            return paEx.toString();
         }
         catch(Exception ex){
-
+            return ex.toString();
         }
         return response.toString();
     }

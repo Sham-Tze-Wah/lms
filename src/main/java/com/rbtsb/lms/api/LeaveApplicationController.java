@@ -1,6 +1,7 @@
 package com.rbtsb.lms.api;
 
 import com.rbtsb.lms.dto.LeaveDTO;
+import com.rbtsb.lms.entity.LeaveEntity;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.repo.LeaveDTORepo;
 import com.rbtsb.lms.service.EmployeeService;
@@ -76,11 +77,46 @@ public class LeaveApplicationController {
 
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateLeaveApplicationById(@PathVariable("id") int id, @RequestBody @Valid @NonNull LeaveDTO leaveDTO){
-        return new ResponseEntity<>(leaveService.updateLeaveStatus(id, leaveDTO), HttpStatus.OK);
+        String response = leaveService.updateLeaveStatus(id, leaveDTO);
+        if(response.equalsIgnoreCase("Updated successfully.")){
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteLeaveApplicationById(@PathVariable("id") int id){
-        return new ResponseEntity<>(leaveService.deleteLeaveById(id), HttpStatus.OK);
+        String response = leaveService.deleteLeaveById(id);
+        if(response.equalsIgnoreCase("Deleted successfully")){
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<?> approveLeaveApplication(@PathVariable("id") int id){
+        String response = leaveService.approveLeaveStatus(id);
+        if(response.equalsIgnoreCase("Approved status updated successfully.")){
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/reject")
+    public ResponseEntity<?> rejectLeaveApplication(@PathVariable("id") int id){
+        String response = leaveService.rejectLeaveStatus(id);
+        if(response.equalsIgnoreCase("Rejected status updated successfully.")){
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 }
