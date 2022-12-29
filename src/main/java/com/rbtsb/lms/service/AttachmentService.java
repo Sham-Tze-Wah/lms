@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AttachmentService {
-    public String insertAttachment(AttachmentDTO attachmentDTO, MultipartFile file) throws IOException;
+
+    public void insertAttachment(AttachmentDTO attachmentDTO, MultipartFile file);
+
+    @Deprecated
+    public String insertAAttachment(AttachmentDTO attachmentDTO, String fileName, byte[] file) throws IOException;
 
     public List<AttachmentDTO> getAllAttachment();
 
@@ -18,9 +22,15 @@ public interface AttachmentService {
 
     public String deleteAttachmentById(String id);
 
+    @Deprecated
+    public String uploadImage(MultipartFile file, AttachmentDTO attachmentDTO) throws IOException;
+
     public String uploadFile(MultipartFile file, AttachmentDTO attachmentDTO) throws IOException;
 
     public byte[] downloadFile(String fileName);
+
+    @Deprecated
+    public byte[] downloadFileFromDB(String fileName);
 
     Optional<AttachmentEntity> getAttachmentByFileName(String fileName);
 

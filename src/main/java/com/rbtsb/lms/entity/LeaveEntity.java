@@ -41,6 +41,16 @@ public class LeaveEntity {
     @NonNull
     private Date dateLeave = new Date();
 
+//    @Column(name = "date_leave_start") //in format of dd/mm/yyyy
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @NonNull
+//    private Date dateLeaveStart = new Date();
+//
+//    @Column(name = "date_leave_end")
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @NonNull
+//    private Date dateLeaveEnd = new Date();
+
     @ManyToOne()
     @JoinColumn(name="emp_id", referencedColumnName = "emp_id")
     private EmployeeEntity employeeEntity;

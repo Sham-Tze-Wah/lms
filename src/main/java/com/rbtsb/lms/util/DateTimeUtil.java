@@ -15,4 +15,9 @@ public class DateTimeUtil {
         String dateStr = DateToString(inputDate);
         return new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
     }
+
+    public static String yyyyMMddhhmmssDateTime(Date inputDate) throws ParseException {
+        Date date = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(inputDate.toString());
+        return new SimpleDateFormat("yyyy-MM-dd'T'hh-mm-ss").format(date);
+    }
 }

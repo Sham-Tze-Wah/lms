@@ -1,16 +1,23 @@
 package com.rbtsb.lms.util;
 
 import com.rbtsb.lms.constant.GlobalConstant;
+import com.rbtsb.lms.error.ErrorAction;
+import jdk.nashorn.internal.objects.Global;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.Inflater;
-import java.util.zip.InflaterOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.zip.*;
 
 public class FileUtil {
     public static byte[] compressImage(byte[] data){
@@ -56,49 +63,322 @@ public class FileUtil {
 
     }
 
-    public static String compressFile(MultipartFile file) throws IOException {
-        String fileExtension = getFileExtension(file.getOriginalFilename());
+    @Deprecated
+    public static byte[] compressFileWithFileName(String originalFileName) throws IOException {
+        String fileExtension = getFileExtension(originalFileName);
 
-        String fileName = getFileName(file.getOriginalFilename());
+        String fileName = getFileName(originalFileName);
 
-        String filePath = GlobalConstant.ATTACHMENT_PATH + "\\" + fileName + fileExtension;
-        String compFilePath = GlobalConstant.ATTACHMENT_PATH + "\\" + fileName + "Compressed" + fileExtension;
-
-
+        String filePath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName + fileExtension;
+        String compFilePath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName + "_Compressed" + fileExtension;
 
         try{
+            String compDirectory = getFileName(compFilePath) + "_" +
+                    DateTimeUtil.yyyyMMddhhmmssDateTime(new Date()) +
+                    fileExtension;
+
             FileInputStream fileRead = new FileInputStream(filePath);
-            FileOutputStream fileWrite = new FileOutputStream(compFilePath);
+            FileOutputStream fileWrite = new FileOutputStream(compDirectory);
+            ByteArrayOutputStream dbWrite = new ByteArrayOutputStream();
 
             DeflaterOutputStream comp = new DeflaterOutputStream(fileWrite);
+            DeflaterOutputStream compDB = new DeflaterOutputStream(dbWrite);
 
             int data;
 
             while((data=fileRead.read())!=-1){
                 comp.write(data);
+                compDB.write(data);
             }
 
             fileRead.close();
             comp.close();
+            compDB.close();
 
             long originalSize = new File(filePath).length();
-            long compSize = new File(compFilePath).length();
+            long compSize = new File(compDirectory).length();
 
             if(originalSize > compSize){
-                return "compress successfully.";
+                return dbWrite.toByteArray();
             }
             else{
-                File fileToDelete = new File(compFilePath);
+                File fileToDelete = new File(compDirectory);
                 fileToDelete.delete();
-                return "Can't compress file. The uploaded file is not saved.";
+                //return "Can't compress file. The uploaded file is not saved.";
+                return new byte[0];
             }
 
         }
         catch(Exception ex){
-            return "compress failed";
+            return new byte[0];
+            //return "compress failed";
         }
         //Path fileNameAndPAth = Paths.get(GlobalConstant.ATTACHMENT_PATH, file.getOriginalFilename())
         //Files.write(fileNameAndPAth, file.getBytes());
+    }
+
+    public static byte[] compressFile(byte[] fileData, String directory) throws IOException {
+
+        try{
+            String fileName = getFileName(directory);
+            String fileExtension = getFileExtension(directory);
+            String compDirectory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName + fileExtension;
+
+            ByteArrayInputStream byteRead = new ByteArrayInputStream(fileData);
+
+            FileOutputStream fileWrite = new FileOutputStream(compDirectory);
+            ByteArrayOutputStream dbWrite = new ByteArrayOutputStream();
+
+            DeflaterOutputStream compFile = new DeflaterOutputStream(fileWrite);
+            DeflaterOutputStream compDB = new DeflaterOutputStream(dbWrite);
+
+            int data;
+
+            while((data=byteRead.read())!=-1){
+                compFile.write(data);
+                compDB.write(data);
+            }
+
+            byteRead.close();
+            compFile.close();
+            compDB.close();
+
+            long originalSize = fileData.length;
+            long compSize = new File(compDirectory).length();
+
+            if(originalSize > compSize){
+                return dbWrite.toByteArray();
+            }
+            else{
+                File fileToDelete = new File(compDirectory);
+                fileToDelete.delete();
+                //return "Can't compress file. The uploaded file is not saved.";
+                return new byte[0];
+            }
+
+        }
+        catch(Exception ex){
+            return new byte[0];
+            //return "compress failed";
+        }
+    }
+
+    @Deprecated
+    public static byte[] compressFileNoSaveInFolder(byte[] fileData){
+        try{
+            String compDirectory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" +
+                    DateTimeUtil.yyyyMMddhhmmssDateTime(new Date()) + "_Compressed" + ".txt";
+
+            ByteArrayInputStream byteRead = new ByteArrayInputStream(fileData);
+
+            //FileOutputStream fileWrite = new FileOutputStream(compDirectory);
+            ByteArrayOutputStream dbWrite = new ByteArrayOutputStream();
+
+            //DeflaterOutputStream compFile = new DeflaterOutputStream(fileWrite);
+            DeflaterOutputStream compDB = new DeflaterOutputStream(dbWrite);
+
+            int data;
+
+            while((data=byteRead.read())!=-1){
+                //compFile.write(data);
+                compDB.write(data);
+            }
+
+            byteRead.close();
+            //compFile.close();
+            compDB.close();
+
+            long originalSize = fileData.length;
+            long compSize = new File(compDirectory).length();
+
+            if(originalSize > compSize){
+                return dbWrite.toByteArray();
+            }
+            else{
+                File fileToDelete = new File(compDirectory);
+                fileToDelete.delete();
+                //return "Can't compress file. The uploaded file is not saved.";
+                return new byte[0];
+            }
+
+        }
+        catch(Exception ex){
+            return new byte[0];
+            //return "compress failed";
+        }
+    }
+
+    @Deprecated
+    public static byte[] decompressFileFromFolder(String file, byte[] fileData){
+        String fileExtension = getFileExtension(file);
+
+        String fileName = getFileName(file);
+
+        String filePath = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" + fileName + fileExtension;
+        String decompFilePath = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" + fileName + "Decompressed" + fileExtension;
+
+        ByteArrayOutputStream dbWrite = new ByteArrayOutputStream();
+
+        try{
+            FileInputStream fileRead = new FileInputStream(filePath);
+            FileOutputStream fileWrite = new FileOutputStream(decompFilePath);
+            InflaterOutputStream decomp = new InflaterOutputStream(fileWrite);
+
+            int data;
+
+            while((data=fileRead.read())!=-1){
+                decomp.write(data);
+            }
+
+            fileRead.close();
+            decomp.close();
+
+            long originalSize = new File(filePath).length();
+            long decompSize = new File(decompFilePath).length();
+
+            if(originalSize < decompSize){
+                //return "decompress successfully.";
+                return fileData;
+            }
+            else{
+                File fileToDelete = new File(decompFilePath);
+                fileToDelete.delete();
+                return new byte[0];
+                //return "Can't decompress file. The uploaded file is not saved.";
+            }
+
+        } catch (FileNotFoundException e) {
+            //return "decompress failed due to file not exists";
+        } catch (IOException e) {
+            //return "decompress failed due to file read error";
+        }
+        return new byte[0];
+    }
+
+    public static byte[] decompressFile(String file, byte[] fileData){
+        String fileExtension = getFileExtension(file);
+        String fileName = getFileName(file);
+        String filePath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName +  fileExtension;
+        String decompFilePath = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" + fileName + fileExtension;
+        //File fileDirectory = new File(decompFilePath);
+
+        ByteArrayInputStream dbRead = new ByteArrayInputStream(fileData);
+        ByteArrayOutputStream dbWrite = new ByteArrayOutputStream();
+        InflaterOutputStream decompByteArray = new InflaterOutputStream(dbWrite);
+
+        try{
+            String decompDirectory = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" + getFileName(decompFilePath) + "_" +
+                    DateTimeUtil.yyyyMMddhhmmssDateTime(new Date()) +
+                    fileExtension;
+            FileOutputStream fileWrite = new FileOutputStream(decompDirectory);
+            InflaterOutputStream decompFile = new InflaterOutputStream(fileWrite);
+            //check for file exist: if(fileDirectory.exists() && !fileDirectory.isDirectory())
+
+            byte[] buffer = new byte[1024];
+            for (int length; (length = dbRead.read(buffer)) != -1; ) {
+                decompByteArray.write(buffer, 0, length);
+                decompFile.write(buffer, 0, length);
+            }
+
+            dbRead.close();
+            decompFile.close();
+            decompByteArray.close();
+
+            long originalSize = new File(filePath).length();
+            long decompFileSize = new File(decompDirectory).length();
+
+            if(originalSize < decompFileSize){
+                return readFile(decompDirectory).getBytes(StandardCharsets.UTF_8);
+            }
+            else{
+                File fileToDelete = new File(decompFilePath);
+                fileToDelete.delete();
+                return "Can't decompress file. The uploaded file is not saved.".getBytes(StandardCharsets.UTF_8);
+            }
+
+
+        } catch (FileNotFoundException e) {
+            return ("decompress failed due to file not exists."+ ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return ("decompress failed due to file read error."+ ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+        } catch (ParseException e) {
+            return ("decompress failed due to date time error."+ ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+        }
+        catch(Exception ex){
+            return ("decompress failed due to internal error. " + ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+        }
+        finally {
+
+        }
+        //return new byte[0];
+        //return "File Name: " + fileDirectory + " decompress successfully.";
+    }
+
+//    public static byte[] decompressFileWithUnzip(String file, byte[] fileData){
+//        String fileExtension = getFileExtension(file);
+//
+//        String fileName = getFileName(file);
+//
+//        String filePath = GlobalConstant.ATTACHMENT_PATH + "\\" + fileName + fileExtension;
+//        String compFilePath = GlobalConstant.ATTACHMENT_PATH + "\\" + fileName + "Compressed" + fileExtension;
+//        String decompFilePath = GlobalConstant.ATTACHMENT_PATH + "\\" + fileName + "Decompressed" + fileExtension;
+//        Path tgt = Paths.get(decompFilePath);
+//
+//        try (OutputStream out = Files.newOutputStream(tgt)) {
+//            FileInputStream fileRead = new FileInputStream(filePath);
+//            ZipOutputStream zip = new ZipOutputStream(out);
+//            zip.putNextEntry(new ZipEntry(compFilePath));
+//
+//            int data;
+//
+//            while((data=fileRead.read())!=-1){
+//                zip.write(fileRead.read());
+//            }
+//
+//            // write the other files here
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return new byte[0];
+//    }
+
+    @Deprecated
+    public static String convertByteToString(byte[] data) {
+        StringBuilder content = new StringBuilder();
+        for(byte x : data){
+            content.append("" + x);
+        }
+        String finalContent = new String(content.toString().getBytes(StandardCharsets.US_ASCII));
+        return finalContent;
+    }
+
+    public static String readFile(String directory) throws IOException {
+        FileInputStream readFile = new FileInputStream(directory);
+        byte[] buffers = new byte[10];
+        StringBuilder sb = new StringBuilder();
+        while (readFile.read(buffers) != -1) {
+            sb.append(new String(buffers));
+            buffers = new byte[10];
+        }
+        readFile.close();
+        return sb.toString();
+    }
+
+    public static void writeImage(String fileName, byte[] data) throws IOException {
+        String fileNameWithoutExt = getFileName(fileName);
+        String ext = getFileExtension(fileName);
+        String directory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName;
+
+        // create the object of ByteArrayInputStream class
+        // and initialized it with the byte array.
+        ByteArrayInputStream inStreambj = new ByteArrayInputStream(data);
+
+        // read image from byte array
+        BufferedImage newImage = ImageIO.read(inStreambj);
+
+        // write output image
+        ImageIO.write(newImage, ext, new File(directory));
+        //System.out.println("Image generated from the byte array.");
     }
 
     public static String getFileExtension(String fileName){
@@ -115,55 +395,20 @@ public class FileUtil {
 
     public static String getFileName(String file){
         int getExtensionIndex = file.lastIndexOf('.');
+        int getPathSlashIndex = file.lastIndexOf('\\');
+        String fileName = "";
         if(getExtensionIndex > 0){
-            String fileName = file.substring(0, getExtensionIndex);
+            if(getPathSlashIndex > 0){
+                fileName = file.substring(getPathSlashIndex+1, getExtensionIndex);
+            }
+            else{
+                fileName = file.substring(0, getExtensionIndex);
+            }
             return fileName;
         }
         else{
             return null;
         }
 
-    }
-
-    public static String decompressFile(String file){
-        String fileExtension = getFileExtension(file);
-
-        String fileName = getFileName(file);
-
-        String filePath = GlobalConstant.ATTACHMENT_PATH + "\\" + fileName + fileExtension;
-        String decompFilePath = GlobalConstant.ATTACHMENT_PATH + "\\" + fileName + "Decompressed" + fileExtension;
-
-        try{
-            FileInputStream fileRead = new FileInputStream(filePath);
-            FileOutputStream fileWrite = new FileOutputStream(decompFilePath);
-
-            InflaterOutputStream decomp = new InflaterOutputStream(fileWrite);
-
-            int data;
-
-            while((data=fileRead.read())!=-1){
-                decomp.write(data);
-            }
-
-            fileRead.close();
-            decomp.close();
-
-            long originalSize = new File(filePath).length();
-            long decompSize = new File(decompFilePath).length();
-
-            if(originalSize < decompSize){
-                return "decompress successfully.";
-            }
-            else{
-                File fileToDelete = new File(decompFilePath);
-                fileToDelete.delete();
-                return "Can't decompress file. The uploaded file is not saved.";
-            }
-
-        } catch (FileNotFoundException e) {
-            return "decompress failed due to file not exists ";
-        } catch (IOException e) {
-            return "decompress failed due to file read error";
-        }
     }
 }
