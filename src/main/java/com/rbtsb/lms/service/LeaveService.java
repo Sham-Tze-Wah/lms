@@ -9,11 +9,11 @@ public interface LeaveService {
 
     public List<LeaveDTO> getAllLeave();
 
-    public String updateLeaveStatus(int id, LeaveDTO leaveDTO);
+    public String updateLeaveStatus(String id, LeaveDTO leaveDTO);
 
-    public String deleteLeaveById(int id);
+    public String deleteLeaveById(String id);
 
-    String approveLeaveStatus(int id);
+    String approveLeaveStatus(String id);
 
-    String rejectLeaveStatus(int id);
+    String rejectLeaveStatus(String id);
 }

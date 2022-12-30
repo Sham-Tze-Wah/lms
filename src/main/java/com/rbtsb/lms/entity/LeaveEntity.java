@@ -6,9 +6,11 @@ import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.util.SqlDataType;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,14 +19,17 @@ import java.util.Date;
 @Data
 @Builder
 public class LeaveEntity {
-    @Id
-    @Column(name="leave_id", unique = true)
+
     //@GeneratedValue(generator = "uuid") //you need to make the dao throw error as it is generated and set into entity.
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+//    @GeneratedValue(generator = "emp_gen",strategy = GenerationType.SEQUENCE)
+//    @SequenceGenerator(name="emp_gen", sequenceName="emp_seq", allocationSize=1)
+    @Id
+    @Column(name="leave_id", unique = true)
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     @JsonIgnore
     @NonNull
-    private int leaveId;
+    private String leaveId = UUID.randomUUID().toString();
 
     @Enumerated(value=EnumType.STRING)
     @Column(name="leave_status", length= SqlDataType.VARCHAR64, nullable = false)
@@ -51,7 +56,7 @@ public class LeaveEntity {
 //    @NonNull
 //    private Date dateLeaveEnd = new Date();
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="emp_id", referencedColumnName = "emp_id")
     private EmployeeEntity employeeEntity;
 }

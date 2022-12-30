@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/attachment")
 @RestController
@@ -44,13 +45,13 @@ public class AttachmentController {
 
     @PostMapping("/postAll")
     public ResponseEntity<?> insertAttachment(@RequestParam("leaveReason") String leaveReason,
-                                                 @RequestParam("employeeName") String employeeName,
-                                                 @RequestParam(value = "dateLeave", required = false) String dateLeave,
-                                                 @RequestParam("image") MultipartFile[] files){
+                                              @RequestParam("employeeName") String employeeName,
+                                              @RequestParam(value = "dateLeave", required = false) String dateLeave,
+                                              @RequestParam("file") MultipartFile[] files) {
 
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         String message = "";
-        try{
+        try {
             List<String> fileNames = new ArrayList<>();
 
             Arrays.asList(files).stream().forEach(file -> {
@@ -60,130 +61,162 @@ public class AttachmentController {
 
             message = "Uploaded the files successfully: " + fileNames;
             return ResponseEntity.status(HttpStatus.OK).body(message);
-        }
-        catch (IllegalStateException e) {
-            return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
-        }
-        catch(Exception exception){
-            return new ResponseEntity(exception.toString(),HttpStatus.BAD_REQUEST);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
+        } catch (Exception exception) {
+            return new ResponseEntity(exception.toString(), HttpStatus.BAD_REQUEST);
         }
 
     }
 
+    private String someErrorResponse() {
+        String error = "";
+        try {
+            return error;
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
     @PostMapping("/post")
-    public ResponseEntity<?> insertAAttachment(//@RequestParam("fileName") String fileName,
-                                              //@RequestParam("fileType") FileType fileType,
-                                              //@RequestParam("directory") String directory,
-                                              @RequestParam("leaveReason") String leaveReason,
-                                              @RequestParam("employeeName") String employeeName,
-                                              @RequestParam(value = "dateLeave", required = false) String dateLeave,
-                                              @RequestParam("file") MultipartFile file) throws IOException{
+    public ResponseEntity<?> insertAttachments(//@RequestParam("fileName") String fileName,
+                                               //@RequestParam("fileType") FileType fileType,
+                                               //@RequestParam("directory") String directory,
+                                               @RequestParam("leaveReason") String leaveReason,
+                                               @RequestParam("employeeName") String employeeName,
+                                               @RequestParam(value = "dateLeave", required = false) String dateLeave,
+                                               @RequestParam("file") MultipartFile[] files) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
-        byte[] fileData ;
+        byte[] fileData;
 
-        try{
-            if(!leaveReason.equals(null)){
-                if(!file.isEmpty()){
-                    String extension = FileUtil.getFileExtension(file.getOriginalFilename());
-                    String directory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\"+file.getOriginalFilename();
-                    boolean isPicture = FileValidation.isPicture(extension);
+        List<String> fileNames = new ArrayList<>();
 
-                    if(isPicture){
-                        fileData = FileUtil.compressImage(file.getBytes());
-                        FileUtil.writeImage(file.getOriginalFilename(),fileData);
-                    }
-                    else{
-                        FileUtil.compressFile(file.getBytes(), directory);
-                    }
+        try {
+            for (MultipartFile file : files) {
+                String extension = FileUtil.getFileExtension(file.getOriginalFilename());
+                String sourcePath = GlobalConstant.ATTACHMENT_PATH + "\\" + file.getOriginalFilename();
+                String sourceDirectory = GlobalConstant.ATTACHMENT_PATH;
+                String targetDirectory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\";
+                String targetPath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + file.getOriginalFilename();
 
-
-                    if(!directory.equalsIgnoreCase("")){ //directory
+                if (!leaveReason.equals(null)) {
+                    if (!targetPath.equalsIgnoreCase("")) { //path
                         String fileName = file.getOriginalFilename();
 
-                        if(!fileName.equalsIgnoreCase("") && (
+                        if (!fileName.equalsIgnoreCase("") && (
                                 !attachmentService.getAttachmentByFileName(fileName).isPresent() ||
-                                        attachmentService.getAttachmentLength()==0L
-                        )){
+                                        attachmentService.getAttachmentLength() == 0L
+                        )) {
                             MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
                             String fileType = fileTypeMap.getContentType(file.getName());
 
-                            if(!fileType.equalsIgnoreCase("")){
+                            if (!fileType.equalsIgnoreCase("")) {
 
-                                if(!attachmentDTO.getDateLeave().equals(null) || !dateLeave.equals(null)){
+                                if (!attachmentDTO.getDateLeave().equals(null) || !dateLeave.equals(null)) {
                                     Optional<EmployeeEntity> empName = employeeService.getEmployeeByEmployeeName(employeeName);
 
-                                    if(!employeeName.equalsIgnoreCase("") &&
-                                            empName.isPresent()){
+                                    if (!employeeName.equalsIgnoreCase("") &&
+                                            empName.isPresent()) {
                                         attachmentDTO.setFileName(fileName);
                                         attachmentDTO.setFileType(fileType);
 
-                                        if(dateLeave!= null){
+                                        if (dateLeave != null) {
                                             attachmentDTO.setDateLeave(new SimpleDateFormat("yyyy-MM-dd").parse(dateLeave.toString()));
                                         }
 
-                                        attachmentDTO.setDirectory(directory);
+                                        attachmentDTO.setDirectory(targetPath);
                                         attachmentDTO.setLeaveReason(leaveReason);
                                         attachmentDTO.setEmployeeName(employeeName);
 
-                                        return new ResponseEntity<>(
-                                                attachmentService.insertAAttachment(
-                                                        attachmentDTO,
-                                                        directory,
-                                                        file.getBytes()
-                                                ), HttpStatus.OK);
-//                                        }
+                                        if (!file.isEmpty()) {
+                                            fileData = file.getBytes();
+                                            boolean isPicture = FileValidation.isPicture(extension);
+                                            boolean isZip = FileValidation.isZip(extension);
 
-                                    }
-                                    else{
+                                            if(isZip){
+                                                //unzip files and assign the fileName to a list
+                                                List<String> unzipFileNames = FileUtil.unzipFiles(sourcePath, targetPath);
+
+                                                //compress a file
+                                                for(String unzipFileName : unzipFileNames){
+                                                    sourcePath = unzipFileName;
+                                                    FileUtil.compressFile(fileData, sourcePath);
+
+                                                    //save the file into the database
+                                                    attachmentService.insertAttachments(
+                                                            attachmentDTO,
+                                                            targetPath,
+                                                            fileData
+                                                    );
+                                                    fileData = new byte[0];
+                                                    fileNames.add(file.getOriginalFilename());
+                                                }
+
+                                            }
+                                            else{
+                                                if (isPicture) {
+                                                    fileData = FileUtil.compressImage(file.getBytes());
+                                                    FileUtil.writeImage(file.getOriginalFilename(), fileData);
+                                                }
+                                                else{
+                                                    FileUtil.compressFile(file.getBytes(), targetPath);
+                                                }
+                                                attachmentService.insertAttachments(
+                                                        attachmentDTO,
+                                                        targetPath,
+                                                        fileData
+                                                );
+                                                fileData = new byte[0];
+                                                fileNames.add(file.getOriginalFilename());
+                                            }
+
+
+                                        } else {
+                                            return new ResponseEntity<>("the attachment is not attached to any leave.", HttpStatus.UNPROCESSABLE_ENTITY);
+                                        }
+                                    } else {
                                         return new ResponseEntity<>("employee cannot be null and must be the company employee.", HttpStatus.UNPROCESSABLE_ENTITY);
                                     }
-                                }
-                                else{
+                                } else {
                                     return new ResponseEntity<>("date leave cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
                                 }
-                            }
-                            else{
+                            } else {
                                 return new ResponseEntity<>("file type cannot be null or duplicate", HttpStatus.UNPROCESSABLE_ENTITY);
                             }
+                        } else {
+                            return new ResponseEntity<>("file name cannot be null or duplicate", HttpStatus.UNPROCESSABLE_ENTITY);
                         }
-                        else{
-                            return new ResponseEntity<>( "file name cannot be null or duplicate", HttpStatus.UNPROCESSABLE_ENTITY);
-                        }
+                    } else {
+                        return new ResponseEntity<>("attachment directory cannot be null.", HttpStatus.UNPROCESSABLE_ENTITY);
                     }
-                    else{
-                        return new ResponseEntity<>( "attachment directory cannot be null.", HttpStatus.UNPROCESSABLE_ENTITY);
-                    }
-                }
-                else{
-                    return new ResponseEntity<>("the attachment is not attached to any leave.",HttpStatus.UNPROCESSABLE_ENTITY);
+                } else {
+                    return new ResponseEntity<>("this attachment is not used in any leave application.", HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             }
-            else{
-                return new ResponseEntity<>( "this attachment is not used in any leave application.", HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-        }
-        catch (IllegalStateException | IOException e) {
-            return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
-        }
-        catch(Exception exception){
-            return new ResponseEntity(exception.toString(),HttpStatus.BAD_REQUEST);
+
+            return new ResponseEntity<>("Files: +" + fileNames.stream().collect(Collectors.joining(" ")) +
+                    "\nInsert successfully", HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
+        } catch (Exception exception) {
+            return new ResponseEntity(exception.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getAllAttachment(){
+    public ResponseEntity<?> getAllAttachment() {
         return new ResponseEntity<>(attachmentService.getAllAttachment(), HttpStatus.OK);
     }
 
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateAnAttachmentById(@PathVariable("id") String id,
-                                                  //@RequestParam("fileName") String fileName,
-                                                  //@RequestParam("fileType") FileType fileType,
-                                                  //@RequestParam("directory") String directory,
-                                                  @RequestParam("leaveReason") String leaveReason,
-                                                  @RequestParam("employeeName") String employeeName,
-                                                  @RequestParam(value = "dateLeave", required = false) Date dateLeave,
-                                                  @RequestParam("image") MultipartFile file) throws IOException{
+                                                    //@RequestParam("fileName") String fileName,
+                                                    //@RequestParam("fileType") FileType fileType,
+                                                    //@RequestParam("directory") String directory,
+                                                    @RequestParam("leaveReason") String leaveReason,
+                                                    @RequestParam("employeeName") String employeeName,
+                                                    @RequestParam(value = "dateLeave", required = false) Date dateLeave,
+                                                    @RequestParam("image") MultipartFile file) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         attachmentDTO.setFileName(file.getOriginalFilename());
 
@@ -191,7 +224,7 @@ public class AttachmentController {
         attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
 
         attachmentDTO.setDirectory(file.getResource().getURL().getPath());
-        if(!dateLeave.equals(null)){
+        if (!dateLeave.equals(null)) {
             attachmentDTO.setDateLeave(dateLeave);
         }
         attachmentDTO.setLeaveReason(leaveReason);
@@ -200,18 +233,18 @@ public class AttachmentController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteAnAttachmentById(@PathVariable("id") String id){
+    public ResponseEntity<?> deleteAnAttachmentById(@PathVariable("id") String id) {
         return new ResponseEntity<>(attachmentService.deleteAttachmentById(id), HttpStatus.OK);
     }
 
     @PostMapping("/post/upload")
-    public ResponseEntity<?> uploadFile(@RequestParam("image")MultipartFile file,
+    public ResponseEntity<?> uploadFile(@RequestParam("image") MultipartFile file,
 //                                         @RequestParam("fileName") String fileName,
 //                                         @RequestParam("fileType") FileType fileType,
 //                                         @RequestParam("directory") String directory,
-                                         @RequestParam("leaveReason") String leaveReason,
-                                         @RequestParam("employeeName") String employeeName,
-                                         @RequestParam(value = "dateLeave", required = false) Date dateLeave) throws IOException {
+                                        @RequestParam("leaveReason") String leaveReason,
+                                        @RequestParam("employeeName") String employeeName,
+                                        @RequestParam(value = "dateLeave", required = false) Date dateLeave) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         attachmentDTO.setFileName(file.getOriginalFilename());
 
@@ -220,7 +253,7 @@ public class AttachmentController {
 
         attachmentDTO.setDirectory(file.getResource().getURI().toString());
 
-        if(!dateLeave.equals(null)){
+        if (!dateLeave.equals(null)) {
             attachmentDTO.setDateLeave(dateLeave);
         }
 
@@ -232,18 +265,17 @@ public class AttachmentController {
 
     @PostMapping("/post/download")
     public ResponseEntity<?> downloadFile(
-            @RequestParam("fileName") String fileName){
+            @RequestParam("fileName") String fileName) {
 
         // TODO: try catch for attachment
 
         String fileExtension = FileUtil.getFileExtension(fileName);
         boolean isPicture = FileValidation.isPicture(fileExtension);
-        if(isPicture){
+        if (isPicture) {
             byte[] data = attachmentService.downloadFile(fileName);
             return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("image/png"))
                     .body(data);
-        }
-        else{
+        } else {
             byte[] data = attachmentService.downloadFileFromDB(fileName);
             return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
                     .body(data); //FileUtil.convertByteToString(data)
@@ -253,7 +285,7 @@ public class AttachmentController {
 
     @PostMapping("/post/download/file")
     public ResponseEntity<?> downloadFileToFolder(
-            @RequestParam("fileName") String fileName){
+            @RequestParam("fileName") String fileName) {
         String fileExtension = FileUtil.getFileExtension(fileName);
 
         byte[] data = attachmentService.downloadFile(fileName);
@@ -261,15 +293,15 @@ public class AttachmentController {
                 .body(FileUtil.convertByteToString(data)); //FileUtil.convertByteToString(data)
     }
 
-//    @PostMapping("/post/download/filefromdb")
-//    public ResponseEntity<?> downloadFileFromDb(
-//            @RequestParam("fileName") String fileName){
-//        String fileExtension = FileUtil.getFileExtension(fileName);
-//
-//        String response = attachmentService.downloadFileFromDB(fileName);
-//        return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
-//                .body(response); //FileUtil.convertByteToString(data)
-//    }
+    @PostMapping("/post/download/filefromdb")
+    public ResponseEntity<?> downloadFileFromDb(
+            @RequestParam("fileName") String fileName) {
+        String fileExtension = FileUtil.getFileExtension(fileName);
+
+        byte[] response = attachmentService.downloadFileFromDB(fileName);
+        return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
+                .body(response); //FileUtil.convertByteToString(data)
+    }
 
     // TODO: Upload Zip file
 }

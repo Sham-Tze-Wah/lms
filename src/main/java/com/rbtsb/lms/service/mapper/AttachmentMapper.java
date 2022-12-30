@@ -53,7 +53,7 @@ public class AttachmentMapper {
         entity.setFileType(attachmentDTO.getFileType());
         entity.setDirectory(attachmentDTO.getDirectory());
         entity.setFileData(file);
-        Optional<Integer> leave_id = leaveDTORepo.findByReasonAndEmployeeAndDate(
+        Optional<String> leave_id = leaveDTORepo.findByReasonAndEmployeeAndDate(
                 attachmentDTO.getLeaveReason(),
                 attachmentDTO.getEmployeeName(),
                 DateTimeUtil.yyyyMMddDate(attachmentDTO.getDateLeave())

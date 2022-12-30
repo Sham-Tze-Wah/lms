@@ -20,12 +20,11 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Table(name = "Education")
 @Builder
 public class EducationEntity{
-    @Id
-    @Column(name="education_id", unique = true, nullable = false)
+
     //@GeneratedValue(generator = "uuid") //you need to make the dao throw error as it is generated and set into entity.
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
     //@GeneratedValue(generator="UUID")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+
 //    @SequenceGenerator(
 //            name = "edu_seq", //sequence name
 //            sequenceName = "edu_seq", //catalogue schema
@@ -35,6 +34,9 @@ public class EducationEntity{
 //            strategy = SEQUENCE, //strategy use to generate id
 //            generator = "edu_seq" //generator type for the sequence
 //    )
+    @Id
+    @Column(name="education_id", unique = true, nullable = false)
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     @NonNull
     @JsonIgnore
     private String educationId = UUID.randomUUID().toString();

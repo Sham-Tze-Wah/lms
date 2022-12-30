@@ -48,7 +48,7 @@ class EmployeeControllerTest {
     @BeforeEach
     void setUp() throws ParseException {
         this.employeeEntity = EmployeeEntity.builder()
-                .empId(3)
+                .empId("3")
                 .name("Abu")
                 .phoneNo("0143456789")
                 .email("abu@gmail.com")
@@ -124,7 +124,7 @@ class EmployeeControllerTest {
 
     @Test
     void getEmployeeById() throws Exception {
-        int id = 1;
+        String id = "1";
         //Optional<EmployeePojo> employeePojo1 = employeeService.getEmployeeById(id);
 
         Mockito.when(employeeService.
@@ -156,9 +156,9 @@ class EmployeeControllerTest {
 
     @Test
     void updateEmployeeById() throws Exception {
-        int id =1;
+        String id = "1"; //need to change
         this.employeeEntity = EmployeeEntity.builder()
-                .empId(1)
+                .empId("1")
                 .name("Abu")
                 .phoneNo("0143456789")
                 .email("abu@gmail.com")
@@ -200,7 +200,7 @@ class EmployeeControllerTest {
 
     @Test
     void deleteEmployeeById() throws Exception {
-        int id = 1;
+        String id = "1";
 
         Mockito.when(employeeService.deleteEmployeeById(id))
                 .thenReturn("deleted successfully.");

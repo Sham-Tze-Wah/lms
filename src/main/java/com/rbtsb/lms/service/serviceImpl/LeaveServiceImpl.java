@@ -52,7 +52,7 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public String updateLeaveStatus(int id, LeaveDTO leaveDTO) {
+    public String updateLeaveStatus(String id, LeaveDTO leaveDTO) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
 
         if(leave.isPresent()){
@@ -60,7 +60,7 @@ public class LeaveServiceImpl implements LeaveService {
                 if(!leaveDTO.getLeaveStatus().equals(null)){
                     if(!leaveDTO.getEmployeeName().equals(null)){
                         if(!leaveDTO.getDateLeave().equals(null)){
-                            Optional<Integer> leave_id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(), leaveDTO.getEmployeeName(), leaveDTO.getDateLeave());
+                            Optional<String> leave_id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(), leaveDTO.getEmployeeName(), leaveDTO.getDateLeave());
                             if(leave_id.isPresent()){
                                 leave.get().setLeaveId(leave_id.get());
                                 leave.get().setLeaveStatus(leaveDTO.getLeaveStatus());
@@ -98,7 +98,7 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public String deleteLeaveById(int id) {
+    public String deleteLeaveById(String id) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
 
         if(leave.isPresent()){
@@ -111,7 +111,7 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public String approveLeaveStatus(int id) {
+    public String approveLeaveStatus(String id) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
 
         if(leave.isPresent()){
@@ -125,7 +125,7 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public String rejectLeaveStatus(int id) {
+    public String rejectLeaveStatus(String id) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
 
         if(leave.isPresent()){

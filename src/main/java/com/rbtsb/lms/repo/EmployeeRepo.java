@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Transactional
 @Repository
-public interface EmployeeRepo extends JpaRepository<EmployeeEntity, Integer> {
+public interface EmployeeRepo extends JpaRepository<EmployeeEntity, String> {
     @Transactional
     @Query(value="SELECT * FROM employee WHERE name=?1",nativeQuery = true)
     Optional<EmployeeEntity> getEmployeeByName(String name);

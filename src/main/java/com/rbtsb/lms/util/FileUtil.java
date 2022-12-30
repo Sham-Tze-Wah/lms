@@ -16,8 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.zip.*;
+import java.util.List;
 
 public class FileUtil {
     public static byte[] compressImage(byte[] data){
@@ -117,11 +119,11 @@ public class FileUtil {
         //Files.write(fileNameAndPAth, file.getBytes());
     }
 
-    public static byte[] compressFile(byte[] fileData, String directory) throws IOException {
+    public static byte[] compressFile(byte[] fileData, String sourcePath) throws IOException {
 
         try{
-            String fileName = getFileName(directory);
-            String fileExtension = getFileExtension(directory);
+            String fileName = getFileName(sourcePath);
+            String fileExtension = getFileExtension(sourcePath);
             String compDirectory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName + fileExtension;
 
             ByteArrayInputStream byteRead = new ByteArrayInputStream(fileData);
@@ -147,6 +149,7 @@ public class FileUtil {
             long compSize = new File(compDirectory).length();
 
             if(originalSize > compSize){
+                String file = readFile(compDirectory);
                 return dbWrite.toByteArray();
             }
             else{
@@ -255,10 +258,10 @@ public class FileUtil {
         return new byte[0];
     }
 
-    public static byte[] decompressFile(String file, byte[] fileData){
+    public static byte[] decompressFileFromDB(String file, byte[] fileData){
         String fileExtension = getFileExtension(file);
         String fileName = getFileName(file);
-        String filePath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName +  fileExtension;
+        String originalPath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName +  fileExtension;
         String decompFilePath = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" + fileName + fileExtension;
         //File fileDirectory = new File(decompFilePath);
 
@@ -267,34 +270,42 @@ public class FileUtil {
         InflaterOutputStream decompByteArray = new InflaterOutputStream(dbWrite);
 
         try{
-            String decompDirectory = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" + getFileName(decompFilePath) + "_" +
+            String decompDirectory = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" +
+                    getFileName(decompFilePath) + "_" +
                     DateTimeUtil.yyyyMMddhhmmssDateTime(new Date()) +
                     fileExtension;
             FileOutputStream fileWrite = new FileOutputStream(decompDirectory);
             InflaterOutputStream decompFile = new InflaterOutputStream(fileWrite);
             //check for file exist: if(fileDirectory.exists() && !fileDirectory.isDirectory())
 
-            byte[] buffer = new byte[1024];
-            for (int length; (length = dbRead.read(buffer)) != -1; ) {
-                decompByteArray.write(buffer, 0, length);
-                decompFile.write(buffer, 0, length);
+            //byte[] buffer = new byte[1024];
+            //byte[] bufferFile = new byte[1024];
+            int data;
+            while((data=dbRead.read())!=-1){
+                //decompByteArray.write(data);
+                //decompFile.write(data);
+                fileWrite.write(data);
+                dbWrite.write(data);
             }
+//            for (int length; (length = dbRead.read(buffer)) != -1; ) {
+//                decompByteArray.write(buffer, 0, length);
+//            }
 
             dbRead.close();
             decompFile.close();
             decompByteArray.close();
-
-            long originalSize = new File(filePath).length();
-            long decompFileSize = new File(decompDirectory).length();
-
-            if(originalSize < decompFileSize){
-                return readFile(decompDirectory).getBytes(StandardCharsets.UTF_8);
-            }
-            else{
-                File fileToDelete = new File(decompFilePath);
-                fileToDelete.delete();
-                return "Can't decompress file. The uploaded file is not saved.".getBytes(StandardCharsets.UTF_8);
-            }
+            return dbWrite.toByteArray();
+//            long originalSize = new File(originalPath).length();
+//            long decompFileSize = new File(decompDirectory).length();
+//
+//            if(originalSize < decompFileSize){
+//                return dbWrite.toByteArray();
+//            }
+//            else{
+//                File fileToDelete = new File(decompDirectory);
+//                fileToDelete.delete();
+//                return "Can't decompress file. The uploaded file is not saved.".getBytes(StandardCharsets.UTF_8);
+//            }
 
 
         } catch (FileNotFoundException e) {
@@ -313,6 +324,81 @@ public class FileUtil {
         //return new byte[0];
         //return "File Name: " + fileDirectory + " decompress successfully.";
     }
+
+    public static void zipFiles(String... filePaths) {
+        try {
+            File firstFile = new File(filePaths[0]);
+            String zipFileName = firstFile.getName().concat(".zip");
+
+            FileOutputStream fos = new FileOutputStream(zipFileName);
+            ZipOutputStream zos = new ZipOutputStream(fos);
+
+            for (String aFile : filePaths) {
+                zos.putNextEntry(new ZipEntry(new File(aFile).getName()));
+
+                byte[] bytes = Files.readAllBytes(Paths.get(aFile));
+                zos.write(bytes, 0, bytes.length);
+                zos.closeEntry();
+            }
+
+            zos.close();
+
+        } catch (FileNotFoundException ex) {
+            System.err.println("A file does not exist: " + ex);
+        } catch (IOException ex) {
+            System.err.println("I/O error: " + ex);
+        }
+    }
+
+    public static List<String> unzipFiles(String zipFilePath, String destDir) {
+        //destDir = createFolder(destDir);
+        File dir = new File(destDir);
+        List<String> fileNames = new ArrayList<>();
+
+        // create output directory if it doesn't exist
+        if(!dir.exists()) dir.mkdirs();
+        FileInputStream fis;
+
+        //buffer for read and write data to file
+        byte[] buffer = new byte[1024];
+        try {
+            fis = new FileInputStream(zipFilePath);
+            ZipInputStream zis = new ZipInputStream(fis);
+            ZipEntry ze = zis.getNextEntry();
+            while(ze != null){
+                String fileName = ze.getName();
+                File newFile = new File(destDir + File.separator + fileName);
+                System.out.println("Unzipping to "+newFile.getAbsolutePath());
+                fileNames.add(newFile.getAbsolutePath());
+
+                //create directories for sub directories in zip
+                new File(newFile.getParent()).mkdirs();
+                FileUtil.compressFile(new byte[],newFile.getAbsolutePath());
+//                FileOutputStream fos = new FileOutputStream(newFile);
+//                int len;
+//
+//                while ((len = zis.read(buffer)) > 0) {
+//                    fos.write(buffer, 0, len);
+//                }
+//                fos.close();
+
+                //close this ZipEntry
+                zis.closeEntry();
+                ze = zis.getNextEntry();
+            }
+            //close last ZipEntry
+            zis.closeEntry();
+            zis.close();
+            fis.close();
+
+            return fileNames;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 
 //    public static byte[] decompressFileWithUnzip(String file, byte[] fileData){
 //        String fileExtension = getFileExtension(file);
@@ -364,6 +450,7 @@ public class FileUtil {
         return sb.toString();
     }
 
+    // TODO: Fix save image into folder in Insert,
     public static void writeImage(String fileName, byte[] data) throws IOException {
         String fileNameWithoutExt = getFileName(fileName);
         String ext = getFileExtension(fileName);
@@ -410,5 +497,34 @@ public class FileUtil {
             return null;
         }
 
+    }
+
+    public static String getDirectory(String path){
+        int lastSlashIndex = path.lastIndexOf('\\');
+        int lastExtIndex = path.lastIndexOf('.');
+        int fileNameIndex = path.lastIndexOf(getFileName(path)); //put fileName
+
+        if(fileNameIndex > 0){
+            String subPath = path.substring(0, fileNameIndex-1);
+            return subPath;
+        }
+        else{
+            return path;
+        }
+    }
+
+    @Deprecated
+    public static String createFolder(String targetPath){
+        String newDirectory = getDirectory(targetPath) + "\\" + getFileName(targetPath);
+        File f = new File(newDirectory);
+
+        // check if the directory can be created
+        // using the specified path name
+        if (f.mkdir() == true) {
+            return newDirectory;
+        }
+        else {
+            return "Directory cannot be created";
+        }
     }
 }

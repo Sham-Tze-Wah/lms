@@ -18,15 +18,15 @@ import java.util.UUID;
 @Table(name = "Employee")
 @Builder
 public class EmployeeEntity {
-    @Id
-    @Column(name="emp_id", unique = true, nullable = false)
+
     //@GeneratedValue(generator = "uuid") //you need to make the dao throw error as it is generated and set into entity.
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
-    @GeneratedValue(generator = "emp_gen",strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name="emp_gen", sequenceName="emp_seq", allocationSize=1)
+    @Id
+    @Column(name="emp_id", unique = true, nullable = false)
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     @JsonIgnore
     @NonNull
-    private int empId;
+    private String empId = UUID.randomUUID().toString();
 
     @Column(name="name", nullable = false, unique=true, length = SqlDataType.VARCHAR100)
     @NonNull
@@ -63,15 +63,15 @@ public class EmployeeEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateLeave;
 
-    @PrePersist
-    public void onCreate(){
-        if(this.empId!=0){
-            this.empId = empId;
-        }
-        else{
-            this.empId = 0;
-        }
-    }
+//    @PrePersist
+//    public void onCreate(){
+//        if(!this.empId.isEmpty()){
+//            this.empId = empId;
+//        }
+//        else{
+//            this.empId = UUID.randomUUID().toString();
+//        }
+//    }
 
 //
 }

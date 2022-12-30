@@ -14,7 +14,7 @@ public interface AttachmentService {
     public void insertAttachment(AttachmentDTO attachmentDTO, MultipartFile file);
 
     @Deprecated
-    public String insertAAttachment(AttachmentDTO attachmentDTO, String fileName, byte[] file) throws IOException;
+    public String insertAttachments(AttachmentDTO attachmentDTO, String fileName, byte[] file) throws IOException;
 
     public List<AttachmentDTO> getAllAttachment();
 

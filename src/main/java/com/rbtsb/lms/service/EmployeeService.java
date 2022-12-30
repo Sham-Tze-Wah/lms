@@ -17,15 +17,15 @@ public interface EmployeeService {
 
     public List<EmployeePojo> getAllEmployee();
 
-    public Optional<EmployeePojo> getEmployeeById(int id);
+    public Optional<EmployeePojo> getEmployeeById(String id);
 
     public Optional<EmployeePojo> getEmployeeByName(String name);
 
-    public String updateEmployeeById(int id, EmployeePojo employeePojo);
+    public String updateEmployeeById(String id, EmployeePojo employeePojo);
 
-    public String deleteEmployeeById(int id);
+    public String deleteEmployeeById(String id);
 
-    public Optional<EmployeePojo> getEmployeePojo(int empId);
+    public Optional<EmployeePojo> getEmployeePojo(String empId);
 
     Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName);
 }

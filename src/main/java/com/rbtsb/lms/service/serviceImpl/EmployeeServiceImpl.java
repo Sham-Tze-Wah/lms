@@ -61,7 +61,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Optional<EmployeePojo> getEmployeeById(int id) {
+    public Optional<EmployeePojo> getEmployeeById(String id) {
         Optional<EmployeeEntity> emp = employeeRepo.findById(id);
 
         if(emp.isPresent()){
@@ -79,7 +79,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public String updateEmployeeById(int id, EmployeePojo employeePojo) {
+    public String updateEmployeeById(String id, EmployeePojo employeePojo) {
         Optional<EmployeeEntity> emp = employeeRepo.findById(id);
         if(emp.isPresent()){
             if(!employeePojo.getName().equalsIgnoreCase("")){
@@ -131,7 +131,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public String deleteEmployeeById(int id) {
+    public String deleteEmployeeById(String id) {
         Optional<EmployeeEntity> emp = employeeRepo.findById(id);
         if(emp.isPresent()){
             employeeRepo.delete(emp.get());
@@ -143,7 +143,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Optional<EmployeePojo> getEmployeePojo(int empId) {
+    public Optional<EmployeePojo> getEmployeePojo(String empId) {
         Optional<EmployeeEntity> entity = employeeRepo.findById(empId);
         if(entity.isPresent()){
             return Optional.of(employeeMapper.entityToPojo(entity.get()));

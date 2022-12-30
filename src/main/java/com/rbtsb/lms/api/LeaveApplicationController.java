@@ -76,7 +76,7 @@ public class LeaveApplicationController {
     }
 
     @PutMapping("/put/{id}")
-    public ResponseEntity<?> updateLeaveApplicationById(@PathVariable("id") int id, @RequestBody @Valid @NonNull LeaveDTO leaveDTO){
+    public ResponseEntity<?> updateLeaveApplicationById(@PathVariable("id") String id, @RequestBody @Valid @NonNull LeaveDTO leaveDTO){
         String response = leaveService.updateLeaveStatus(id, leaveDTO);
         if(response.equalsIgnoreCase("Updated successfully.")){
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -88,7 +88,7 @@ public class LeaveApplicationController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteLeaveApplicationById(@PathVariable("id") int id){
+    public ResponseEntity<?> deleteLeaveApplicationById(@PathVariable("id") String id){
         String response = leaveService.deleteLeaveById(id);
         if(response.equalsIgnoreCase("Deleted successfully")){
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -99,7 +99,7 @@ public class LeaveApplicationController {
     }
 
     @PutMapping("/approve")
-    public ResponseEntity<?> approveLeaveApplication(@PathVariable("id") int id){
+    public ResponseEntity<?> approveLeaveApplication(@PathVariable("id") String id){
         String response = leaveService.approveLeaveStatus(id);
         if(response.equalsIgnoreCase("Approved status updated successfully.")){
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -110,7 +110,7 @@ public class LeaveApplicationController {
     }
 
     @PutMapping("/reject")
-    public ResponseEntity<?> rejectLeaveApplication(@PathVariable("id") int id){
+    public ResponseEntity<?> rejectLeaveApplication(@PathVariable("id") String id){
         String response = leaveService.rejectLeaveStatus(id);
         if(response.equalsIgnoreCase("Rejected status updated successfully.")){
             return new ResponseEntity<>(response, HttpStatus.OK);

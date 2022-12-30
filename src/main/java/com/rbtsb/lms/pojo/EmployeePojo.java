@@ -5,12 +5,13 @@ import com.rbtsb.lms.constant.Role;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 public class EmployeePojo {
 
     //employee pojo
-    private int empId;
+    private String empId = UUID.randomUUID().toString();
     private String name;
     private String phoneNo;
     private String email;

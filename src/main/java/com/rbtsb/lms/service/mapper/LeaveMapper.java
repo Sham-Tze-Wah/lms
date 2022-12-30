@@ -36,7 +36,7 @@ public class LeaveMapper {
 
     public LeaveEntity DTOToEntity(LeaveDTO leaveDTO){
         LeaveEntity leave = new LeaveEntity();
-        Optional<Integer> id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(),
+        Optional<String> id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(),
                 leaveDTO.getEmployeeName(),
                 leaveDTO.getDateLeave());
         if(id.isPresent()){
@@ -55,7 +55,7 @@ public class LeaveMapper {
     public LeaveEntity DTOToEntityCreate(LeaveDTO leaveDTO){
         LeaveEntity leave = new LeaveEntity();
         try{
-            Optional<Integer> id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(),
+            Optional<String> id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(),
                     leaveDTO.getEmployeeName(),
                     leaveDTO.getDateLeave());
             if(!id.isPresent()){

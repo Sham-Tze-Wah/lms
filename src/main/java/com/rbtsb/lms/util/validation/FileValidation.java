@@ -12,4 +12,13 @@ public class FileValidation {
             return false;
         }
     }
+
+    public static boolean isZip(String fileExtension){
+        if(fileExtension.equalsIgnoreCase(".zip")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }
