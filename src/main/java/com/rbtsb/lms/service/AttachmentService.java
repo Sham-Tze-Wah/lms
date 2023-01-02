@@ -2,6 +2,7 @@ package com.rbtsb.lms.service;
 
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.entity.AttachmentEntity;
+import com.rbtsb.lms.pojo.ApiErrorPojo;
 import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +19,7 @@ public interface AttachmentService {
 
     public List<AttachmentDTO> getAllAttachment();
 
-    public String updateAttachmentById(String id, AttachmentDTO attachmentDTO, MultipartFile file) throws IOException;
+    public ApiErrorPojo updateAttachmentById(String id, AttachmentDTO attachmentDTO, MultipartFile file) throws IOException;
 
     public String deleteAttachmentById(String id);
 

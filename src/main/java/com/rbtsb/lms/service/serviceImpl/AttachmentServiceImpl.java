@@ -7,6 +7,7 @@ import com.rbtsb.lms.entity.AttachmentEntity;
 import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.entity.LeaveEntity;
 import com.rbtsb.lms.error.ErrorAction;
+import com.rbtsb.lms.pojo.ApiErrorPojo;
 import com.rbtsb.lms.repo.AttachmentRepo;
 import com.rbtsb.lms.repo.EmployeeRepo;
 import com.rbtsb.lms.repo.LeaveDTORepo;
@@ -31,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,6 +78,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try{
             String fileName = attachmentDTO.getFileName();
             String fileExtension = FileUtil.getFileExtension(fileName);
+
             File fileDirectory = new File(directory);
             if(!fileExtension.equalsIgnoreCase("")){
                 if(fileDirectory.exists() && !fileDirectory.isDirectory()){
@@ -85,19 +88,6 @@ public class AttachmentServiceImpl implements AttachmentService {
                 }
                 else{
                     return "Your file has corrupted or missing. " + ErrorAction.ERROR_ACTION;
-//                    boolean isPicture = FileValidation.isPicture(fileExtension);
-//                    if(isPicture){
-//                        byte[] files = FileUtil.compressImage(file);
-//                        AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntityCreate(
-//                                attachmentDTO,files);
-//                        attachmentRepo.saveAndFlush(attachmentEntity);
-//                    }
-//                    else{
-//                        byte[] files = FileUtil.compressFile(file);
-//                        AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntityCreate(
-//                                attachmentDTO, files);
-//                        attachmentRepo.saveAndFlush(attachmentEntity);
-//                    }
                 }
             }
             else{
@@ -136,94 +126,160 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public String updateAttachmentById(String id, AttachmentDTO attachmentDTO, MultipartFile file) {
+    public ApiErrorPojo updateAttachmentById(String id, AttachmentDTO attachmentDTO, MultipartFile file) {
         Optional<AttachmentEntity> attachment = attachmentRepo.findById(id);
-        StringBuilder response = new StringBuilder();
-        try{
-            if(attachment.isPresent()){
-                if(!attachmentDTO.getDirectory().equalsIgnoreCase("")){
-                    if(!attachmentDTO.getFileName().equalsIgnoreCase("")){
-                        if(!attachmentDTO.getFileType().equals(null)){
-                            if(!attachmentDTO.getDateLeave().equals(null)){
-                                Optional<EmployeeEntity> emp = employeeRepo.getEmployeeByName(attachmentDTO.getEmployeeName());
-                                if(emp.isPresent()){
-                                    Optional<String> leave_id = leaveDTORepo.findByReasonAndEmployeeAndDate(
-                                            attachmentDTO.getLeaveReason(),
-                                            attachmentDTO.getEmployeeName(),
-                                            DateTimeUtil.yyyyMMddDate(attachmentDTO.getDateLeave())
-                                    );
-                                    if(leave_id.isPresent()){
-                                        attachment.get().setFileId(id);
-                                        attachment.get().setFileName(attachmentDTO.getFileName());
-                                        attachment.get().setFileType(attachmentDTO.getFileType());
-                                        attachment.get().setDirectory(attachmentDTO.getDirectory());
-                                        attachment.get().setFileData(FileUtil.compressImage(file.getBytes()));
-                                        Optional<LeaveEntity> leaveEntity = leaveDTORepo.findById(leave_id.get());
 
-                                        if(leaveEntity.isPresent()){
-                                            attachment.get().setLeaveEntity(leaveEntity.get());
-                                            attachmentRepo.saveAndFlush(attachment.get());
-                                            response.append("insert successfully");
-                                            //return "insert successfully"
-                                        }
-                                        else{
-                                            //return "internal error occurs.";
-                                            response.setLength(0);
-                                            response.append("internal error occurs.");
-                                        }
-                                    }
-                                    else{
-                                        //return "the leave must be create first before attachment is uploaded";
-                                        response.setLength(0);
-                                        response.append("the leave must be create first before attachment is uploaded");
-                                    }
-                                }
-                                else {
-                                    //return "The attachment must belongs to an employee";
-                                    response.setLength(0);
-                                    response.append("The attachment must belongs to an employee");
-                                }
-                            }
-                            else{
-                                //return "the attachment must consist of date leave";
-                                response.setLength(0);
-                                response.append("the attachment must consist of date leave");
-                            }
-                        }
-                        else{
-                            //return "file type cannot be null";
-                            response.setLength(0);
-                            response.append("file type cannot be null");
-                        }
-                    }
-                    else{
-                        //return "file name cannot be null";
-                        response.setLength(0);
-                        response.append("file name cannot be null");
+        StringBuilder response = new StringBuilder();
+        ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
+
+        List<String> fileNames = new ArrayList<>();
+        String absolutePath = attachment.get().getDirectory();
+        String destDir = "";
+
+        try{
+            if(attachmentDTO!=null && attachment.isPresent()){
+                if(attachmentDTO.getDirectory() !=null && !attachmentDTO.getDirectory().equalsIgnoreCase("")){
+                    attachment.get().setDirectory(attachmentDTO.getDirectory());
+                    absolutePath = attachmentDTO.getDirectory();
+                    destDir = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + file.getOriginalFilename();
+                }
+
+                Optional<AttachmentEntity> attachmentEntity = attachmentRepo.findByName(attachmentDTO.getFileName());
+                if(attachmentDTO.getFileName() == null ||
+                        attachmentDTO.getFileName().equalsIgnoreCase("")){
+                    attachment.get().setFileName(attachment.get().getFileName());
+                }
+                else if(attachmentDTO.getFileName() != null &&
+                        !attachmentDTO.getFileName().equalsIgnoreCase("") && !attachmentEntity.isPresent()){
+                    attachment.get().setFileName(attachmentDTO.getFileName());
+                }
+                else{
+                    apiErrorPojo.setResponseStatus("422");
+                    apiErrorPojo.setResponseMessage("File name is duplicated. Please rename your file.");
+                    return apiErrorPojo;
+                }
+
+                if(attachmentDTO.getFileType() != null &&
+                        !attachmentDTO.getFileType().equals(null)){
+                    attachment.get().setFileType(attachmentDTO.getFileType());
+                }
+
+                Date dateLeave;
+                if(attachmentDTO.getDateLeave() != null &&
+                        !attachmentDTO.getDateLeave().equals(null)){
+                    dateLeave = DateTimeUtil.yyyyMMddDate(attachmentDTO.getDateLeave());
+                }
+                else{
+                    dateLeave = DateTimeUtil.yyyyMMddDate(attachment.get().getLeaveEntity().getDateLeave());
+                }
+                attachment.get().getLeaveEntity().setDateLeave(dateLeave);
+
+                StringBuilder empName = new StringBuilder();
+                Optional<EmployeeEntity> emp;
+                if(attachmentDTO.getEmployeeName() == null ||
+                        attachmentDTO.getEmployeeName().equalsIgnoreCase("")){
+                    emp = Optional.of(attachment.get().getLeaveEntity().getEmployeeEntity());
+                    empName.setLength(0);
+                    empName.append(attachment.get().getLeaveEntity().getEmployeeEntity().getName());
+                }
+                else if(attachmentDTO.getEmployeeName() != null &&
+                        !attachmentDTO.getEmployeeName().equalsIgnoreCase("")){
+                    emp = employeeRepo.getEmployeeByName(attachmentDTO.getEmployeeName());
+                    if(emp.isPresent()){
+                        empName.setLength(0);
+                        empName.append(attachmentDTO.getEmployeeName());
+                    }else{
+                        empName.setLength(0);
+                        empName.append(attachment.get().getLeaveEntity().getEmployeeEntity().getName());
                     }
                 }
                 else{
-                    //return "attachment directory cannot be null.";
-                    response.setLength(0);
-                    response.append("attachment directory cannot be null.");
+                    apiErrorPojo.setResponseStatus("422");
+                    apiErrorPojo.setResponseMessage("Provided account is not exist.");
+                    return apiErrorPojo;
                 }
+                attachment.get().getLeaveEntity().setEmployeeEntity(emp.get());
+
+                StringBuilder leaveReason = new StringBuilder();
+                Optional<LeaveEntity> leave = Optional.of(attachment.get().getLeaveEntity());
+                if(attachmentDTO.getLeaveReason() == null ||
+                        attachmentDTO.getLeaveReason().equalsIgnoreCase("")){
+                    leaveReason.setLength(0);
+                    leaveReason.append(attachment.get().getLeaveEntity().getReason());
+                }
+                else if(attachmentDTO.getLeaveReason() != null &&
+                        !attachmentDTO.getLeaveReason().equalsIgnoreCase("")){
+                    leave = leaveDTORepo.findByEmployeeAndDate(
+                            empName.toString(),
+                            dateLeave);
+                    if(leave.isPresent()){
+                        leaveReason.setLength(0);
+                        leaveReason.append(attachmentDTO.getLeaveReason());
+                    }
+                    else{
+                        leave = Optional.of(attachment.get().getLeaveEntity());
+                        leaveReason.setLength(0);
+                        leaveReason.append(attachment.get().getLeaveEntity().getReason());
+                    }
+                }
+                else{
+                    apiErrorPojo.setResponseStatus("422");
+                    apiErrorPojo.setResponseMessage("The applied leave is not exist.");
+                    return apiErrorPojo;
+                }
+                attachment.get().setLeaveEntity(leave.get());
+
+                if(file != null && !file.isEmpty()){
+                    byte[] fileData = file.getBytes();
+                    String extension = FileUtil.getFileExtension(file.getOriginalFilename());
+
+
+                    boolean isPicture = FileValidation.isPicture(extension);
+                    boolean isZip = FileValidation.isZip(extension);
+
+                    if (isZip) {
+                        //unzip files and assign the fileName to a list
+                        List<String> unzipFileNames = FileUtil.unzipFiles(absolutePath, destDir);
+                        fileData = FileUtil.readZipFileAndReturnBytes(absolutePath);
+                    } else {
+                        if (isPicture) {
+                            fileData = FileUtil.compressImage(file.getBytes());
+                            FileUtil.writeImage(file.getOriginalFilename(), fileData);
+                        } else {
+                            fileData = FileUtil.compressFile(file.getBytes(), destDir);
+                        }
+                    }
+                    attachment.get().setFileData(fileData);
+                    response.append("File: " + attachmentDTO.getFileName() + "\n");
+                }
+
+                //FileUtil.readZipFileAndReturnBytes(sourcePath);
+                // TODO: test below line of code
+                leaveDTORepo.saveAndFlush(attachment.get().getLeaveEntity());
+
+                attachmentRepo.saveAndFlush(attachment.get());
+                response.append("Updated successfully.");
+                apiErrorPojo.setResponseStatus("200");
+                apiErrorPojo.setResponseMessage(response.toString());
+                return apiErrorPojo;
             }
             else{
-                //return "Update unsuccessfully due to id not exist";
-                response.setLength(0);
-                response.append("Update unsuccessfully due to id not exist");
+                apiErrorPojo.setResponseStatus("422");
+                apiErrorPojo.setResponseMessage("Attachment id is not exist.");
+                return apiErrorPojo;
             }
         }
         catch(IOException ioEx){
-            return ioEx.toString();
+            return new ApiErrorPojo("400",ioEx.toString());
         }
         catch(ParseException paEx){
-            return paEx.toString();
+            return new ApiErrorPojo("400", paEx.toString());
         }
         catch(Exception ex){
-            return ex.toString();
+            return new ApiErrorPojo("400",ex.toString());
         }
-        return response.toString();
+
+
     }
 
     @Override
@@ -320,7 +376,13 @@ public class AttachmentServiceImpl implements AttachmentService {
         if(dbAttachmentEntity.isPresent()){
             String fileExtension = FileUtil.getFileExtension(dbAttachmentEntity.get().getFileName());
             boolean isPicture = FileValidation.isPicture(fileExtension);
-            if(isPicture){
+            boolean isZip = FileValidation.isZip(fileExtension);
+
+            if(isZip){
+                return FileUtil.decompressZipFileFromDB(dbAttachmentEntity.get().getFileName(),
+                        dbAttachmentEntity.get().getFileData());
+            }
+            else if(isPicture){
                 return FileUtil.decompressImage(dbAttachmentEntity.get().getFileData());
             }
             else{

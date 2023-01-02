@@ -11,5 +11,5 @@ public interface GlobalConstant {
 
     final static String DateTime = "DATETIME";
 
-    final static String ATTACHMENT_PATH = "C:\\Practice\\lms\\src\\main\\resources\\leaveAttachment";
+    final static String ATTACHMENT_PATH = System.getProperty("user.dir") + "\\src\\main\\resources\\leaveAttachment";
 }

@@ -5,6 +5,8 @@ import com.rbtsb.lms.constant.GlobalConstant;
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.entity.AttachmentEntity;
 import com.rbtsb.lms.entity.EmployeeEntity;
+import com.rbtsb.lms.error.ErrorStatus;
+import com.rbtsb.lms.pojo.ApiErrorPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.service.AttachmentService;
 import com.rbtsb.lms.service.EmployeeService;
@@ -24,6 +26,8 @@ import javax.activation.MimetypesFileTypeMap;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,6 +103,15 @@ public class AttachmentController {
                 String targetDirectory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\";
                 String targetPath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + file.getOriginalFilename();
 
+                File targetDirTemp = new File(targetDirectory);
+                if (targetDirTemp.exists() && targetDirTemp.isDirectory()) {
+                    log.info("The directory has been created");
+                } else if (targetDirTemp.mkdir()) {
+                    log.info("The directory has created successfully.");
+                } else {
+                    return new ResponseEntity<>("The directory cannot be created", HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+
                 if (!leaveReason.equals(null)) {
                     if (!targetPath.equalsIgnoreCase("")) { //path
                         String fileName = file.getOriginalFilename();
@@ -133,32 +146,38 @@ public class AttachmentController {
                                             boolean isPicture = FileValidation.isPicture(extension);
                                             boolean isZip = FileValidation.isZip(extension);
 
-                                            if(isZip){
+                                            if (isZip) {
                                                 //unzip files and assign the fileName to a list
                                                 List<String> unzipFileNames = FileUtil.unzipFiles(sourcePath, targetPath);
 
-                                                //compress a file
-                                                for(String unzipFileName : unzipFileNames){
-                                                    sourcePath = unzipFileName;
-                                                    FileUtil.compressFile(fileData, sourcePath);
+                                                //save zip files into the database
+                                                attachmentService.insertAttachments(
+                                                        attachmentDTO,
+                                                        sourcePath,
+                                                        FileUtil.readZipFileAndReturnBytes(sourcePath)
+                                                );
 
-                                                    //save the file into the database
-                                                    attachmentService.insertAttachments(
-                                                            attachmentDTO,
-                                                            targetPath,
-                                                            fileData
-                                                    );
-                                                    fileData = new byte[0];
-                                                    fileNames.add(file.getOriginalFilename());
-                                                }
+//                                                //compress a file
+//                                                for(String unzipFileName : unzipFileNames){
+//                                                    targetPath = unzipFileName;
+//
+//                                                    //save the file into the database
+//                                                    attachmentService.insertAttachments(
+//                                                            attachmentDTO,
+//                                                            targetPath,
+//                                                            FileUtil.readFileAndReturnBytes(targetPath)
+//                                                    );
+//                                                    //fileData = new byte[0];
+//                                                    //fileNames.add(file.getOriginalFilename());
+//                                                }
 
-                                            }
-                                            else{
+
+                                            } else {
                                                 if (isPicture) {
                                                     fileData = FileUtil.compressImage(file.getBytes());
                                                     FileUtil.writeImage(file.getOriginalFilename(), fileData);
-                                                }
-                                                else{
+                                                } else {
+                                                    fileData = file.getBytes();
                                                     FileUtil.compressFile(file.getBytes(), targetPath);
                                                 }
                                                 attachmentService.insertAttachments(
@@ -208,28 +227,70 @@ public class AttachmentController {
         return new ResponseEntity<>(attachmentService.getAllAttachment(), HttpStatus.OK);
     }
 
-    @PutMapping("/put/{id}")
-    public ResponseEntity<?> updateAnAttachmentById(@PathVariable("id") String id,
+    @PutMapping("/put")
+    public ResponseEntity<?> updateAnAttachmentById(@RequestParam(value = "id", required = false) String id,
                                                     //@RequestParam("fileName") String fileName,
                                                     //@RequestParam("fileType") FileType fileType,
                                                     //@RequestParam("directory") String directory,
-                                                    @RequestParam("leaveReason") String leaveReason,
-                                                    @RequestParam("employeeName") String employeeName,
+                                                    @RequestParam(value = "leaveReason", required = false) String leaveReason,
+                                                    @RequestParam(value = "employeeName", required = false) String employeeName,
                                                     @RequestParam(value = "dateLeave", required = false) Date dateLeave,
-                                                    @RequestParam("image") MultipartFile file) throws IOException {
+                                                    @RequestParam(value = "file", required = false) MultipartFile[] files) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
-        attachmentDTO.setFileName(file.getOriginalFilename());
+        StringBuilder response = new StringBuilder();
 
-        MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
-        attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
+        if (files != null && Arrays.stream(files).count() > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    attachmentDTO.setFileName(file.getOriginalFilename());
 
-        attachmentDTO.setDirectory(file.getResource().getURL().getPath());
-        if (!dateLeave.equals(null)) {
-            attachmentDTO.setDateLeave(dateLeave);
+                    MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+                    attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
+
+                    attachmentDTO.setDirectory(file.getResource().getURL().getPath());
+                    if (!dateLeave.equals(null)) {
+                        attachmentDTO.setDateLeave(dateLeave);
+                    }
+                    if (!leaveReason.equalsIgnoreCase("")) {
+                        attachmentDTO.setLeaveReason(leaveReason);
+                    }
+                    if (!employeeName.equalsIgnoreCase("")) {
+                        attachmentDTO.setEmployeeName(employeeName);
+                    }
+
+                    ApiErrorPojo responseObj = attachmentService.updateAttachmentById(id, attachmentDTO, file);
+
+                    if (!responseObj.getResponseStatus().equalsIgnoreCase("200")) {
+                        return new ResponseEntity<>(responseObj.getResponseMessage(),
+                                ErrorStatus.codeMapResponse.get(responseObj.getResponseStatus()));
+                    } else {
+                        response.append(responseObj.getResponseMessage());
+                    }
+                } else {
+                    attachmentService.updateAttachmentById(null, null, null);
+                }
+            }
+        } else {
+            if (dateLeave !=null ) {
+                attachmentDTO.setDateLeave(dateLeave);
+            }
+            if (dateLeave != null && !leaveReason.equalsIgnoreCase("")) {
+                attachmentDTO.setLeaveReason(leaveReason);
+            }
+            if (employeeName != null && !employeeName.equalsIgnoreCase("")) {
+                attachmentDTO.setEmployeeName(employeeName);
+            }
+
+            ApiErrorPojo responseObj = attachmentService.updateAttachmentById(id, attachmentDTO, null);
+
+            if (!responseObj.getResponseStatus().equalsIgnoreCase("200")) {
+                return new ResponseEntity<>(responseObj.getResponseMessage(),
+                        ErrorStatus.codeMapResponse.get(responseObj.getResponseStatus()));
+            } else {
+                response.append(responseObj.getResponseMessage());
+            }
         }
-        attachmentDTO.setLeaveReason(leaveReason);
-        attachmentDTO.setEmployeeName(employeeName);
-        return new ResponseEntity<>(attachmentService.updateAttachmentById(id, attachmentDTO, file), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -246,6 +307,7 @@ public class AttachmentController {
                                         @RequestParam("employeeName") String employeeName,
                                         @RequestParam(value = "dateLeave", required = false) Date dateLeave) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
+
         attachmentDTO.setFileName(file.getOriginalFilename());
 
         MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
@@ -265,13 +327,19 @@ public class AttachmentController {
 
     @PostMapping("/post/download")
     public ResponseEntity<?> downloadFile(
-            @RequestParam("fileName") String fileName) {
+            @RequestParam("fileName") String fileName) { //with extension
 
         // TODO: try catch for attachment
 
         String fileExtension = FileUtil.getFileExtension(fileName);
         boolean isPicture = FileValidation.isPicture(fileExtension);
-        if (isPicture) {
+        boolean isZip = FileValidation.isZip(fileExtension);
+
+        if (isZip) {
+            byte[] data = attachmentService.downloadFile(fileName);
+            return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("image/png"))
+                    .body(data);
+        } else if (isPicture) {
             byte[] data = attachmentService.downloadFile(fileName);
             return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("image/png"))
                     .body(data);
@@ -283,25 +351,24 @@ public class AttachmentController {
 
     }
 
-    @PostMapping("/post/download/file")
-    public ResponseEntity<?> downloadFileToFolder(
-            @RequestParam("fileName") String fileName) {
-        String fileExtension = FileUtil.getFileExtension(fileName);
+//    @PostMapping("/post/download/file")
+//    public ResponseEntity<?> downloadFileToFolder(
+//            @RequestParam("fileName") String fileName) {
+//        String fileExtension = FileUtil.getFileExtension(fileName);
+//
+//        byte[] data = attachmentService.downloadFile(fileName);
+//        return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
+//                .body(FileUtil.convertByteToString(data)); //FileUtil.convertByteToString(data)
+//    }
 
-        byte[] data = attachmentService.downloadFile(fileName);
-        return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
-                .body(FileUtil.convertByteToString(data)); //FileUtil.convertByteToString(data)
-    }
+//    @PostMapping("/post/download/filefromdb")
+//    public ResponseEntity<?> downloadFileFromDb(
+//            @RequestParam("fileName") String fileName) {
+//        String fileExtension = FileUtil.getFileExtension(fileName);
+//
+//        byte[] response = attachmentService.downloadFileFromDB(fileName);
+//        return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
+//                .body(response); //FileUtil.convertByteToString(data)
+//    }
 
-    @PostMapping("/post/download/filefromdb")
-    public ResponseEntity<?> downloadFileFromDb(
-            @RequestParam("fileName") String fileName) {
-        String fileExtension = FileUtil.getFileExtension(fileName);
-
-        byte[] response = attachmentService.downloadFileFromDB(fileName);
-        return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
-                .body(response); //FileUtil.convertByteToString(data)
-    }
-
-    // TODO: Upload Zip file
 }
