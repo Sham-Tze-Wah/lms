@@ -38,11 +38,11 @@ public class EducationController {
             if(!educationPojo.getQualification().toString().equalsIgnoreCase("")){
                 if(!educationPojo.getInstitute().equalsIgnoreCase("")){
                     if(!educationPojo.getCourse().toString().equalsIgnoreCase("")){
-                        Optional<EmployeePojo> empPojo = Optional.ofNullable(employeeService.getEmployeeByName(educationPojo.getEmployeePojo().getName()))
-                                .orElse(null);
-                        educationPojo.getEmployeePojo().setEmpId(empPojo.get().getEmpId());
-                        if(!educationPojo.getEmployeePojo().equals(null) &&
+                        Optional<EmployeePojo> empPojo = employeeService.getEmployeeByName(educationPojo.getEmployeePojo().getName());
+
+                        if(educationPojo.getEmployeePojo() != null &&
                                 empPojo.isPresent()){
+                            educationPojo.getEmployeePojo().setEmpId(empPojo.get().getEmpId());
                             return new ResponseEntity<>(educationService.insertEducationByEmpId(educationPojo), HttpStatus.OK);
                         }
                         else{

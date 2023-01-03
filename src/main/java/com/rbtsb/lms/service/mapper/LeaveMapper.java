@@ -25,7 +25,8 @@ public class LeaveMapper {
 
     public LeaveDTO entityToDTO(LeaveEntity leaveEntity){
         LeaveDTO leaveDTO = new LeaveDTO();
-        leaveDTO.setDateLeave(leaveEntity.getDateLeave());
+        leaveDTO.setStartDateLeave(leaveEntity.getStartDateLeave());
+        leaveDTO.setEndDateLeave(leaveEntity.getEndDateLeave());
         leaveDTO.setLeaveStatus(leaveEntity.getLeaveStatus());
         leaveDTO.setReason(leaveEntity.getReason());
         leaveDTO.setDescription(leaveEntity.getDescription());
@@ -34,64 +35,78 @@ public class LeaveMapper {
         return leaveDTO;
     }
 
-    public LeaveEntity DTOToEntity(LeaveDTO leaveDTO){
+    public LeaveEntity DTOToEntity(String id, LeaveDTO leaveDTO) throws ParseException {
         LeaveEntity leave = new LeaveEntity();
-        Optional<String> id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(),
-                leaveDTO.getEmployeeName(),
-                leaveDTO.getDateLeave());
-        if(id.isPresent()){
-            leave.setLeaveId(id.get());
+//        Optional<LeaveEntity> leaveFromDB = leaveDTORepo.findByEmployeeNameAndStartDateLeaveAndEndDateLeave(
+//                leaveDTO.getEmployeeName(),
+//                leaveDTO.getStartDateLeave(),
+//                leaveDTO.getEndDateLeave()
+//        );
+        if(id!=null && !id.equalsIgnoreCase("")){
+            leave.setLeaveId(id);
+        }
             leave.setLeaveStatus(leaveDTO.getLeaveStatus());
+            leave.setLeaveType(leaveDTO.getLeaveType());
+            leave.setStartDateLeave(DateTimeUtil.yyyyMMddDate(leaveDTO.getStartDateLeave()));
+            leave.setEndDateLeave(DateTimeUtil.yyyyMMddDate(leaveDTO.getEndDateLeave()));
             leave.setReason(leaveDTO.getReason());
             leave.setDescription(leaveDTO.getDescription());
-            //leave.setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
+            leave.setEmployeeEntity(employeeRepo.findByName(leaveDTO.getEmployeeName()).get());
             return leave;
-        }
-        else{
-            return null;
-        }
+
+//        else{
+//            return null;
+//        }
     }
 
-    public LeaveEntity DTOToEntityCreate(LeaveDTO leaveDTO){
-        LeaveEntity leave = new LeaveEntity();
-        try{
-            Optional<String> id = leaveDTORepo.findByReasonAndEmployeeAndDate(leaveDTO.getReason(),
-                    leaveDTO.getEmployeeName(),
-                    leaveDTO.getDateLeave());
-            if(!id.isPresent()){
-                leave.setLeaveStatus(leaveDTO.getLeaveStatus());
-                leave.setReason(leaveDTO.getReason());
-                leave.setDescription(leaveDTO.getDescription());
-                leave.setDateLeave(DateTimeUtil.yyyyMMddDate(leaveDTO.getDateLeave()));
-                Optional<EmployeeEntity> emp = employeeRepo.getEmployeeByName(leaveDTO.getEmployeeName());
-                if(emp.isPresent()){
-                    leave.setEmployeeEntity(emp.get());
-                    //leave.setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
-                    return leave;
-                }
-                else{
-                    return null;
-                }
-            }
-            else{
-                return null;
-            }
-        }
-        catch(NoSuchElementException | ParseException ex){
-            leave.setLeaveStatus(leaveDTO.getLeaveStatus());
-            leave.setReason(leaveDTO.getReason());
-            leave.setDescription(leaveDTO.getDescription());
-            leave.setDateLeave(leaveDTO.getDateLeave());
-            Optional<EmployeeEntity> emp = employeeRepo.getEmployeeByName(leaveDTO.getEmployeeName());
-            if(emp.isPresent()){
-                leave.setEmployeeEntity(emp.get());
-                //leave.setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
-                return leave;
-            }
-            else{
-                return null;
-            }
-        }
-
-    }
+//    @Deprecated
+//    public LeaveEntity DTOToEntityCreate(LeaveDTO leaveDTO){
+//        LeaveEntity leave = new LeaveEntity();
+//        try{
+//            Optional<LeaveEntity> leaveEntity = leaveDTORepo.findByEmployeeNameAndStartDateLeaveAndEndDateLeave(
+//                    leaveDTO.getEmployeeName(),
+//                    leaveDTO.getStartDateLeave(),
+//                    leaveDTO.getEndDateLeave()
+//            );
+//            if(!leaveEntity.isPresent()){
+//                leave.setLeaveStatus(leaveDTO.getLeaveStatus());
+//                leave.setReason(leaveDTO.getReason());
+//                leave.setDescription(leaveDTO.getDescription());
+//                leave.setLeaveType(leaveDTO.getLeaveType());
+//                leave.setEndDateLeave(DateTimeUtil.yyyyMMddDate(leaveDTO.getEndDateLeave()));
+//                leave.setStartDateLeave(DateTimeUtil.yyyyMMddDate(leaveDTO.getStartDateLeave()));
+//                Optional<EmployeeEntity> emp = employeeRepo.findByName(leaveDTO.getEmployeeName());
+//                leave.setEmployeeEntity(emp.get());
+//
+//                if(emp.isPresent()){
+//                    leave.setEmployeeEntity(emp.get());
+//                    //leave.setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
+//                    return leave;
+//                }
+//                else{
+//                    return null;
+//                }
+//            }
+//            else{
+//                return null;
+//            }
+//        }
+//        catch(NoSuchElementException | ParseException ex){
+//            leave.setLeaveStatus(leaveDTO.getLeaveStatus());
+//            leave.setReason(leaveDTO.getReason());
+//            leave.setDescription(leaveDTO.getDescription());
+//            leave.setStartDateLeave(leaveDTO.getStartDateLeave());
+//            leave.setEndDateLeave(leaveDTO.getEndDateLeave());
+//            Optional<EmployeeEntity> emp = employeeRepo.findByName(leaveDTO.getEmployeeName());
+//            if(emp.isPresent()){
+//                leave.setEmployeeEntity(emp.get());
+//                //leave.setEmployeeEntity(EmployeeMapper.pojoToEntity(leaveDTO.getEmployeePojo()));
+//                return leave;
+//            }
+//            else{
+//                return null;
+//            }
+//        }
+//
+//    }
 }

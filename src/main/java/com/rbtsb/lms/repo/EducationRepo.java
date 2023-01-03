@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface EducationRepo extends JpaRepository<EducationEntity, String> {
 
+    //next time return pojo or dto, else entity need to convert to pojo or dto
     @Query(value = "SELECT * FROM education e, employee emp, WHERE e.emp_id = emp.emp_id AND e.emp_id = ?1 ", nativeQuery = true)
-    public EducationEntity selectEducationByEmpId(String empId);
+    EducationEntity selectEducationByEmpId(String empId);
 }

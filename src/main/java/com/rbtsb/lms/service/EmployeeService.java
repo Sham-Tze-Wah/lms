@@ -13,19 +13,19 @@ import java.util.Optional;
 
 public interface EmployeeService {
 
-    public String insertEmployee(EmployeePojo employeePojo);
+     String insertEmployee(EmployeePojo employeePojo);
 
-    public List<EmployeePojo> getAllEmployee();
+     List<EmployeePojo> getAllEmployee();
 
-    public Optional<EmployeePojo> getEmployeeById(String id);
+     Optional<EmployeePojo> getEmployeeById(String id);
 
-    public Optional<EmployeePojo> getEmployeeByName(String name);
+     Optional<EmployeePojo> getEmployeeByName(String name);
 
-    public String updateEmployeeById(String id, EmployeePojo employeePojo);
+     String updateEmployeeById(String id, EmployeePojo employeePojo);
 
-    public String deleteEmployeeById(String id);
+     String deleteEmployeeById(String id);
 
-    public Optional<EmployeePojo> getEmployeePojo(String empId);
+     Optional<EmployeePojo> getEmployeePojo(String empId);
 
-    Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName);
+    //Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName);
 }

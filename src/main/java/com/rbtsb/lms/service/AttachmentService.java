@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public interface AttachmentService {
 
+    @Deprecated
     public void insertAttachment(AttachmentDTO attachmentDTO, MultipartFile file);
 
-    @Deprecated
     public String insertAttachments(AttachmentDTO attachmentDTO, String fileName, byte[] file) throws IOException;
 
     public List<AttachmentDTO> getAllAttachment();

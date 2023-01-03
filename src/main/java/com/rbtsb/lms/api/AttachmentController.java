@@ -50,7 +50,8 @@ public class AttachmentController {
     @PostMapping("/postAll")
     public ResponseEntity<?> insertAttachment(@RequestParam("leaveReason") String leaveReason,
                                               @RequestParam("employeeName") String employeeName,
-                                              @RequestParam(value = "dateLeave", required = false) String dateLeave,
+                                              @RequestParam(value = "startDateLeave", required = false) String startDateLeave,
+                                              @RequestParam(value = "endDateLeave", required = false) String endDateLeave,
                                               @RequestParam("file") MultipartFile[] files) {
 
         AttachmentDTO attachmentDTO = new AttachmentDTO();
@@ -88,7 +89,8 @@ public class AttachmentController {
                                                //@RequestParam("directory") String directory,
                                                @RequestParam("leaveReason") String leaveReason,
                                                @RequestParam("employeeName") String employeeName,
-                                               @RequestParam(value = "dateLeave", required = false) String dateLeave,
+                                               @RequestParam(value = "startDateLeave", required = false) String startDateLeave,
+                                               @RequestParam(value = "endDateLeave", required = false) String endDateLeave,
                                                @RequestParam("file") MultipartFile[] files) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         byte[] fileData;
@@ -125,37 +127,39 @@ public class AttachmentController {
 
                             if (!fileType.equalsIgnoreCase("")) {
 
-                                if (!attachmentDTO.getDateLeave().equals(null) || !dateLeave.equals(null)) {
-                                    Optional<EmployeeEntity> empName = employeeService.getEmployeeByEmployeeName(employeeName);
+                                if (attachmentDTO.getStartDateLeave() != null && startDateLeave != null) {
 
-                                    if (!employeeName.equalsIgnoreCase("") &&
-                                            empName.isPresent()) {
-                                        attachmentDTO.setFileName(fileName);
-                                        attachmentDTO.setFileType(fileType);
+                                    if(attachmentDTO.getEndDateLeave() != null && endDateLeave != null){
+                                        Optional<EmployeePojo> empName = employeeService.getEmployeeByName(employeeName);
 
-                                        if (dateLeave != null) {
-                                            attachmentDTO.setDateLeave(new SimpleDateFormat("yyyy-MM-dd").parse(dateLeave.toString()));
-                                        }
+                                        if (!employeeName.equalsIgnoreCase("") &&
+                                                empName.isPresent()) {
+                                            attachmentDTO.setFileName(fileName);
+                                            attachmentDTO.setFileType(fileType);
 
-                                        attachmentDTO.setDirectory(targetPath);
-                                        attachmentDTO.setLeaveReason(leaveReason);
-                                        attachmentDTO.setEmployeeName(employeeName);
+                                            if (startDateLeave != null) {
+                                                attachmentDTO.setStartDateLeave(new SimpleDateFormat("yyyy-MM-dd").parse(startDateLeave.toString()));
+                                            }
 
-                                        if (!file.isEmpty()) {
-                                            fileData = file.getBytes();
-                                            boolean isPicture = FileValidation.isPicture(extension);
-                                            boolean isZip = FileValidation.isZip(extension);
+                                            attachmentDTO.setDirectory(targetPath);
+                                            attachmentDTO.setLeaveReason(leaveReason);
+                                            attachmentDTO.setEmployeeName(employeeName);
 
-                                            if (isZip) {
-                                                //unzip files and assign the fileName to a list
-                                                List<String> unzipFileNames = FileUtil.unzipFiles(sourcePath, targetPath);
+                                            if (!file.isEmpty()) {
+                                                fileData = file.getBytes();
+                                                boolean isPicture = FileValidation.isPicture(extension);
+                                                boolean isZip = FileValidation.isZip(extension);
 
-                                                //save zip files into the database
-                                                attachmentService.insertAttachments(
-                                                        attachmentDTO,
-                                                        sourcePath,
-                                                        FileUtil.readZipFileAndReturnBytes(sourcePath)
-                                                );
+                                                if (isZip) {
+                                                    //unzip files and assign the fileName to a list
+                                                    List<String> unzipFileNames = FileUtil.unzipFiles(sourcePath, targetPath);
+
+                                                    //save zip files into the database
+                                                    attachmentService.insertAttachments(
+                                                            attachmentDTO,
+                                                            sourcePath,
+                                                            FileUtil.readZipFileAndReturnBytes(sourcePath)
+                                                    );
 
 //                                                //compress a file
 //                                                for(String unzipFileName : unzipFileNames){
@@ -172,32 +176,36 @@ public class AttachmentController {
 //                                                }
 
 
-                                            } else {
-                                                if (isPicture) {
-                                                    fileData = FileUtil.compressImage(file.getBytes());
-                                                    FileUtil.writeImage(file.getOriginalFilename(), fileData);
                                                 } else {
-                                                    fileData = file.getBytes();
-                                                    FileUtil.compressFile(file.getBytes(), targetPath);
+                                                    if (isPicture) {
+                                                        fileData = FileUtil.compressImage(file.getBytes());
+                                                        FileUtil.writeImage(file.getOriginalFilename(), fileData);
+                                                    } else {
+                                                        fileData = file.getBytes();
+                                                        FileUtil.compressFile(file.getBytes(), targetPath);
+                                                    }
+                                                    attachmentService.insertAttachments(
+                                                            attachmentDTO,
+                                                            targetPath,
+                                                            fileData
+                                                    );
+                                                    fileData = new byte[0];
+                                                    fileNames.add(file.getOriginalFilename());
                                                 }
-                                                attachmentService.insertAttachments(
-                                                        attachmentDTO,
-                                                        targetPath,
-                                                        fileData
-                                                );
-                                                fileData = new byte[0];
-                                                fileNames.add(file.getOriginalFilename());
+
+
+                                            } else {
+                                                return new ResponseEntity<>("the attachment is not attached to any leave.", HttpStatus.UNPROCESSABLE_ENTITY);
                                             }
-
-
                                         } else {
-                                            return new ResponseEntity<>("the attachment is not attached to any leave.", HttpStatus.UNPROCESSABLE_ENTITY);
+                                            return new ResponseEntity<>("employee cannot be null and must be the company employee.", HttpStatus.UNPROCESSABLE_ENTITY);
                                         }
-                                    } else {
-                                        return new ResponseEntity<>("employee cannot be null and must be the company employee.", HttpStatus.UNPROCESSABLE_ENTITY);
+                                    }
+                                    else {
+                                        return new ResponseEntity<>("end date leave cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
                                     }
                                 } else {
-                                    return new ResponseEntity<>("date leave cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
+                                    return new ResponseEntity<>("start date leave cannot be null", HttpStatus.UNPROCESSABLE_ENTITY);
                                 }
                             } else {
                                 return new ResponseEntity<>("file type cannot be null or duplicate", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -234,7 +242,8 @@ public class AttachmentController {
                                                     //@RequestParam("directory") String directory,
                                                     @RequestParam(value = "leaveReason", required = false) String leaveReason,
                                                     @RequestParam(value = "employeeName", required = false) String employeeName,
-                                                    @RequestParam(value = "dateLeave", required = false) Date dateLeave,
+                                                    @RequestParam(value = "startDateLeave", required = false) Date startDateLeave,
+                                                    @RequestParam(value = "endDateLeave", required = false) Date endDateLeave,
                                                     @RequestParam(value = "file", required = false) MultipartFile[] files) throws IOException {
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         StringBuilder response = new StringBuilder();
@@ -248,8 +257,11 @@ public class AttachmentController {
                     attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
 
                     attachmentDTO.setDirectory(file.getResource().getURL().getPath());
-                    if (!dateLeave.equals(null)) {
-                        attachmentDTO.setDateLeave(dateLeave);
+                    if (!startDateLeave.equals(null)) {
+                        attachmentDTO.setStartDateLeave(startDateLeave);
+                    }
+                    if(!endDateLeave.equals(null)){
+                        attachmentDTO.setEndDateLeave(endDateLeave);
                     }
                     if (!leaveReason.equalsIgnoreCase("")) {
                         attachmentDTO.setLeaveReason(leaveReason);
@@ -271,10 +283,13 @@ public class AttachmentController {
                 }
             }
         } else {
-            if (dateLeave !=null ) {
-                attachmentDTO.setDateLeave(dateLeave);
+            if (startDateLeave !=null ) {
+                attachmentDTO.setStartDateLeave(startDateLeave);
             }
-            if (dateLeave != null && !leaveReason.equalsIgnoreCase("")) {
+            if (endDateLeave !=null ) {
+                attachmentDTO.setEndDateLeave(endDateLeave);
+            }
+            if (leaveReason != null && !leaveReason.equalsIgnoreCase("")) {
                 attachmentDTO.setLeaveReason(leaveReason);
             }
             if (employeeName != null && !employeeName.equalsIgnoreCase("")) {
@@ -316,7 +331,7 @@ public class AttachmentController {
         attachmentDTO.setDirectory(file.getResource().getURI().toString());
 
         if (!dateLeave.equals(null)) {
-            attachmentDTO.setDateLeave(dateLeave);
+            attachmentDTO.setStartDateLeave(dateLeave);
         }
 
         attachmentDTO.setLeaveReason(leaveReason);

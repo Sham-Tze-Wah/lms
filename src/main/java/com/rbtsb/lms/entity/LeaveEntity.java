@@ -2,6 +2,7 @@ package com.rbtsb.lms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rbtsb.lms.constant.LeaveStatus;
+import com.rbtsb.lms.constant.LeaveType;
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.util.SqlDataType;
@@ -35,26 +36,30 @@ public class LeaveEntity {
     @Column(name="leave_status", length= SqlDataType.VARCHAR64, nullable = false)
     private LeaveStatus leaveStatus;
 
+    @Column(name = "leave_type", length = SqlDataType.VARCHAR64, nullable = false)
+    @Enumerated(value=EnumType.STRING)
+    private LeaveType leaveType;
+
     @Column(name="reason", length= SqlDataType.VARCHAR64, nullable = false)
     private String reason;
 
     @Column(name="description", length= SqlDataType.VARCHAR255)
     private String description;
 
-    @Column(name = "date_leave") //in format of dd/mm/yyyy
+//    @Column(name = "date_leave") //in format of dd/mm/yyyy
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @NonNull
+//    private Date dateLeave = new Date();
+
+    @Column(name = "start_date_leave") //in format of dd/mm/yyyy
     @Temporal(TemporalType.TIMESTAMP)
     @NonNull
-    private Date dateLeave = new Date();
+    private Date startDateLeave = new Date();
 
-//    @Column(name = "date_leave_start") //in format of dd/mm/yyyy
-//    @Temporal(TemporalType.TIMESTAMP)
-//    @NonNull
-//    private Date dateLeaveStart = new Date();
-//
-//    @Column(name = "date_leave_end")
-//    @Temporal(TemporalType.TIMESTAMP)
-//    @NonNull
-//    private Date dateLeaveEnd = new Date();
+    @Column(name = "end_date_leave")
+    @Temporal(TemporalType.TIMESTAMP)
+    @NonNull
+    private Date endDateLeave = new Date();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="emp_id", referencedColumnName = "emp_id")

@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ApiErrorPojo {
     String responseStatus;
-    String responseMessage;
+    Object responseMessage;
 }

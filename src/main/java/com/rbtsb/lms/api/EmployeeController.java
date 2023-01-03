@@ -80,6 +80,11 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/get")
+    public ResponseEntity<?> getEmployeeByName(@RequestParam(value="empName") String name){
+        return new ResponseEntity<>(employeeService.getEmployeeByName(name), HttpStatus.OK);
+    }
+
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateEmployeeById(@PathVariable("id") String id,
                                                 @RequestBody @Valid @NonNull EmployeePojo employeePojo){

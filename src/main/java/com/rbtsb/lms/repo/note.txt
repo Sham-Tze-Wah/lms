@@ -1,0 +1,5 @@
+Everything that need to return to the front end / view should be pojo or dto,
+ but you can use internally with the employeeEntity with the restrict of dto transfer
+ between different layers
+
+ and pojo is to responsible to map with entity.

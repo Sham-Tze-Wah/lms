@@ -19,7 +19,8 @@ public class AttachmentDTO {
     private String fileName;
     private String fileType;
     private String directory;
-    private Date dateLeave = new Date();
+    private Date startDateLeave = new Date();
+    private Date endDateLeave = new Date();
     private String leaveReason;
     private String employeeName;
 }

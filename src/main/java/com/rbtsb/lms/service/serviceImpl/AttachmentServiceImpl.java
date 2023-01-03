@@ -64,7 +64,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
             // TODO: encrypt the file
             byte[] fileData = FileUtil.compressFile(file.getBytes(),rootInsert + file.getOriginalFilename());
-            AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntityCreate(
+            AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntity("",
                     attachmentDTO, fileData);
             attachmentRepo.saveAndFlush(attachmentEntity);
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             File fileDirectory = new File(directory);
             if(!fileExtension.equalsIgnoreCase("")){
                 if(fileDirectory.exists() && !fileDirectory.isDirectory()){
-                    AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntityCreate(
+                    AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntity("",
                             attachmentDTO, file);
                     attachmentRepo.saveAndFlush(attachmentEntity);
                 }
@@ -144,7 +144,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                     destDir = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + file.getOriginalFilename();
                 }
 
-                Optional<AttachmentEntity> attachmentEntity = attachmentRepo.findByName(attachmentDTO.getFileName());
+                Optional<AttachmentEntity> attachmentEntity = attachmentRepo.findByFileName(attachmentDTO.getFileName());
                 if(attachmentDTO.getFileName() == null ||
                         attachmentDTO.getFileName().equalsIgnoreCase("")){
                     attachment.get().setFileName(attachment.get().getFileName());
@@ -164,15 +164,26 @@ public class AttachmentServiceImpl implements AttachmentService {
                     attachment.get().setFileType(attachmentDTO.getFileType());
                 }
 
-                Date dateLeave;
-                if(attachmentDTO.getDateLeave() != null &&
-                        !attachmentDTO.getDateLeave().equals(null)){
-                    dateLeave = DateTimeUtil.yyyyMMddDate(attachmentDTO.getDateLeave());
+                Date startDateLeave;
+                if(attachmentDTO.getStartDateLeave() != null &&
+                        !attachmentDTO.getStartDateLeave().equals(null)){
+                    startDateLeave = DateTimeUtil.yyyyMMddDate(attachmentDTO.getStartDateLeave());
                 }
                 else{
-                    dateLeave = DateTimeUtil.yyyyMMddDate(attachment.get().getLeaveEntity().getDateLeave());
+                    startDateLeave = DateTimeUtil.yyyyMMddDate(attachment.get().getLeaveEntity().getStartDateLeave());
                 }
-                attachment.get().getLeaveEntity().setDateLeave(dateLeave);
+                attachment.get().getLeaveEntity().setStartDateLeave(startDateLeave);
+
+                Date endDateLeave;
+                if(attachmentDTO.getEndDateLeave() != null &&
+                        !attachmentDTO.getEndDateLeave().equals(null)){
+                    endDateLeave = DateTimeUtil.yyyyMMddDate(attachmentDTO.getEndDateLeave());
+                }
+                else{
+                    endDateLeave = DateTimeUtil.yyyyMMddDate(attachment.get().getLeaveEntity().getEndDateLeave());
+                }
+                attachment.get().getLeaveEntity().setEndDateLeave(endDateLeave);
+
 
                 StringBuilder empName = new StringBuilder();
                 Optional<EmployeeEntity> emp;
@@ -184,7 +195,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 }
                 else if(attachmentDTO.getEmployeeName() != null &&
                         !attachmentDTO.getEmployeeName().equalsIgnoreCase("")){
-                    emp = employeeRepo.getEmployeeByName(attachmentDTO.getEmployeeName());
+                    emp = employeeRepo.findByName(attachmentDTO.getEmployeeName());
                     if(emp.isPresent()){
                         empName.setLength(0);
                         empName.append(attachmentDTO.getEmployeeName());
@@ -209,9 +220,10 @@ public class AttachmentServiceImpl implements AttachmentService {
                 }
                 else if(attachmentDTO.getLeaveReason() != null &&
                         !attachmentDTO.getLeaveReason().equalsIgnoreCase("")){
-                    leave = leaveDTORepo.findByEmployeeAndDate(
+                    leave = leaveDTORepo.findByEmployeeNameAndStartDateLeaveAndEndDateLeave(
                             empName.toString(),
-                            dateLeave);
+                            startDateLeave,
+                            endDateLeave);
                     if(leave.isPresent()){
                         leaveReason.setLength(0);
                         leaveReason.append(attachmentDTO.getLeaveReason());
@@ -253,8 +265,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                     response.append("File: " + attachmentDTO.getFileName() + "\n");
                 }
 
-                //FileUtil.readZipFileAndReturnBytes(sourcePath);
-                // TODO: test below line of code
+
                 leaveDTORepo.saveAndFlush(attachment.get().getLeaveEntity());
 
                 attachmentRepo.saveAndFlush(attachment.get());
@@ -303,12 +314,13 @@ public class AttachmentServiceImpl implements AttachmentService {
                 attachment.setFileName(file.getOriginalFilename());
                 attachment.setDirectory(attachmentDTO.getDirectory());
                 attachment.setFileType(file.getContentType());
-                Optional<String> leave = leaveDTORepo.findByReasonAndEmployeeAndDate(
-                        attachmentDTO.getLeaveReason(),
+                Optional<LeaveEntity> leave = leaveDTORepo.findByEmployeeNameAndStartDateLeaveAndEndDateLeave(
                         attachmentDTO.getEmployeeName(),
-                        DateTimeUtil.yyyyMMddDate(attachmentDTO.getDateLeave()));
+                        DateTimeUtil.yyyyMMddDate(attachmentDTO.getStartDateLeave()),
+                        DateTimeUtil.yyyyMMddDate(attachmentDTO.getEndDateLeave())
+                        );
                 if(leave.isPresent()){
-                    attachment.setLeaveEntity(leaveDTORepo.findById(leave.get()).get());
+                    attachment.setLeaveEntity(leaveDTORepo.findById(leave.get().getLeaveId()).get());
                 }
                 attachment.setFileData(FileUtil.compressImage(file.getBytes()));
                 attachmentRepo.saveAndFlush(attachment);
@@ -331,25 +343,53 @@ public class AttachmentServiceImpl implements AttachmentService {
         return response.toString();
     }
 
+    // TODO: add end date leave
+
     @Override
     public String uploadFile(MultipartFile file, AttachmentDTO attachmentDTO) {
         AttachmentEntity attachment = new AttachmentEntity();
+        LeaveEntity leave = new LeaveEntity();
+        EmployeeEntity employee = new EmployeeEntity();
+
         StringBuilder response = new StringBuilder();
         try{
-            if(!attachmentDTO.equals(null)){
+            if(file.isEmpty() && !attachmentDTO.equals(null)){
                 attachment.setFileName(file.getOriginalFilename());
                 attachment.setDirectory(attachmentDTO.getDirectory());
                 attachment.setFileType(file.getContentType());
-                Optional<String> leave = leaveDTORepo.findByReasonAndEmployeeAndDate(
-                        attachmentDTO.getLeaveReason(),
-                        attachmentDTO.getEmployeeName(),
-                        DateTimeUtil.yyyyMMddDate(attachmentDTO.getDateLeave()));
-                if(leave.isPresent()){
-                    attachment.setLeaveEntity(leaveDTORepo.findById(leave.get()).get());
-                }
                 attachment.setFileData(FileUtil.compressImage(file.getBytes()));
-                attachmentRepo.saveAndFlush(attachment);
-                response.append("Upload file successfully.");
+
+                if(attachmentDTO.getEmployeeName() != null && !attachmentDTO.getEmployeeName().equalsIgnoreCase("")){
+                    Optional<EmployeeEntity> tempEmp = employeeRepo.findByName(attachmentDTO.getEmployeeName());
+
+                    if(tempEmp.isPresent()){
+                        if(attachmentDTO.getStartDateLeave() != null){
+                            if(attachmentDTO.getEndDateLeave() != null){
+                                Optional<LeaveEntity> tempLeave = leaveDTORepo.findByEmployeeNameAndStartDateLeaveAndEndDateLeave(
+                                        attachmentDTO.getEmployeeName(),
+                                        DateTimeUtil.yyyyMMddDate(attachmentDTO.getStartDateLeave()),
+                                        DateTimeUtil.yyyyMMddDate(attachmentDTO.getEndDateLeave())
+                                );
+                                if(tempLeave.isPresent()){
+                                    tempLeave.get().setEmployeeEntity(tempEmp.get());
+                                    attachment.setLeaveEntity(tempLeave.get());
+                                }
+                                attachmentRepo.saveAndFlush(attachment);
+                                leaveDTORepo.saveAndFlush(tempLeave.get());
+                                response.append("Upload file successfully.");
+                            }
+                            else{
+                                response.setLength(0);
+                                response.append("Upload file unsuccessfully due to empty start date leave.");
+                            }
+                        }
+                        else{
+                            response.setLength(0);
+                            response.append("Upload file unsuccessfully due to empty end date leave.");
+                        }
+                    }
+                }
+
             }
             else{
                 response.setLength(0);
@@ -371,7 +411,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public byte[] downloadFile(String fileName) {
-        Optional<AttachmentEntity> dbAttachmentEntity = attachmentRepo.findByName(fileName);
+        Optional<AttachmentEntity> dbAttachmentEntity = attachmentRepo.findByFileName(fileName);
 
         if(dbAttachmentEntity.isPresent()){
             String fileExtension = FileUtil.getFileExtension(dbAttachmentEntity.get().getFileName());
@@ -400,7 +440,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Deprecated
     @Override
     public byte[] downloadFileFromDB(String fileName) {
-        Optional<AttachmentEntity> dbAttachmentEntity = attachmentRepo.findByName(fileName);
+        Optional<AttachmentEntity> dbAttachmentEntity = attachmentRepo.findByFileName(fileName);
         if(dbAttachmentEntity.isPresent()){
             String fileExtension = FileUtil.getFileExtension(dbAttachmentEntity.get().getFileName());
             byte[] response = FileUtil.decompressFileFromDB(fileName, dbAttachmentEntity.get().getFileData());
@@ -413,7 +453,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public Optional<AttachmentEntity> getAttachmentByFileName(String fileName) {
-        return attachmentRepo.findByName(fileName);
+        return attachmentRepo.findByFileName(fileName);
     }
 
     @Override
