@@ -79,9 +79,9 @@ public class WorkExperienceController {
     }
 
     @PutMapping("/put/{id}")
-    public ResponseEntity<?> updateWorkExperienceById(@PathVariable("id") String id,
+    public ResponseEntity<?> updateWorkExperienceByEmpId(@PathVariable("id") String empId,
             @RequestBody @Valid @NonNull WorkExperiencePojo workExperiencePojo){
-        return new ResponseEntity<>(workExperienceService.updateWorkExperienceByEmpId(id, workExperiencePojo)
+        return new ResponseEntity<>(workExperienceService.updateWorkExperienceByEmpId(empId, workExperiencePojo)
         ,HttpStatus.OK);
     }
 
