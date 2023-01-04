@@ -16,9 +16,9 @@ public interface LeaveService {
 
     public String deleteLeaveById(String id);
 
-    String approveLeaveStatus(String id);
+    ApiErrorPojo approveLeaveStatus(String id);
 
-    String rejectLeaveStatus(String id);
+    ApiErrorPojo rejectLeaveStatus(String id);
 
     @Deprecated
     ApiErrorPojo checkDuplicateReason(LeaveDTO leaveDTO);

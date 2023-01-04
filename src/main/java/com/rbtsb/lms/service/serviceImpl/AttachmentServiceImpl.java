@@ -3,11 +3,13 @@ package com.rbtsb.lms.service.serviceImpl;
 import com.rbtsb.lms.constant.GlobalConstant;
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.dto.LeaveDTO;
+import com.rbtsb.lms.dto.VisibleAttachmentDTO;
 import com.rbtsb.lms.entity.AttachmentEntity;
 import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.entity.LeaveEntity;
 import com.rbtsb.lms.error.ErrorAction;
 import com.rbtsb.lms.pojo.ApiErrorPojo;
+import com.rbtsb.lms.pojo.AttachmentPojo;
 import com.rbtsb.lms.repo.AttachmentRepo;
 import com.rbtsb.lms.repo.EmployeeRepo;
 import com.rbtsb.lms.repo.LeaveDTORepo;
@@ -78,16 +80,18 @@ public class AttachmentServiceImpl implements AttachmentService {
         try{
             String fileName = attachmentDTO.getFileName();
             String fileExtension = FileUtil.getFileExtension(fileName);
+            boolean isPicture = FileValidation.isPicture(fileExtension);
 
             File fileDirectory = new File(directory);
             if(!fileExtension.equalsIgnoreCase("")){
-                if(fileDirectory.exists() && !fileDirectory.isDirectory()){
+                if((fileDirectory.exists() && !fileDirectory.isDirectory()) || isPicture){
                     AttachmentEntity attachmentEntity = attachmentMapper.DTOToEntity("",
                             attachmentDTO, file);
                     attachmentRepo.saveAndFlush(attachmentEntity);
                 }
                 else{
                     return "Your file has corrupted or missing. " + ErrorAction.ERROR_ACTION;
+
                 }
             }
             else{
@@ -110,11 +114,15 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<AttachmentDTO> getAllAttachment() {
+    public List<VisibleAttachmentDTO> getAllAttachment() {
         List<AttachmentEntity> attachmentEntities = attachmentRepo.findAll();
-        List<AttachmentDTO> dtoList = new ArrayList<>();
+        List<VisibleAttachmentDTO> dtoList = new ArrayList<>();
         attachmentEntities.forEach(attachmentEntity -> {
-            dtoList.add(attachmentMapper.entityToDTO(attachmentEntity));
+            try {
+                dtoList.add(attachmentMapper.entityToVisibleDTO(attachmentEntity));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         if(!dtoList.isEmpty()){
@@ -343,10 +351,8 @@ public class AttachmentServiceImpl implements AttachmentService {
         return response.toString();
     }
 
-    // TODO: add end date leave
-
     @Override
-    public String uploadFile(MultipartFile file, AttachmentDTO attachmentDTO) {
+    public String uploadFile(String leaveId, MultipartFile file, AttachmentDTO attachmentDTO) {
         AttachmentEntity attachment = new AttachmentEntity();
         LeaveEntity leave = new LeaveEntity();
         EmployeeEntity employee = new EmployeeEntity();
@@ -357,7 +363,30 @@ public class AttachmentServiceImpl implements AttachmentService {
                 attachment.setFileName(file.getOriginalFilename());
                 attachment.setDirectory(attachmentDTO.getDirectory());
                 attachment.setFileType(file.getContentType());
-                attachment.setFileData(FileUtil.compressImage(file.getBytes()));
+
+                String extension = FileUtil.getFileExtension(file.getOriginalFilename());
+                boolean isZip = FileValidation.isZip(extension);
+                boolean isPicture = FileValidation.isPicture(extension);
+                if(isZip){
+                    attachment.setFileData(file.getBytes());
+                }
+                else if(isPicture){
+                    attachment.setFileData(FileUtil.compressImage(file.getBytes()));
+                }
+                else{
+                    attachment.setFileData(file.getBytes());
+                }
+
+
+                if(leaveId != null && !leaveId.equalsIgnoreCase("")){
+                    Optional<LeaveEntity> leaveEntity = leaveDTORepo.findById(leaveId);
+                    if(leaveEntity.isPresent()){
+                        attachment.setLeaveEntity(leaveEntity.get());
+                        attachmentRepo.saveAndFlush(attachment);
+                        response.append("Upload file successfully.");
+                        return response.toString();
+                    }
+                }
 
                 if(attachmentDTO.getEmployeeName() != null && !attachmentDTO.getEmployeeName().equalsIgnoreCase("")){
                     Optional<EmployeeEntity> tempEmp = employeeRepo.findByName(attachmentDTO.getEmployeeName());
@@ -376,6 +405,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                                 }
                                 attachmentRepo.saveAndFlush(attachment);
                                 leaveDTORepo.saveAndFlush(tempLeave.get());
+                                response.setLength(0);
                                 response.append("Upload file successfully.");
                             }
                             else{

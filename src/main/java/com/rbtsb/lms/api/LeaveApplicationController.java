@@ -87,14 +87,14 @@ public class LeaveApplicationController {
     }
 
     @PutMapping("/put/{id}")
-    public ResponseEntity<?> updateLeaveApplicationById(@PathVariable("id") String id, @RequestBody @Valid @NonNull LeaveDTO leaveDTO){
-        ApiErrorPojo apiErrorPojo = leaveService.updateLeaveApplication(id, leaveDTO);
+    public ResponseEntity<?> updateLeaveApplicationByLeaveId(@PathVariable("id") String leaveId, @RequestBody @Valid @NonNull LeaveDTO leaveDTO){
+        ApiErrorPojo apiErrorPojo = leaveService.updateLeaveApplication(leaveId, leaveDTO);
         return new ResponseEntity<>(apiErrorPojo.getResponseMessage(), ErrorStatus.codeMapResponse.get(
                 apiErrorPojo.getResponseStatus()
         ));
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteLeaveApplicationById(@PathVariable("id") String id){
         String response = leaveService.deleteLeaveById(id);
         if(response.equalsIgnoreCase("Deleted successfully")){
@@ -105,25 +105,25 @@ public class LeaveApplicationController {
         }
     }
 
-    @PutMapping("/approve")
+    @PutMapping("/approve/{id}")
     public ResponseEntity<?> approveLeaveApplication(@PathVariable("id") String id){
-        String response = leaveService.approveLeaveStatus(id);
-        if(response.equalsIgnoreCase("Approved status updated successfully.")){
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        else{
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        ApiErrorPojo apiErrorPojo = leaveService.approveLeaveStatus(id);
+        return new ResponseEntity<>(
+                apiErrorPojo.getResponseMessage(),
+                ErrorStatus.codeMapResponse.get(
+                        apiErrorPojo.getResponseStatus()
+                )
+        );
     }
 
-    @PutMapping("/reject")
+    @PutMapping("/reject/{id}")
     public ResponseEntity<?> rejectLeaveApplication(@PathVariable("id") String id){
-        String response = leaveService.rejectLeaveStatus(id);
-        if(response.equalsIgnoreCase("Rejected status updated successfully.")){
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        else{
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        ApiErrorPojo apiErrorPojo = leaveService.rejectLeaveStatus(id);
+        return new ResponseEntity<>(
+                apiErrorPojo.getResponseMessage(),
+                ErrorStatus.codeMapResponse.get(
+                        apiErrorPojo.getResponseStatus()
+                )
+        );
     }
 }

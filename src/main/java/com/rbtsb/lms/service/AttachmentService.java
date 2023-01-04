@@ -1,8 +1,10 @@
 package com.rbtsb.lms.service;
 
 import com.rbtsb.lms.dto.AttachmentDTO;
+import com.rbtsb.lms.dto.VisibleAttachmentDTO;
 import com.rbtsb.lms.entity.AttachmentEntity;
 import com.rbtsb.lms.pojo.ApiErrorPojo;
+import com.rbtsb.lms.pojo.AttachmentPojo;
 import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +19,7 @@ public interface AttachmentService {
 
     public String insertAttachments(AttachmentDTO attachmentDTO, String fileName, byte[] file) throws IOException;
 
-    public List<AttachmentDTO> getAllAttachment();
+    public List<VisibleAttachmentDTO> getAllAttachment();
 
     public ApiErrorPojo updateAttachmentById(String id, AttachmentDTO attachmentDTO, MultipartFile file) throws IOException;
 
@@ -26,7 +28,7 @@ public interface AttachmentService {
     @Deprecated
     public String uploadImage(MultipartFile file, AttachmentDTO attachmentDTO) throws IOException;
 
-    public String uploadFile(MultipartFile file, AttachmentDTO attachmentDTO) throws IOException;
+    public String uploadFile(String leaveId, MultipartFile file, AttachmentDTO attachmentDTO) throws IOException;
 
     public byte[] downloadFile(String fileName);
 

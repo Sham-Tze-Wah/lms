@@ -392,6 +392,83 @@ public class FileUtil {
         //return "File Name: " + fileDirectory + " decompress successfully.";
     }
 
+    public static byte[] decompressZipFileFromDBWithoutCreatingFile(byte[] fileData){
+//        String fileExtension = getFileExtension(fileName);
+//        String fileNameWithoutExtension = getFileName(fileName);
+//        String originalPath = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName;
+//        String decompFilePath = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" + fileName;
+//        //File fileDirectory = new File(decompFilePath);
+
+        //Create directory
+//        File downloadPath = new File(GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\");
+//        if (!(downloadPath.isDirectory() && downloadPath.exists())) {
+//            downloadPath.mkdir(); //create directory
+//        }
+
+        ByteArrayInputStream dbRead = new ByteArrayInputStream(fileData);
+        ByteArrayOutputStream dbWrite = new ByteArrayOutputStream();
+        //InflaterOutputStream decompByteArray = new InflaterOutputStream(dbWrite);
+        List<String> fileNames = new ArrayList<>();
+        byte[] buffer = new byte[1024];
+
+        try {
+//            String decompDirectory = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\" +
+//                    getFileName(decompFilePath) + "_" +
+//                    DateTimeUtil.yyyyMMddhhmmssDateTime(new Date()) +
+//                    fileExtension;
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(fileData);
+            ZipInputStream zis = new ZipInputStream(bais);
+            ZipEntry ze = zis.getNextEntry();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            FileOutputStream fos = new FileOutputStream(decompDirectory);
+            //ZipOutputStream zos = new ZipOutputStream(baos);
+
+            while (ze != null) {
+                String zipFileName = ze.getName();
+//                File newFile = new File(decompDirectory);
+//                System.out.println("Unzipping and Download to " + newFile.getAbsolutePath());
+//                fileNames.add(newFile.getAbsolutePath());
+
+                //create directories for sub directories in zip
+//                new File(newFile.getParent()).mkdirs();
+
+                int len;
+
+                while ((len = zis.read(buffer)) > 0) {
+                    baos.write(buffer, 0, len);
+//                    fos.write(buffer, 0, len);
+                }
+                baos.close();
+
+                //close this ZipEntry
+                zis.closeEntry();
+                ze = zis.getNextEntry();
+            }
+            //close last ZipEntry
+            zis.closeEntry();
+            zis.close();
+
+
+            return baos.toByteArray();
+
+
+        } catch (FileNotFoundException e) {
+            return ("decompress failed due to file not exists." + ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return ("decompress failed due to file read error." + ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+        }
+//        catch (ParseException e) {
+//            return ("decompress failed due to date time error." + ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+//        }
+        catch (Exception ex) {
+            return ("decompress failed due to internal error. " + ErrorAction.ERROR_ACTION).getBytes(StandardCharsets.UTF_8);
+        } finally {
+
+        }
+    }
+
     @Deprecated
     public static void zipFiles(String... filePaths) {
         try {
@@ -488,6 +565,32 @@ public class FileUtil {
         }
         readFile.close();
         return sb.toString();
+    }
+
+    public static byte[] readByteAndReturnStringBytes(byte[] readByte) {
+
+        String outputStr = "";
+        try{
+            outputStr = new String(readByte, StandardCharsets.UTF_8);
+//            ByteArrayInputStream readByteArray = new ByteArrayInputStream(readByte);
+//            ByteArrayOutputStream writeByteArray = new ByteArrayOutputStream();
+//
+//            int len;
+//            while ((len = readByteArray.read()) != -1) {
+//                writeByteArray.write(len);
+//            }
+        }
+//        catch(FileNotFoundException fnfEx){
+//            outputStr = fnfEx.toString();
+//        }
+//        catch(IOException ioEx){
+//            outputStr = ioEx.toString();
+//        }
+        catch(Exception ex){
+            outputStr = ex.toString();
+        }
+
+        return outputStr.getBytes(StandardCharsets.UTF_8);
     }
 
     public static byte[] readZipFileAndReturnBytes(String directory) throws IOException {

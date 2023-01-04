@@ -28,8 +28,10 @@ public class LeaveMapper {
         leaveDTO.setStartDateLeave(leaveEntity.getStartDateLeave());
         leaveDTO.setEndDateLeave(leaveEntity.getEndDateLeave());
         leaveDTO.setLeaveStatus(leaveEntity.getLeaveStatus());
+        leaveDTO.setLeaveType(leaveEntity.getLeaveType());
         leaveDTO.setReason(leaveEntity.getReason());
         leaveDTO.setDescription(leaveEntity.getDescription());
+        leaveDTO.setEmployeeName(leaveEntity.getEmployeeEntity().getName());
         //leaveDTO.setEmployeePojo(EmployeeMapper.entityToPojo(leaveEntity.getEmployeeEntity()));
 
         return leaveDTO;
@@ -51,7 +53,9 @@ public class LeaveMapper {
             leave.setEndDateLeave(DateTimeUtil.yyyyMMddDate(leaveDTO.getEndDateLeave()));
             leave.setReason(leaveDTO.getReason());
             leave.setDescription(leaveDTO.getDescription());
-            leave.setEmployeeEntity(employeeRepo.findByName(leaveDTO.getEmployeeName()).get());
+
+            Optional<EmployeeEntity> emp = employeeRepo.findByName(leaveDTO.getEmployeeName());
+            leave.setEmployeeEntity(emp.get());
             return leave;
 
 //        else{

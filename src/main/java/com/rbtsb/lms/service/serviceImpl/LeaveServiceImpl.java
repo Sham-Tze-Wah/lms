@@ -39,6 +39,7 @@ public class LeaveServiceImpl implements LeaveService {
         ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
 
         try{
+
             leaveDTORepo.saveAndFlush(
                     leaveMapper.DTOToEntity("",leaveDTO)
             );
@@ -169,7 +170,7 @@ public class LeaveServiceImpl implements LeaveService {
             }
         }
         else{
-            apiErrorPojo.setResponseMessage("the updated leave is null");
+            apiErrorPojo.setResponseMessage("the leave id is null");
             apiErrorPojo.setResponseStatus("422");
         }
         return apiErrorPojo;
@@ -189,30 +190,53 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public String approveLeaveStatus(String id) {
+    public ApiErrorPojo approveLeaveStatus(String id) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
+        ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
 
         if(leave.isPresent()){
-            leave.get().setLeaveStatus(LeaveStatus.Approved);
-            leaveDTORepo.saveAndFlush(leave.get());
-            return "Approved status updated successfully.";
+            if(!leave.get().getLeaveStatus().toString().equalsIgnoreCase("Approved")
+            && !leave.get().getLeaveStatus().toString().equalsIgnoreCase("Rejected")){
+                leave.get().setLeaveStatus(LeaveStatus.Approved);
+                leaveDTORepo.saveAndFlush(leave.get());
+                apiErrorPojo.setResponseStatus("200");
+                apiErrorPojo.setResponseMessage("Approved status updated successfully.");
+            }
+            else{
+                apiErrorPojo.setResponseStatus("422");
+                apiErrorPojo.setResponseMessage("the leave status has been approved or rejected.");
+            }
         }
         else{
-            return "the id provided is not exist";
+            apiErrorPojo.setResponseStatus("422");
+            apiErrorPojo.setResponseMessage("the id provided is not exist");
         }
+        return apiErrorPojo;
     }
 
     @Override
-    public String rejectLeaveStatus(String id) {
+    public ApiErrorPojo rejectLeaveStatus(String id) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
+        ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
 
         if(leave.isPresent()){
-            leave.get().setLeaveStatus(LeaveStatus.Rejected);
-            leaveDTORepo.saveAndFlush(leave.get());
-            return "Rejected status updated successfully.";
+            if(!leave.get().getLeaveStatus().toString().equalsIgnoreCase("Approved")
+                    && !leave.get().getLeaveStatus().toString().equalsIgnoreCase("Rejected")){
+                leave.get().setLeaveStatus(LeaveStatus.Rejected);
+                leaveDTORepo.saveAndFlush(leave.get());
+                apiErrorPojo.setResponseStatus("200");
+                apiErrorPojo.setResponseMessage("Rejected status updated successfully.");
+            }
+            else{
+                apiErrorPojo.setResponseStatus("422");
+                apiErrorPojo.setResponseMessage("the leave status has been approved or rejected.");
+            }
+
         }
         else{
-            return "the id provided is not exist";
+            apiErrorPojo.setResponseStatus("422");
+            apiErrorPojo.setResponseMessage("the id provided is not exist");
         }
+        return apiErrorPojo;
     }
 }
