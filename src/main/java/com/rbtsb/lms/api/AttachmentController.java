@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.print.attribute.standard.Media;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
@@ -241,7 +242,7 @@ public class AttachmentController {
         }
     }
 
-    @GetMapping("/get/all")
+    @GetMapping(path = "/get/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllAttachment() {
         List<VisibleAttachmentDTO> empList = attachmentService.getAllAttachment();
 
@@ -348,7 +349,9 @@ public class AttachmentController {
         return new ResponseEntity<>(attachmentService.deleteAttachmentById(id), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/post/upload", consumes = MediaType.APPLICATION_JSON_VALUE)
+    // TODO: change file to files (array of multipart)
+
+    @PostMapping(path = "/post/upload")
     public ResponseEntity<?> uploadFile(//@RequestParam("fileName") String fileName,
 //                                         @RequestParam("fileType") FileType fileType,
 //                                         @RequestParam("directory") String directory,

@@ -359,7 +359,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         StringBuilder response = new StringBuilder();
         try{
-            if(file.isEmpty() && !attachmentDTO.equals(null)){
+            if(!file.isEmpty() && !attachmentDTO.equals(null)){
                 attachment.setFileName(file.getOriginalFilename());
                 attachment.setDirectory(attachmentDTO.getDirectory());
                 attachment.setFileType(file.getContentType());
