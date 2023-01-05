@@ -22,14 +22,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Decoder;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.imageio.ImageIO;
+import javax.persistence.Convert;
 import javax.print.attribute.standard.Media;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
+import javax.xml.bind.DatatypeConverter;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -242,11 +250,33 @@ public class AttachmentController {
         }
     }
 
-    @GetMapping(path = "/get/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllAttachment() {
+    @GetMapping(path = "/get/all")//, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE,MediaType.IMAGE_JPEG_VALUE})
+    public ResponseEntity<?> getAllAttachment() throws UnsupportedEncodingException {
         List<VisibleAttachmentDTO> empList = attachmentService.getAllAttachment();
-
         ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
+
+        for(VisibleAttachmentDTO dto : empList){
+            String extension = FileUtil.getFileExtension(dto.getFileName());
+            boolean isPicture = FileValidation.isPicture(extension);
+
+            if(isPicture){
+//                try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//                     ObjectOutputStream oos = new ObjectOutputStream(bos)){
+//                    oos.writeObject(dto.getFileData());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+
+                ResponseEntity re = ResponseEntity.ok()
+                        //.contentType(MediaType.IMAGE_JPEG)
+                        .body(
+                                Base64.getEncoder().encodeToString(
+                                (byte[])dto.getFileData()).replaceAll("\\s+","")
+                        );
+                dto.setFileData(re);
+            }
+
+        }
 
         apiErrorPojo.setResponseStatus("200");
         apiErrorPojo.setResponseMessage(empList);
@@ -428,12 +458,12 @@ public class AttachmentController {
 
     }
 
-    @PostMapping(path = "/post/download", produces = MediaType.ALL_VALUE)
+    @PostMapping(path = "/post/download")
     public ResponseEntity<?> downloadFile(
             @RequestParam("fileName") String fileName) { //with extension
         ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
 
-        // TODO: try catch for attachment
+        // TODO: try catch for attachment (completed)
         try{
             String fileExtension = FileUtil.getFileExtension(fileName);
             boolean isPicture = FileValidation.isPicture(fileExtension);
@@ -443,35 +473,176 @@ public class AttachmentController {
                 data = attachmentService.downloadFile(fileName);
 //                return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("image/png"))
 //                        .body(data);
+
+                apiErrorPojo.setResponseStatus("200");
+                apiErrorPojo.setResponseMessage(data);
+                return ResponseEntity.status(ErrorStatus.codeMapResponse.get(
+                        apiErrorPojo.getResponseStatus()
+                )).contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .body(apiErrorPojo.getResponseMessage());
             } else if (isPicture) {
                 data = attachmentService.downloadFile(fileName);
-                FileUtil.writeImage(fileName, data);
+                writeImageFile(data.toString());
+                //FileUtil.writeImage(fileName, data);
 //                return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("image/png"))
 //                        .body(data);
+                apiErrorPojo.setResponseStatus("200");
+
+
+                byte[] encodeData = Base64.getEncoder().encode(data);
+                String encodeStr = new String(encodeData);
+
+                data = new byte[0];
+                data = Base64.getDecoder().decode(encodeStr.getBytes());
+                apiErrorPojo.setResponseMessage(data);
+
+                return ResponseEntity.status(ErrorStatus.codeMapResponse.get(
+                        apiErrorPojo.getResponseStatus()
+                )).contentType(MediaType.valueOf("image/png"))
+                        .body(apiErrorPojo.getResponseMessage());
             } else {
                 data = attachmentService.downloadFileFromDB(fileName);
 //                return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("application/octet-stream"))//.contentType(MediaType.valueOf("text/plain"))
 //                        .body(data); //FileUtil.convertByteToString(data)
+                apiErrorPojo.setResponseStatus("200");
+                apiErrorPojo.setResponseMessage(data);
+                return ResponseEntity.status(ErrorStatus.codeMapResponse.get(
+                        apiErrorPojo.getResponseStatus()
+                )).contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .body(apiErrorPojo.getResponseMessage());
             }
-            apiErrorPojo.setResponseStatus("200");
+
 
 //            Base64.Decoder decoder = Base64.getDecoder();
 //            String encoded = data.toString();
             //decoder.decode(encoded)
-            apiErrorPojo.setResponseMessage(data);
+
         }
         catch(Exception ex){
             apiErrorPojo.setResponseStatus("400");
             apiErrorPojo.setResponseMessage(ex.toString());
+            return ResponseEntity.status(ErrorStatus.codeMapResponse.get(
+                    apiErrorPojo.getResponseStatus()
+            )).body(apiErrorPojo.getResponseMessage());
         }
 
 
-        return ResponseEntity.status(ErrorStatus.codeMapResponse.get(
-                apiErrorPojo.getResponseStatus()
-        ))//.contentType(MediaType.valueOf("image/png"))
-                .body(apiErrorPojo.getResponseMessage());
+
 
     }
+
+    @GetMapping(path="/displayImage")
+    public ResponseEntity<?> displayImage(@RequestParam("image") String imageData){
+        int width = 134;
+        int height = 134;
+//        int pixels = getPixel(imageData);
+
+        try{
+
+
+
+////            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+////            bitmap.compress(CompressFormat.JPEG, 70, stream);
+////            return stream.toByteArray();
+//
+////https://stackoverflow.com/questions/34308211/imageio-read-cant-read-bytearrayinputstream-image-processing
+//            BASE64Decoder decoder = new BASE64Decoder();
+//            byte[] imageBytes = decoder.decodeBuffer("date:image/jpeg;base64,"+imageData);
+//
+//             //javax.xml.bind.DatatypeConverter.parseBase64Binary(imageData);
+//            byte[] imageByte1 = Base64.getDecoder().decode(imageData);
+
+
+            String data = "data:image/jpeg;base64,"+imageData;
+            String base64Image = data.split(",")[1];
+            String encodeStr = URLEncoder.encode(base64Image,StandardCharsets.UTF_8.toString());
+            encodeStr = encodeStr.replaceAll("\\+","%2B");
+            System.out.println(encodeStr);
+            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(encodeStr);
+//
+//            //BufferedImage convertedGrayscale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+//            //convertedGrayscale.getRaster().setDataElements(0, 0, width, height, pixels);
+//
+//            ByteArrayOutputStream os = new ByteArrayOutputStream();
+//            BufferedImage convertedGrayscale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+//            //InputStream is = new ByteArrayInputStream(imageBytes);
+//            convertedGrayscale.getRaster().setDataElements(0, 0, width, height, imageBytes);
+//            ImageIO.write(convertedGrayscale, "JPEG", os);
+//
+//            writeImageFile(imageData);
+            //ImageIO.createImageOutputStream(new ByteArrayInputStream(imageBytes));
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG)
+                    .body(imageBytes); //os.toByteArray()
+        }
+        catch(Exception ex){
+            return ResponseEntity.badRequest().body(ex.toString());
+        }
+
+    }
+
+    private int getPixel(String imageData){
+
+        int stringLength = imageData.length() - "data:image/png;base64,".length();
+
+        double sizeInBytes = 4 * Math.ceil((stringLength / 3))*0.5624896334383812;
+        double sizeInKb=sizeInBytes/1000;
+
+        return stringLength;
+    }
+
+    private byte[] writeImageFile(String imageData) throws UnsupportedEncodingException {
+        String base64String = "data:image/jpeg;base64,"+imageData;
+        String[] strings = base64String.split(",");
+        byte[] data = DatatypeConverter.parseBase64Binary(strings[1]);
+
+        try{
+            String path = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\"+ "bear_"+DateTimeUtil.yyyyMMddhhmmssDateTime(new Date())+".jpeg";
+            File file = new File(path);
+
+            //Approach 1
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+            ImageIO.write(img, "JPEG", file);
+
+            //Approach 2
+//            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
+//
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//            OutputStream outputStream2 = new BufferedOutputStream(byteArrayOutputStream);
+//
+//            byte[] b = new byte[4 * 1024];
+//            BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(data));
+//            int bytesRead; // Keep track of the number of bytes read into 'b'
+//            while ((bytesRead = in.read(b)) != -1){
+//                outputStream.write(b, 0, bytesRead);
+//                outputStream2.write(b, 0, bytesRead);
+//            }
+//
+//            data=byteArrayOutputStream.toByteArray();
+            //outputStream.write(data);
+        }
+        catch(IOException ioEx){
+            return null;
+        }
+//        catch(FileNotFoundException fnfEx){
+//            return null;
+//        }
+        catch(Exception ex){
+            return null;
+        }
+        return data;
+    }
+
+
+    public static byte[] toByteArray(BufferedImage bi, String format)
+        throws IOException {
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(bi, format, baos);
+            byte[] bytes = baos.toByteArray();
+            return bytes;
+
+    }
+
 
 //    @PostMapping("/post/download/file")
 //    public ResponseEntity<?> downloadFileToFolder(
