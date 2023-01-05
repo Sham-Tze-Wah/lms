@@ -552,13 +552,14 @@ public class AttachmentController {
 //             //javax.xml.bind.DatatypeConverter.parseBase64Binary(imageData);
 //            byte[] imageByte1 = Base64.getDecoder().decode(imageData);
 
-
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
             String data = "data:image/jpeg;base64,"+imageData;
             String base64Image = data.split(",")[1];
-            String encodeStr = URLEncoder.encode(base64Image,StandardCharsets.UTF_8.toString());
-            encodeStr = encodeStr.replaceAll("\\+","%2B");
-            System.out.println(encodeStr);
-            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(encodeStr);
+//            String encodeStr = URLEncoder.encode(base64Image,StandardCharsets.UTF_8.toString());
+//            encodeStr = encodeStr.replaceAll("\\+","%2B");
+//            System.out.println(encodeStr);
+            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
+
 //
 //            //BufferedImage convertedGrayscale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 //            //convertedGrayscale.getRaster().setDataElements(0, 0, width, height, pixels);
