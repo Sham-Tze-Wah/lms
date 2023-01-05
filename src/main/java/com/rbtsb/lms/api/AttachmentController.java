@@ -38,6 +38,7 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -260,18 +261,10 @@ public class AttachmentController {
             boolean isPicture = FileValidation.isPicture(extension);
 
             if(isPicture){
-//                try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                     ObjectOutputStream oos = new ObjectOutputStream(bos)){
-//                    oos.writeObject(dto.getFileData());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-
                 ResponseEntity re = ResponseEntity.ok()
                         //.contentType(MediaType.IMAGE_JPEG)
                         .body(
-                                Base64.getEncoder().encodeToString(
-                                (byte[])dto.getFileData()).replaceAll("\\s+","")
+                                FileUtil.byteArrayImageToBase64((byte[])dto.getFileData())
                         );
                 dto.setFileData(re);
             }
@@ -482,19 +475,21 @@ public class AttachmentController {
                         .body(apiErrorPojo.getResponseMessage());
             } else if (isPicture) {
                 data = attachmentService.downloadFile(fileName);
-                writeImageFile(data.toString());
+                writeImageFile(FileUtil.byteArrayImageToBase64WithoutEncoder(data));
                 //FileUtil.writeImage(fileName, data);
 //                return ResponseEntity.status(HttpStatus.OK)//.contentType(MediaType.valueOf("image/png"))
 //                        .body(data);
                 apiErrorPojo.setResponseStatus("200");
 
 
-                byte[] encodeData = Base64.getEncoder().encode(data);
-                String encodeStr = new String(encodeData);
-
-                data = new byte[0];
-                data = Base64.getDecoder().decode(encodeStr.getBytes());
+//                byte[] encodeData = Base64.getEncoder().encode(data);
+//                String encodeStr = new String(encodeData);
+//
+//                data = new byte[0];
+//                data = Base64.getDecoder().decode(encodeStr.getBytes());
                 apiErrorPojo.setResponseMessage(data);
+
+                //writeImageFile(FileUtil.byteArrayImageToBase64(data));
 
                 return ResponseEntity.status(ErrorStatus.codeMapResponse.get(
                         apiErrorPojo.getResponseStatus()
@@ -533,45 +528,20 @@ public class AttachmentController {
 
     @GetMapping(path="/displayImage")
     public ResponseEntity<?> displayImage(@RequestParam("image") String imageData){
-        int width = 134;
-        int height = 134;
+//        int width = 134;
+//        int height = 134;
 //        int pixels = getPixel(imageData);
 
         try{
+            //String encodeStr = urlEncodeImageBase64(base64Image);
+            //encodeStr = urlEncodeImageBase64(encodeStr);
+            //System.out.println("["+base64Image+"]");
 
-
-
-////            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-////            bitmap.compress(CompressFormat.JPEG, 70, stream);
-////            return stream.toByteArray();
-//
-////https://stackoverflow.com/questions/34308211/imageio-read-cant-read-bytearrayinputstream-image-processing
-//            BASE64Decoder decoder = new BASE64Decoder();
-//            byte[] imageBytes = decoder.decodeBuffer("date:image/jpeg;base64,"+imageData);
-//
-//             //javax.xml.bind.DatatypeConverter.parseBase64Binary(imageData);
-//            byte[] imageByte1 = Base64.getDecoder().decode(imageData);
-
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            String data = "data:image/jpeg;base64,"+imageData;
-            String base64Image = data.split(",")[1];
-//            String encodeStr = URLEncoder.encode(base64Image,StandardCharsets.UTF_8.toString());
-//            encodeStr = encodeStr.replaceAll("\\+","%2B");
-//            System.out.println(encodeStr);
-            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
-
-//
-//            //BufferedImage convertedGrayscale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-//            //convertedGrayscale.getRaster().setDataElements(0, 0, width, height, pixels);
-//
-//            ByteArrayOutputStream os = new ByteArrayOutputStream();
-//            BufferedImage convertedGrayscale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-//            //InputStream is = new ByteArrayInputStream(imageBytes);
-//            convertedGrayscale.getRaster().setDataElements(0, 0, width, height, imageBytes);
-//            ImageIO.write(convertedGrayscale, "JPEG", os);
-//
-//            writeImageFile(imageData);
-            //ImageIO.createImageOutputStream(new ByteArrayInputStream(imageBytes));
+//            StringBuilder imgStr = new StringBuilder();
+//            imgStr = imgStr.append(imageData.trim().replaceAll(" ","+"));
+//            String data = "data:image/jpeg;base64,"+imgStr;
+//            String base64Image = data.split(",")[1];
+            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageData);
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG)
                     .body(imageBytes); //os.toByteArray()
         }
@@ -581,17 +551,30 @@ public class AttachmentController {
 
     }
 
-    private int getPixel(String imageData){
 
-        int stringLength = imageData.length() - "data:image/png;base64,".length();
 
-        double sizeInBytes = 4 * Math.ceil((stringLength / 3))*0.5624896334383812;
-        double sizeInKb=sizeInBytes/1000;
+//    private String urlDecodeImageBase64(String imageBase64) throws UnsupportedEncodingException {
+//        String decodeStr = URLDecoder.decode(imageBase64,StandardCharsets.UTF_8.toString());
+//        decodeStr = decodeStr.replaceAll("\\+","%2B");
+//        decodeStr = decodeStr.trim();
+//        System.out.println("["+decodeStr+"]");
+//        return decodeStr;
+//    }
 
-        return stringLength;
-    }
+//    private int getPixel(String imageData){
+//
+//        int stringLength = imageData.length() - "data:image/png;base64,".length();
+//
+//        double sizeInBytes = 4 * Math.ceil((stringLength / 3))*0.5624896334383812;
+//        double sizeInKb=sizeInBytes/1000;
+//
+//        return stringLength;
+//    }
 
     private byte[] writeImageFile(String imageData) throws UnsupportedEncodingException {
+        int width = 150;
+        int height = 150;
+
         String base64String = "data:image/jpeg;base64,"+imageData;
         String[] strings = base64String.split(",");
         byte[] data = DatatypeConverter.parseBase64Binary(strings[1]);
@@ -599,10 +582,38 @@ public class AttachmentController {
         try{
             String path = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\"+ "bear_"+DateTimeUtil.yyyyMMddhhmmssDateTime(new Date())+".jpeg";
             File file = new File(path);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+            FileOutputStream writer = new FileOutputStream(file);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(writer);
 
             //Approach 1
-            BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
-            ImageIO.write(img, "JPEG", file);
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path))) {
+                out.write(data);
+            }
+            catch(Exception ex){
+                ex.printStackTrace();
+            }
+
+//            byte[] buffer = new byte[8192]; // Try to read 8K at a time
+//            int bytesRead;
+//            while ((bytesRead = byteArrayInputStream.read(buffer)) != -1) {
+//                bufferedOutputStream.write(buffer, 0, bytesRead);
+//            }
+//            BufferedImage convertedGrayScale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+
+//            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+//            InputStream is = new ByteArrayInputStream(data);
+//
+//            int nRead;
+//            byte[] imageBuf = new byte[imageData.length()];
+//
+//            while ((nRead = is.read(imageBuf, 0, imageBuf.length)) != -1) {
+//                buffer.write(imageBuf, 0, nRead);
+//            }
+//            FileUtil.
+//            convertedGrayScale.getRaster().setDataElements(0, 0, width, height, data);
+//
+//            ImageIO.write(convertedGrayScale, "JPEG", file);
 
             //Approach 2
 //            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
@@ -621,9 +632,9 @@ public class AttachmentController {
 //            data=byteArrayOutputStream.toByteArray();
             //outputStream.write(data);
         }
-        catch(IOException ioEx){
-            return null;
-        }
+//        catch(IOException ioEx){
+//            return null;
+//        }
 //        catch(FileNotFoundException fnfEx){
 //            return null;
 //        }
@@ -666,3 +677,29 @@ public class AttachmentController {
 //    }
 
 }
+
+////            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+////            bitmap.compress(CompressFormat.JPEG, 70, stream);
+////            return stream.toByteArray();
+//
+////https://stackoverflow.com/questions/34308211/imageio-read-cant-read-bytearrayinputstream-image-processing
+//            BASE64Decoder decoder = new BASE64Decoder();
+//            byte[] imageBytes = decoder.decodeBuffer("date:image/jpeg;base64,"+imageData);
+//
+//             //javax.xml.bind.DatatypeConverter.parseBase64Binary(imageData);
+//            byte[] imageByte1 = Base64.getDecoder().decode(imageData);
+
+//ByteArrayOutputStream os = new ByteArrayOutputStream();
+//byte[] decodedImageBytes = Base64.getDecoder().decode(imageBytes);
+//
+//            //BufferedImage convertedGrayscale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+//            //convertedGrayscale.getRaster().setDataElements(0, 0, width, height, pixels);
+//
+//            ByteArrayOutputStream os = new ByteArrayOutputStream();
+//            BufferedImage convertedGrayscale = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+//            //InputStream is = new ByteArrayInputStream(imageBytes);
+//            convertedGrayscale.getRaster().setDataElements(0, 0, width, height, imageBytes);
+//            ImageIO.write(convertedGrayscale, "JPEG", os);
+//
+//            writeImageFile(imageData);
+//ImageIO.createImageOutputStream(new ByteArrayInputStream(imageBytes));

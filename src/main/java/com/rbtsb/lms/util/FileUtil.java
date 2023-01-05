@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.zip.*;
 import java.util.List;
@@ -666,6 +668,26 @@ public class FileUtil {
         } else {
             return path;
         }
+    }
+
+    public static String urlEncodeImageBase64(String imageBase64) throws UnsupportedEncodingException {
+        String encodeStr = URLEncoder.encode(imageBase64,StandardCharsets.UTF_8.toString());
+        encodeStr = encodeStr.replaceAll("\\+","%2B");
+        encodeStr = encodeStr.trim();
+        System.out.println("["+encodeStr+"]");
+        return encodeStr;
+    }
+
+    public static String byteArrayImageToBase64(byte[] imageArray) throws UnsupportedEncodingException {
+        return FileUtil.urlEncodeImageBase64(
+                Base64.getEncoder().encodeToString(
+                        imageArray)//.replaceAll("\\s+","")
+        );
+    }
+
+    public static String byteArrayImageToBase64WithoutEncoder(byte[] imageArray){
+        return Base64.getEncoder().encodeToString(
+                imageArray);
     }
 
     @Deprecated
