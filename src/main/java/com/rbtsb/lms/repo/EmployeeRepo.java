@@ -25,7 +25,7 @@ public interface EmployeeRepo extends JpaRepository<EmployeeEntity, String> {
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(value="UPDATE employee SET name = ?1, address = ?2, phone_no = ?3, date_joined = ?4," +
-            "date_leave = ?5, position = ?6, role = ?7 WHERE emp_id = ?8", nativeQuery = true)
+            "date_leave = ?5, position = ?6 WHERE emp_id = ?7", nativeQuery = true)
     Integer updateByEmployee(
             String name,
             String email,
@@ -34,7 +34,6 @@ public interface EmployeeRepo extends JpaRepository<EmployeeEntity, String> {
             Date dateJoined,
             Date dateLeave,
             Position position,
-            Role role,
             String id
     );
 }

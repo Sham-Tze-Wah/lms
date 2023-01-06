@@ -12,4 +12,7 @@ public interface GlobalConstant {
     final static String DateTime = "DATETIME";
 
     final static String ATTACHMENT_PATH = System.getProperty("user.dir") + "\\src\\main\\resources\\leaveAttachment";
+
+    public static String ENTITY_PATH_REGISTRATION = "/api/registration";
+
 }

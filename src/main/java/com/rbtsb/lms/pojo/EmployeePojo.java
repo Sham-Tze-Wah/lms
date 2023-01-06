@@ -17,7 +17,6 @@ public class EmployeePojo {
     private String email;
     private String address;
     private Position position;
-    private Role role;
     private Date dateJoined;
     private Date dateLeave;
 }

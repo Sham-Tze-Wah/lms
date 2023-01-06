@@ -6,13 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmployeeMapper {
-    public EmployeePojo entityToPojo(EmployeeEntity employeeEntity){
+    public static EmployeePojo entityToPojo(EmployeeEntity employeeEntity){
         EmployeePojo emp = new EmployeePojo();
         emp.setEmpId(employeeEntity.getEmpId());
         emp.setName(employeeEntity.getName());
         emp.setEmail(employeeEntity.getEmail());
         emp.setPhoneNo(employeeEntity.getPhoneNo());
-        emp.setRole(employeeEntity.getRole());
         emp.setPosition(employeeEntity.getPosition());
         emp.setAddress(employeeEntity.getAddress());
         emp.setDateJoined(employeeEntity.getDateJoined());
@@ -21,13 +20,12 @@ public class EmployeeMapper {
         return emp;
     }
 
-    public EmployeeEntity pojoToEntity(EmployeePojo employeePojo){
+    public static EmployeeEntity pojoToEntity(EmployeePojo employeePojo){
         EmployeeEntity emp = new EmployeeEntity();
         emp.setEmpId(employeePojo.getEmpId());
         emp.setName(employeePojo.getName());
         emp.setEmail(employeePojo.getEmail());
         emp.setPhoneNo(employeePojo.getPhoneNo());
-        emp.setRole(employeePojo.getRole());
         emp.setPosition(employeePojo.getPosition());
         emp.setAddress(employeePojo.getAddress());
         emp.setDateJoined(employeePojo.getDateJoined());

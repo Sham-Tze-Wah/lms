@@ -25,7 +25,6 @@ public class EmployeeEntity {
     @Column(name="emp_id", unique = true, nullable = false)
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @JsonIgnore
-    @NonNull
     private String empId = UUID.randomUUID().toString();
 
     @Column(name="name", nullable = false, unique=true, length = SqlDataType.VARCHAR100)
@@ -49,10 +48,10 @@ public class EmployeeEntity {
     @NonNull
     private Position position;
 
-    @Column(name="role", length= SqlDataType.VARCHAR64)
-    @Enumerated(value=EnumType.STRING)
-    @NonNull
-    private Role role;
+//    @Column(name="role", length= SqlDataType.VARCHAR64)
+//    @Enumerated(value=EnumType.STRING)
+//    @NonNull
+//    private Role role;
 
     @Column(name = "date_joined") //in format of dd/mm/yyyy
     @Temporal(TemporalType.TIMESTAMP)

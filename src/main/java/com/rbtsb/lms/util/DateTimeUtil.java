@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -50,6 +51,14 @@ public class DateTimeUtil {
 
     public static Date stringToDate(String date) throws ParseException {
         return new SimpleDateFormat("yyyy-MM-dd").parse(date);
+    }
+
+    //for constructor of verification token only
+    public static Date calculateExpirationDate(int expirationTime){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(new Date().getTime());
+        calendar.add(Calendar.MINUTE, expirationTime);
+        return new Date(calendar.getTime().getTime());
     }
 
     //public static String get

@@ -54,7 +54,7 @@ class EmployeeControllerTest {
                 .email("abu@gmail.com")
                 .address("Jalan Kota")
                 .position(Position.BackEnd)
-                .role(Role.Employee)
+                //.role(Role.Employee)
                 .dateJoined(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX").parse("2022-12-21T01:57:55.000+00:00"))
                 .build();
 
@@ -70,7 +70,7 @@ class EmployeeControllerTest {
                 .email("abu@gmail.com")
                 .address("Jalan Kota")
                 .position(Position.BackEnd)
-                .role(Role.Employee)
+                //.role(Role.Employee)
                 .dateJoined(new Date())
                 .build();
 
@@ -146,9 +146,9 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$.position")
                         .value(employeePojo.getPosition().toString())
                 )
-                .andExpect(jsonPath("$.role")
-                        .value(employeePojo.getRole().toString())
-                )
+//                .andExpect(jsonPath("$.role")
+//                        .value(employeePojo.getRole().toString())
+//                )
                 .andExpect(jsonPath("$.dateJoined")
                         .value("2022-12-21T01:57:55.000+00:00")
                 );
@@ -164,7 +164,7 @@ class EmployeeControllerTest {
                 .email("abu@gmail.com")
                 .address("Jalan Kota")
                 .position(Position.BackEnd)
-                .role(Role.Employee)
+//                .role(Role.Employee)
                 .dateJoined(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX").parse("2022-12-21T01:57:55.000+00:00"))
                 .build();
 

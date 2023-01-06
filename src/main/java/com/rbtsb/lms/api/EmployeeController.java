@@ -33,7 +33,7 @@ public class EmployeeController {
                 if(!employeePojo.getPhoneNo().equalsIgnoreCase("")){
                     if(!employeePojo.getEmail().equalsIgnoreCase("")){
                         if(!employeePojo.getPosition().equals(null)){
-                            if(!employeePojo.getRole().equals(null)){
+//                            if(!employeePojo.getRole().equals(null)){
                                 //if(!employeePojo.getDateJoined().equals(null)){
                                 return new ResponseEntity<>(employeeService.insertEmployee(employeePojo),HttpStatus.CREATED);
                                 //}
@@ -42,10 +42,10 @@ public class EmployeeController {
 //                                employeeRepo.saveAndFlush(EmployeeMapper.pojoToEntity(employeePojo));
 //                                return "Insert successfully.";
 //                            }
-                            }
-                            else{
-                                return new ResponseEntity<> ( "role cannot be null.",HttpStatus.UNPROCESSABLE_ENTITY);
-                            }
+//                            }
+//                            else{
+//                                return new ResponseEntity<> ( "role cannot be null.",HttpStatus.UNPROCESSABLE_ENTITY);
+//                            }
                         }
                         else{
                             return new ResponseEntity<> ( "position cannot be null",HttpStatus.UNPROCESSABLE_ENTITY);

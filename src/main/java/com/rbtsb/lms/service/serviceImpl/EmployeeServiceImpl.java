@@ -90,7 +90,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 if(!employeePojo.getPhoneNo().equalsIgnoreCase("")){
                     if(!employeePojo.getEmail().equalsIgnoreCase("")){
                         if(!employeePojo.getPosition().equals(null)){
-                            if(!employeePojo.getRole().equals(null)){
+                            //if(!employeePojo.getRole().equals(null)){
 
                                 int result = 0;
                                 if(employeePojo.getDateJoined() != null){
@@ -103,7 +103,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                                         emp.get().setDateJoined(employeePojo.getDateJoined());
                                         emp.get().setDateLeave(employeePojo.getDateLeave());
                                         emp.get().setPosition(employeePojo.getPosition());
-                                        emp.get().setRole(employeePojo.getRole());
+                                        //emp.get().setRole(employeePojo.getRole());
                                         employeeRepo.saveAndFlush(emp.get());
 //                                        result =employeeRepo.updateByEmployee(
 //                                                employeePojo.getName(),
@@ -140,7 +140,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                                         emp.get().setDateJoined(employeePojo.getDateJoined());
                                         emp.get().setDateLeave(null);
                                         emp.get().setPosition(employeePojo.getPosition());
-                                        emp.get().setRole(employeePojo.getRole());
+                                        //emp.get().setRole(employeePojo.getRole());
                                         employeeRepo.saveAndFlush(emp.get());
                                         result = 1;
                                         return result + " updated successfully.";
@@ -166,7 +166,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                                         emp.get().setDateJoined(new Date());
                                         emp.get().setDateLeave(employeePojo.getDateLeave());
                                         emp.get().setPosition(employeePojo.getPosition());
-                                        emp.get().setRole(employeePojo.getRole());
+//                                        emp.get().setRole(employeePojo.getRole());
                                         employeeRepo.saveAndFlush(emp.get());
                                         result = 1;
                                         return result + " updated successfully.";
@@ -190,16 +190,16 @@ public class EmployeeServiceImpl implements EmployeeService {
                                         emp.get().setDateJoined(new Date());
                                         emp.get().setDateLeave(null);
                                         emp.get().setPosition(employeePojo.getPosition());
-                                        emp.get().setRole(employeePojo.getRole());
+                                        //emp.get().setRole(employeePojo.getRole());
                                         employeeRepo.saveAndFlush(emp.get());
                                         result = 1;
                                         return result + " updated successfully.";
                                     }
                                 }
-                            }
-                            else{
-                                return "Role cannot be null.";
-                            }
+                            //}
+//                            else{
+//                                return "Role cannot be null.";
+//                            }
                         }
                         else{
                             return "Position cannot be null";
