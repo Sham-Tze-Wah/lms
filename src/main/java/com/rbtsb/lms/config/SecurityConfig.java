@@ -39,6 +39,13 @@ public class SecurityConfig {
     private final JwtAthFilter jwtAuthFilter;
     private AppUserDao userDao;
 
+    private static final String attch_url = "/api/attachment";
+    private static final String edu_url = "/api/education";
+    private static final String emp_url = "/api/emp";
+    private static final String leave_url = "/api/leave";
+    private static final String reg_url = "/api";
+    private static final String work_url = "/api/workexp";
+
     private static final String[] WHITE_LIST_URLS_FOR_EVERYONE={
             "/register",
             "/verifyRegistration*",
@@ -74,7 +81,22 @@ public class SecurityConfig {
     @Bean
     @Order(SecurityProperties.BASIC_AUTH_ORDER) //2147483642
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
+        http
+                .cors()
+                .and()
+                .csrf()
+                .disable()
+                .authorizeHttpRequests()
+                .antMatchers(WHITE_LIST_URLS_FOR_EVERYONE)
+                .permitAll();
+//                .antMatchers("/api/**")
+//                .authenticated()
+//                .and()
+//                .oauth2Login(oauth2login ->
+//                        oauth2login.loginPage("/oauth2/authorization/api-client-oidc"))
+//                .oauth2Client(Customizer.withDefaults());
+
+        //        http
 //                .csrf().disable()
 //                .authorizeHttpRequests(req -> req
 //                        .requestMatchers("")
@@ -105,21 +127,6 @@ public class SecurityConfig {
 
 //        http.formLogin();
 //        http.httpBasic();
-
-        http
-                .cors()
-                .and()
-                .csrf()
-                .disable()
-                .authorizeHttpRequests()
-                .antMatchers(WHITE_LIST_URLS_FOR_EVERYONE)
-                .permitAll();
-//                .antMatchers("/api/**")
-//                .authenticated()
-//                .and()
-//                .oauth2Login(oauth2login ->
-//                        oauth2login.loginPage("/oauth2/authorization/api-client-oidc"))
-//                .oauth2Client(Customizer.withDefaults());
 
         return (SecurityFilterChain)http.build();
     }
