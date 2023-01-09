@@ -26,4 +26,17 @@ public class AppUserMapper {
         appUserEntity.setEmployeeEntity(EmployeeMapper.pojoToEntity(appUserPojo.getEmployeePojo()));
         return appUserEntity;
     }
+
+    public static AppUserPojo entityToPojo(AppUserEntity appUserEntity) {
+        AppUserPojo appUserPojo = new AppUserPojo();
+        appUserPojo.setId(appUserEntity.getId());
+        appUserPojo.setUsername(appUserEntity.getUsername());
+        appUserPojo.setPassword(appUserEntity.getPassword());
+        appUserPojo.setMatchingPassword(appUserEntity.getMatchingPassword());
+        appUserPojo.setEnabled(appUserEntity.isEnabled());
+        appUserPojo.setRoles(appUserEntity.getRoles().stream()
+                .map(roleEntity -> RoleMapper.entityToPojo(roleEntity)).collect(Collectors.toList()));
+        appUserPojo.setEmployeePojo(EmployeeMapper.entityToPojo(appUserEntity.getEmployeeEntity()));
+        return appUserPojo;
+    }
 }

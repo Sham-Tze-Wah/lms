@@ -9,12 +9,12 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 @Setter
 public class RegistrationCompleteEvent extends ApplicationEvent {
-    private LoginDTO loginDTO;
+    private AppUserPojo appUserPojo;
     private String applicationUrl;
 
-    public RegistrationCompleteEvent(LoginDTO loginDTO, String applicationUrl ){
-        super(loginDTO);
-        this.loginDTO = loginDTO;
+    public RegistrationCompleteEvent(AppUserPojo appUserPojo, String applicationUrl ){
+        super(appUserPojo);
+        this.appUserPojo = appUserPojo;
         this.applicationUrl = applicationUrl;
     }
 }

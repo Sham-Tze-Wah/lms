@@ -8,15 +8,17 @@ import com.rbtsb.lms.pojo.VerificationTokenPojo;
 import java.util.Optional;
 
 public interface AppUserService {
-    LoginDTO registerUser(LoginDTO loginDTO);
+    AppUserPojo registerUser(LoginDTO loginDTO);
 
-    void saveVerificationTokenForUser(String token, LoginDTO loginDTO);
+    void saveVerificationTokenForUser(String token, AppUserPojo appUserPojo);
 
     String validateVerificationToken(String token);
 
     VerificationTokenPojo generateNewVerificationToken(String oldToken);
 
-    AppUserPojo findUserByEmailAndRoleName(String email, String roleName);
+    AppUserPojo findByEmailAndRoleName(String email, String roleName);
+
+    AppUserPojo findByUsername(String email);
 
     void createPasswordResetTokenForUser(AppUserPojo user, String token);
 

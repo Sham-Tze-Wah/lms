@@ -36,4 +36,6 @@ public interface EmployeeRepo extends JpaRepository<EmployeeEntity, String> {
             Position position,
             String id
     );
+
+    Optional<EmployeeEntity> findByEmail(String username);
 }

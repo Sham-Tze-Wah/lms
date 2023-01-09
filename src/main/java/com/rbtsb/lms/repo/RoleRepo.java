@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface RoleRepo extends JpaRepository<RoleEntity, String> {
 
-    RolePojo findByRoleName(String roleName);
+    @Query(value = "SELECT * FROM roles r WHERE r.role_name = ?1",nativeQuery = true)
+    RoleEntity findByRoleName(String roleName);
 }

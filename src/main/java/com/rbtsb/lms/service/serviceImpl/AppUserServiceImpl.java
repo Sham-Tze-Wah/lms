@@ -3,18 +3,12 @@ package com.rbtsb.lms.service.serviceImpl;
 import com.rbtsb.lms.constant.Role;
 import com.rbtsb.lms.dao.AppUserDao;
 import com.rbtsb.lms.dto.LoginDTO;
-import com.rbtsb.lms.entity.AppUserEntity;
-import com.rbtsb.lms.entity.PasswordResetTokenEntity;
-import com.rbtsb.lms.entity.RoleEntity;
-import com.rbtsb.lms.entity.VerificationTokenEntity;
+import com.rbtsb.lms.entity.*;
 import com.rbtsb.lms.pojo.AppUserPojo;
 import com.rbtsb.lms.pojo.PasswordResetTokenPojo;
 import com.rbtsb.lms.pojo.RolePojo;
 import com.rbtsb.lms.pojo.VerificationTokenPojo;
-import com.rbtsb.lms.repo.AppUserRepo;
-import com.rbtsb.lms.repo.PasswordResetTokenRepo;
-import com.rbtsb.lms.repo.RoleRepo;
-import com.rbtsb.lms.repo.VerificationTokenRepo;
+import com.rbtsb.lms.repo.*;
 import com.rbtsb.lms.service.AppUserService;
 import com.rbtsb.lms.service.mapper.*;
 import com.rbtsb.lms.util.validation.AppUserPojoValidation;
@@ -43,8 +37,11 @@ public class AppUserServiceImpl implements AppUserService {
     @Autowired
     private RoleRepo roleRepo;
 
+    @Autowired
+    private EmployeeRepo employeeRepo;
+
     @Override
-    public LoginDTO registerUser(LoginDTO loginDTO) {
+    public AppUserPojo registerUser(LoginDTO loginDTO) {
         AppUserEntity appUserEntity = new AppUserEntity();
         List<RoleEntity> roleEntityList = new ArrayList<>();
         //AppUserPojo validatedAppUserPojo = AppUserPojoValidation.validation(loginDTO);
@@ -52,20 +49,31 @@ public class AppUserServiceImpl implements AppUserService {
         // TODO validation
         appUserEntity.setUsername(loginDTO.getUsername());
         appUserEntity.setPassword(passwordEncoder.encode(loginDTO.getPassword()));
-        //appUserEntity.setMatchingPassword();
-        RolePojo rolePojo = roleRepo.findByRoleName("USER"); //Role.Employee.toString() //TODO Checking on the proper role
-        RoleEntity roleEntity = RoleMapper.pojoToEntity(rolePojo);
+        appUserEntity.setMatchingPassword(passwordEncoder.encode(loginDTO.getMatchingPassword()));
+        RoleEntity roleEntity = roleRepo.findByRoleName("USER"); //Role.Employee.toString() //TODO Checking on the proper role
+
+        //RoleEntity roleEntity = RoleMapper.pojoToEntity(rolePojo);
         roleEntityList.add(roleEntity);
         appUserEntity.setRoles(roleEntityList);
-        //appUserEntity.setEmployeeEntity();
 
-        appUserRepo.save(appUserEntity);
-        return loginDTO;
+        Optional<EmployeeEntity> emp = employeeRepo.findByEmail(loginDTO.getUsername());
+        if(emp.isPresent()){
+            appUserEntity.setEmployeeEntity(emp.get());
+            //appUserEntity.setEmployeeEntity();
+
+            appUserRepo.save(appUserEntity);
+            AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
+            return appUserPojo;
+        }
+        else{
+            throw new NullPointerException("username is not found.");
+        }
+
     }
 
     @Override
-    public void saveVerificationTokenForUser(String token, LoginDTO loginDTO) {
-        AppUserEntity user = LoginDTOMapper.dtoToEntity(loginDTO);
+    public void saveVerificationTokenForUser(String token, AppUserPojo appUserPojo) {
+        AppUserEntity user = AppUserMapper.pojoToEntity(appUserPojo);
 
         VerificationTokenEntity verificationToken =
                 new VerificationTokenEntity(user, token);
@@ -108,7 +116,12 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public AppUserPojo findUserByEmailAndRoleName(String email, String roleName) {
+    public AppUserPojo findByUsername(String email) {
+        return appUserRepo.findByUsername(email);
+    }
+
+    @Override
+    public AppUserPojo findByEmailAndRoleName(String email, String roleName) {
         return appUserRepo.findByUsernameAndRoleName(email, roleName);
     }
 

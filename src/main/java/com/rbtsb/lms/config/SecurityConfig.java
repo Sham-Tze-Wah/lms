@@ -159,7 +159,7 @@ public class SecurityConfig {
                 .antMatchers(
                         String.valueOf(WHITE_LIST_URLS_FOR_BOSS))
                 .hasRole("SUPER_ADMIN")
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 //                .antMatchers("/api/**")
 //                .authenticated()
 //                .and()

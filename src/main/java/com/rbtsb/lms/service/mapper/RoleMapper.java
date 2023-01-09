@@ -12,9 +12,7 @@ public class RoleMapper {
     }
 
     public static RolePojo entityToPojo(RoleEntity roleEntity){
-        RolePojo rolePojo = new RolePojo();
-        rolePojo.setRoleId(roleEntity.getRoleId());
-        rolePojo.setRoleName(roleEntity.getRoleName());
+        RolePojo rolePojo = new RolePojo(roleEntity.getRoleId(), roleEntity.getRoleName());
         return rolePojo;
     }
 }

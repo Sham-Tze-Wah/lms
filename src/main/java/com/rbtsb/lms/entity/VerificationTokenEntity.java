@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name="verification_token")
@@ -19,7 +20,7 @@ public class VerificationTokenEntity {
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Column(name = "verification_token_id", unique=true, nullable=false)
-    private String id;
+    private String id = UUID.randomUUID().toString();
 
     @Column(name="token", unique=true, nullable=false)
     private String token;

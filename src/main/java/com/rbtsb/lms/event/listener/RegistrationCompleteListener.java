@@ -22,7 +22,7 @@ public class RegistrationCompleteListener
     public void onApplicationEvent(RegistrationCompleteEvent event) {
         //Create the Verification Token for the USER with LINK.
 
-        LoginDTO user = event.getLoginDTO();
+        AppUserPojo user = event.getAppUserPojo();
         String token = UUID.randomUUID().toString();
         AppUserService.saveVerificationTokenForUser(token, user);
 

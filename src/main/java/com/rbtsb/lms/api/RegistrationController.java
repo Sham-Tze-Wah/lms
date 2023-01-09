@@ -28,7 +28,7 @@ public class RegistrationController {
 
     @PostMapping("/register")
     public String registerUser(@RequestBody LoginDTO loginDTO, final HttpServletRequest request){
-        LoginDTO user = appUserService.registerUser(loginDTO);
+        AppUserPojo user = appUserService.registerUser(loginDTO);
         publisher.publishEvent(new RegistrationCompleteEvent(
                 user,
                 applicationUrl(request)
@@ -75,7 +75,7 @@ public class RegistrationController {
 
     @PostMapping("/resetPassword")
     public String resetPassword(@RequestBody PasswordPojo passwordPojo, HttpServletRequest request){
-        AppUserPojo userEmp = appUserService.findUserByEmail(passwordPojo.getEmail());
+        AppUserPojo userEmp = appUserService.findByUsername(passwordPojo.getEmail());
         String url = "";
         if(userEmp!=null){
             String token = UUID.randomUUID().toString();
@@ -106,7 +106,7 @@ public class RegistrationController {
 
     @PostMapping("/changePassword")
     public String changePassword(@RequestBody PasswordPojo passwordPojo){
-        AppUserPojo userEmp = appUserService.findUserByEmail(passwordPojo.getEmail());
+        AppUserPojo userEmp = appUserService.findByUsername(passwordPojo.getEmail());
         if(!appUserService.checkIfValidOldPassword(userEmp, passwordPojo.getOldPassword())){
             return "Invalid Old Password";
         }

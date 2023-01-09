@@ -115,7 +115,7 @@ public class RoleServiceImpl implements RoleService {
                 if(role != null && !role.equalsIgnoreCase("")){
                     AppUserPojo appUser = appUserRepo.findByUsernameAndRoleName(employeeEntity.get().getEmail(), role);
                     AppUserEntity appUserEntity = new AppUserEntity();
-                    RolePojo rolePojo = roleRepo.findByRoleName(role);
+                    RolePojo rolePojo = RoleMapper.entityToPojo(roleRepo.findByRoleName(role));
 
                     if(appUser != null){
                         appUserEntity.setUsername(appUser.getUsername());
@@ -165,7 +165,7 @@ public class RoleServiceImpl implements RoleService {
                 if(role != null && !role.equalsIgnoreCase("")){
                     AppUserPojo appUserFromDB = appUserRepo.findByUsernameAndRoleName(employeeEntity.get().getEmail(), role);
                     AppUserEntity appUserEntityToBeSaved = new AppUserEntity();
-                    RolePojo rolePojoFromDB = roleRepo.findByRoleName(role);
+                    RolePojo rolePojoFromDB = RoleMapper.entityToPojo(roleRepo.findByRoleName(role));
 
                     if(appUserFromDB != null){
                         appUserEntityToBeSaved.setUsername(appUserFromDB.getUsername());
@@ -204,6 +204,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleEntity getRoleByName(String roleName) {
-        return RoleMapper.pojoToEntity(roleRepo.findByRoleName(roleName));
+        return roleRepo.findByRoleName(roleName);
     }
 }
