@@ -15,4 +15,6 @@ public interface WorkExperienceService {
     public String updateWorkExperienceByEmpId(String empId, WorkExperiencePojo workExperiencePojo);
 
     public String deleteWorkExperienceById(String id);
+
+    public List<WorkExperiencePojo> getWorkExperienceByEmpId(String empId);
 }

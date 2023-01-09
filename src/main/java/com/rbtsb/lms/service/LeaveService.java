@@ -22,4 +22,6 @@ public interface LeaveService {
 
     @Deprecated
     ApiErrorPojo checkDuplicateReason(LeaveDTO leaveDTO);
+
+    List<LeaveDTO> getLeaveApplicationByEmpId(String empId);
 }

@@ -38,4 +38,6 @@ public interface AttachmentService {
     Optional<AttachmentEntity> getAttachmentByFileName(String fileName);
 
     long getAttachmentLength();
+
+    List<AttachmentDTO> getAttachmentByEmpIdAndDate(String empId, String startLeaveDate, String endDateLeave);
 }

@@ -490,4 +490,29 @@ public class AttachmentServiceImpl implements AttachmentService {
     public long getAttachmentLength() {
         return attachmentRepo.count();
     }
+
+    @Override
+    public List<AttachmentDTO> getAttachmentByEmpIdAndDate(String empId, String startLeaveDate, String endLeaveDate) {
+
+        try{
+            List<AttachmentDTO> attachmentDTOList = attachmentRepo.findByEmpIdAndStartDateLeaveAndEndDateLeave(
+                    empId,
+                    DateTimeUtil.stringToDate(startLeaveDate),
+                    DateTimeUtil.stringToDate(endLeaveDate));
+
+            if(attachmentDTOList!=null && !attachmentDTOList.isEmpty()){
+                return attachmentDTOList;
+            }
+            else{
+                return null;
+            }
+        }
+        catch(ParseException ex){
+            return null;
+        }
+        catch(Exception ex){
+            return null;
+        }
+
+    }
 }

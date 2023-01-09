@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -24,4 +25,6 @@ public interface LeaveDTORepo extends JpaRepository<LeaveEntity, String> {
             "e.name = ?1 AND l.start_date_leave = ?2 AND end_date_leave = ?3",nativeQuery = true)
     Optional<LeaveEntity> findByEmployeeNameAndStartDateLeaveAndEndDateLeave(String employeeName, Date startDateLeave, Date endDateLeave);
 
+    @Query(value = "SELECT * FROM leave_application l WHERE l.emp_id = ?1", nativeQuery = true)
+    List<LeaveDTO> findByEmpId(String empId);
 }

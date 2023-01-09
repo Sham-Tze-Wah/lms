@@ -7,6 +7,7 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -611,22 +612,54 @@ public class FileUtil {
         return byteOutput.toByteArray();
     }
 
-    // TODO: Fix save image into folder in Insert,
+    @Deprecated
     public static void writeImage(String fileName, byte[] data) throws IOException {
         String fileNameWithoutExt = getFileName(fileName);
         String ext = getFileExtension(fileName);
         String directory = GlobalConstant.ATTACHMENT_PATH + "\\insertBackup\\" + fileName;
 
-        // create the object of ByteArrayInputStream class
-        // and initialized it with the byte array.
-        ByteArrayInputStream inStreambj = new ByteArrayInputStream(data);
 
-        // read image from byte array
-        BufferedImage newImage = ImageIO.read(inStreambj);
 
-        // write output image
-        ImageIO.write(newImage, ext, new File(directory));
-        //System.out.println("Image generated from the byte array.");
+//        // create the object of ByteArrayInputStream class
+//        // and initialized it with the byte array.
+//        ByteArrayInputStream inStreambj = new ByteArrayInputStream(data);
+//
+//        // read image from byte array
+//        BufferedImage newImage = ImageIO.read(inStreambj);
+//
+//        // write output image
+//        ImageIO.write(newImage, ext, new File(directory));
+//        //System.out.println("Image generated from the byte array.");
+    }
+
+    public static byte[] writeImageFile(String imageData) throws UnsupportedEncodingException {
+        int width = 150;
+        int height = 150;
+
+        String base64String = "data:image/jpeg;base64,"+imageData;
+        String[] strings = base64String.split(",");
+        byte[] data = DatatypeConverter.parseBase64Binary(strings[1]);
+
+        try{
+            String path = GlobalConstant.ATTACHMENT_PATH + "\\downloadBackup\\"+ "bear_"+DateTimeUtil.yyyyMMddhhmmssDateTime(new Date())+".jpeg";
+            File file = new File(path);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+            FileOutputStream writer = new FileOutputStream(file);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(writer);
+
+            //Approach 1
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path))) {
+                out.write(data);
+            }
+            catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+        catch(Exception ex){
+            return null;
+        }
+        return data;
     }
 
     public static String getFileExtension(String fileName) {

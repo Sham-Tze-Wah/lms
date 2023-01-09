@@ -78,6 +78,11 @@ public class WorkExperienceController {
         return new ResponseEntity<>(workExperienceService.getAllWorkExperience(),HttpStatus.OK);
     }
 
+    @GetMapping("/get")
+    public ResponseEntity<?> getWorkExperienceById(@RequestParam("id") String empId){
+        return new ResponseEntity<>(workExperienceService.getWorkExperienceByEmpId(empId), HttpStatus.OK);
+    }
+
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateWorkExperienceByEmpId(@PathVariable("id") String empId,
             @RequestBody @Valid @NonNull WorkExperiencePojo workExperiencePojo){

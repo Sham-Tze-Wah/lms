@@ -86,6 +86,11 @@ public class LeaveApplicationController {
         return new ResponseEntity<>(leaveService.getAllLeave(), HttpStatus.OK);
     }
 
+    @GetMapping("/get")
+    public ResponseEntity<?> getLeaveApplicationByEmpId(@RequestParam("id") String empId){
+        return new ResponseEntity<>(leaveService.getLeaveApplicationByEmpId(empId), HttpStatus.OK);
+    }
+
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateLeaveApplicationByLeaveId(@PathVariable("id") String leaveId, @RequestBody @Valid @NonNull LeaveDTO leaveDTO){
         ApiErrorPojo apiErrorPojo = leaveService.updateLeaveApplication(leaveId, leaveDTO);

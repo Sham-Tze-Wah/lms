@@ -105,4 +105,15 @@ public class EducationServiceImpl implements EducationService {
             return "Deleted unsuccessfully.";
         }
     }
+
+    @Override
+    public List<EducationPojo> getEducationByEmpId(String empId) {
+        List<EducationPojo> educationPojoList = educationRepo.findByEmpId(empId);
+        if(educationPojoList != null && !educationPojoList.isEmpty()){
+            return educationPojoList;
+        }
+        else{
+            return null;
+        }
+    }
 }

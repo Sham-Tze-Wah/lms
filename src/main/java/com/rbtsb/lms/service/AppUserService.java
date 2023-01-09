@@ -16,7 +16,7 @@ public interface AppUserService {
 
     VerificationTokenPojo generateNewVerificationToken(String oldToken);
 
-    AppUserPojo findUserByEmail(String email);
+    AppUserPojo findUserByEmailAndRoleName(String email, String roleName);
 
     void createPasswordResetTokenForUser(AppUserPojo user, String token);
 

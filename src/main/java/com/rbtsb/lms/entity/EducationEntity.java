@@ -53,7 +53,7 @@ public class EducationEntity{
     private Course course;
 
     @ManyToOne(fetch = FetchType.EAGER) //
-    @JoinColumn(name="empId", referencedColumnName="emp_id")
+    @JoinColumn(name="emp_id", referencedColumnName="emp_id")
     private EmployeeEntity employeeEntity;
 
 //    @PrePersist

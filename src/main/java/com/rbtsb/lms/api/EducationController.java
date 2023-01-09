@@ -76,6 +76,11 @@ public class EducationController {
         return new ResponseEntity<>(educationService.getAllEducation(), HttpStatus.OK);
     }
 
+    @GetMapping("/get")
+    public ResponseEntity<?> getEducationByEmpId(@RequestParam("id") String empId){
+        return new ResponseEntity<>(educationService.getEducationByEmpId(empId), HttpStatus.OK);
+    }
+
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateEducationById(@PathVariable("id") String empId,
                                                  @RequestBody @Valid @NonNull EducationPojo educationPojo){

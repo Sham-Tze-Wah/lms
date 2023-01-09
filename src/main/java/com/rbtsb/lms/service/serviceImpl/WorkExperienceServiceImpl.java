@@ -104,4 +104,15 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
             return "work exp is empty";
         }
     }
+
+    @Override
+    public List<WorkExperiencePojo> getWorkExperienceByEmpId(String empId) {
+        List<WorkExperiencePojo> workExpList = workExperienceRepo.findByEmpId(empId);
+        if(workExpList != null && !workExpList.isEmpty()){
+            return workExpList;
+        }
+        else{
+            return null;
+        }
+    }
 }

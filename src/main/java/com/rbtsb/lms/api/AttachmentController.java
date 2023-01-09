@@ -280,6 +280,13 @@ public class AttachmentController {
         );
     }
 
+    @GetMapping(path = "/get")
+    public ResponseEntity<?> getAttachmentByEmpNameAndDate(@RequestParam(value = "id", required = false) String id,
+                                                         @RequestParam(value = "startLeaveData", required = false) String startLeaveDate,
+                                                         @RequestParam(value = "endLeaveDate", required = false) String endLeaveDate){
+        return new ResponseEntity(attachmentService.getAttachmentByEmpIdAndDate(id, startLeaveDate, endLeaveDate), HttpStatus.OK);
+    }
+
     @PutMapping("/put")
     public ResponseEntity<?> updateAnAttachmentByAttachmentId(@RequestParam(value = "id", required = false) String id,
                                                     //@RequestParam("fileName") String fileName,
@@ -374,82 +381,82 @@ public class AttachmentController {
 
     // TODO: change file to files (array of multipart)
 
-    @PostMapping(path = "/post/upload")
-    public ResponseEntity<?> uploadFile(//@RequestParam("fileName") String fileName,
-//                                         @RequestParam("fileType") FileType fileType,
-//                                         @RequestParam("directory") String directory,
-                                        @RequestParam(value = "leaveId", required = false) String leaveId,
-                                        @RequestParam(value = "leaveReason", required = false) String leaveReason,
-                                        @RequestParam(value = "employeeName", required = false) String employeeName,
-                                        @RequestParam(value = "startDateLeave", required = false) String startDateLeave,
-                                        @RequestParam(value = "endDateLeave", required = false) String endDateLeave,
-                                        @RequestParam(value = "files") MultipartFile file ) throws IOException {
-        AttachmentDTO attachmentDTO = new AttachmentDTO();
-        StringBuilder uploadImageMsg = new StringBuilder();
-
-        try{
-            if(!file.isEmpty()){
-                if(leaveId != null && !leaveId.equalsIgnoreCase("")){
-                    uploadImageMsg = uploadImageMsg.append(attachmentService.uploadFile(leaveId, file, null));
-                }
-                else{
-                    attachmentDTO.setFileName(file.getOriginalFilename());
-
-                    MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
-                    attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
-
-                    attachmentDTO.setDirectory(file.getResource().getURI().toString());
-
-                    if (startDateLeave != null) {
-                        attachmentDTO.setStartDateLeave(DateTimeUtil.stringToDate(startDateLeave));
-                    }
-                    else{
-                        uploadImageMsg = uploadImageMsg.append("The start date leave is null.");
-                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
-                    }
-
-                    if(endDateLeave != null){
-                        attachmentDTO.setEndDateLeave(DateTimeUtil.stringToDate(endDateLeave));
-                    }
-                    else{
-                        uploadImageMsg = uploadImageMsg.append("The end date leave is null.");
-                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
-                    }
-
-                    if(leaveReason != null && !leaveReason.equalsIgnoreCase("")){
-                        attachmentDTO.setLeaveReason(leaveReason);
-                    }
-                    else{
-                        uploadImageMsg = uploadImageMsg.append("The leave reason is null.");
-                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
-                    }
-
-                    if(employeeName != null && !employeeName.equalsIgnoreCase("")){
-                        attachmentDTO.setEmployeeName(employeeName);
-                    }
-                    else{
-                        uploadImageMsg = uploadImageMsg.append("The employee name is null.");
-                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
-                    }
-
-                    uploadImageMsg.setLength(0);
-                    uploadImageMsg = uploadImageMsg.append(attachmentService.uploadFile(null, file, attachmentDTO));
-                }
-                return new ResponseEntity<>(uploadImageMsg, HttpStatus.OK);
-            }
-            else{
-                uploadImageMsg.setLength(0);
-                uploadImageMsg = uploadImageMsg.append("Cannot upload file without file uploaded");
-                return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-        }
-        catch(Exception ex){
-            uploadImageMsg.setLength(0);
-            uploadImageMsg = uploadImageMsg.append(ex.toString());
-            return new ResponseEntity<>(uploadImageMsg, HttpStatus.BAD_REQUEST);
-        }
-
-    }
+//    @PostMapping(path = "/post/upload")
+//    public ResponseEntity<?> uploadFile(//@RequestParam("fileName") String fileName,
+////                                         @RequestParam("fileType") FileType fileType,
+////                                         @RequestParam("directory") String directory,
+//                                        @RequestParam(value = "leaveId", required = false) String leaveId,
+//                                        @RequestParam(value = "leaveReason", required = false) String leaveReason,
+//                                        @RequestParam(value = "employeeName", required = false) String employeeName,
+//                                        @RequestParam(value = "startDateLeave", required = false) String startDateLeave,
+//                                        @RequestParam(value = "endDateLeave", required = false) String endDateLeave,
+//                                        @RequestParam(value = "files") MultipartFile file ) throws IOException {
+//        AttachmentDTO attachmentDTO = new AttachmentDTO();
+//        StringBuilder uploadImageMsg = new StringBuilder();
+//
+//        try{
+//            if(!file.isEmpty()){
+//                if(leaveId != null && !leaveId.equalsIgnoreCase("")){
+//                    uploadImageMsg = uploadImageMsg.append(attachmentService.uploadFile(leaveId, file, null));
+//                }
+//                else{
+//                    attachmentDTO.setFileName(file.getOriginalFilename());
+//
+//                    MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+//                    attachmentDTO.setFileType(fileTypeMap.getContentType(file.getName()));
+//
+//                    attachmentDTO.setDirectory(file.getResource().getURI().toString());
+//
+//                    if (startDateLeave != null) {
+//                        attachmentDTO.setStartDateLeave(DateTimeUtil.stringToDate(startDateLeave));
+//                    }
+//                    else{
+//                        uploadImageMsg = uploadImageMsg.append("The start date leave is null.");
+//                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
+//                    }
+//
+//                    if(endDateLeave != null){
+//                        attachmentDTO.setEndDateLeave(DateTimeUtil.stringToDate(endDateLeave));
+//                    }
+//                    else{
+//                        uploadImageMsg = uploadImageMsg.append("The end date leave is null.");
+//                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
+//                    }
+//
+//                    if(leaveReason != null && !leaveReason.equalsIgnoreCase("")){
+//                        attachmentDTO.setLeaveReason(leaveReason);
+//                    }
+//                    else{
+//                        uploadImageMsg = uploadImageMsg.append("The leave reason is null.");
+//                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
+//                    }
+//
+//                    if(employeeName != null && !employeeName.equalsIgnoreCase("")){
+//                        attachmentDTO.setEmployeeName(employeeName);
+//                    }
+//                    else{
+//                        uploadImageMsg = uploadImageMsg.append("The employee name is null.");
+//                        return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
+//                    }
+//
+//                    uploadImageMsg.setLength(0);
+//                    uploadImageMsg = uploadImageMsg.append(attachmentService.uploadFile(null, file, attachmentDTO));
+//                }
+//                return new ResponseEntity<>(uploadImageMsg, HttpStatus.OK);
+//            }
+//            else{
+//                uploadImageMsg.setLength(0);
+//                uploadImageMsg = uploadImageMsg.append("Cannot upload file without file uploaded");
+//                return new ResponseEntity<>(uploadImageMsg, HttpStatus.UNPROCESSABLE_ENTITY);
+//            }
+//        }
+//        catch(Exception ex){
+//            uploadImageMsg.setLength(0);
+//            uploadImageMsg = uploadImageMsg.append(ex.toString());
+//            return new ResponseEntity<>(uploadImageMsg, HttpStatus.BAD_REQUEST);
+//        }
+//
+//    }
 
     @PostMapping(path = "/post/download")
     public ResponseEntity<?> downloadFile(
@@ -645,15 +652,15 @@ public class AttachmentController {
     }
 
 
-    public static byte[] toByteArray(BufferedImage bi, String format)
-        throws IOException {
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bi, format, baos);
-            byte[] bytes = baos.toByteArray();
-            return bytes;
-
-    }
+//    public static byte[] toByteArray(BufferedImage bi, String format)
+//        throws IOException {
+//
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            ImageIO.write(bi, format, baos);
+//            byte[] bytes = baos.toByteArray();
+//            return bytes;
+//
+//    }
 
 
 //    @PostMapping("/post/download/file")
