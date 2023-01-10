@@ -13,11 +13,16 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DateTimeUtil {
-    public static String DateToString(Date inputDate) throws ParseException {
-        System.out.println(inputDate);
-        String inputDateStr = removeMilliSecond(inputDate.toString());
-        Date date = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(inputDateStr);
-        return new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX").format(date);
+    public static String DateToString(Date inputDate) {
+        try{
+            System.out.println(inputDate);
+            String inputDateStr = removeMilliSecond(inputDate.toString());
+            Date date = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(inputDateStr);
+            return new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX").format(date);
+        }
+        catch(ParseException paEx){
+            return null;
+        }
     }
 
     public static String removeMilliSecond(String inputDate){

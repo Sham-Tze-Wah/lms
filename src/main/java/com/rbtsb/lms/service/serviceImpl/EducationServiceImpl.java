@@ -13,6 +13,7 @@ import com.rbtsb.lms.service.mapper.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,11 @@ public class EducationServiceImpl implements EducationService {
         List<EducationEntity> educationEntities = educationRepo.findAll();
         List<EducationPojo> educationPojoList = new ArrayList<>();
         educationEntities.forEach(educationEntity -> {
-            educationPojoList.add(educationMapper.entityToPojo(educationEntity));
+            try {
+                educationPojoList.add(educationMapper.entityToPojo(educationEntity));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         if(!educationPojoList.isEmpty()){

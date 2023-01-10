@@ -5,13 +5,15 @@ import com.rbtsb.lms.pojo.EducationPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+
 @Service
 public class EducationMapper {
 
     @Autowired
     private EmployeeMapper employeeMapper;
 
-    public EducationPojo entityToPojo(EducationEntity educationEntity){
+    public EducationPojo entityToPojo(EducationEntity educationEntity) {
         EducationPojo educationPojo = new EducationPojo();
         educationPojo.setEducationId(educationEntity.getEducationId());
         educationPojo.setQualification(educationEntity.getQualification());

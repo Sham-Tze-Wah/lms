@@ -5,6 +5,7 @@ import com.rbtsb.lms.entity.RoleEntity;
 import com.rbtsb.lms.pojo.AppUserPojo;
 import com.rbtsb.lms.pojo.RolePojo;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class AppUserMapper {
         return appUserEntity;
     }
 
-    public static AppUserPojo entityToPojo(AppUserEntity appUserEntity) {
+    public static AppUserPojo entityToPojo(AppUserEntity appUserEntity){
         AppUserPojo appUserPojo = new AppUserPojo();
         appUserPojo.setId(appUserEntity.getId());
         appUserPojo.setUsername(appUserEntity.getUsername());

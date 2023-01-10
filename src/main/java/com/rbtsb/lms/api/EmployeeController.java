@@ -56,7 +56,7 @@ public class EmployeeController {
                                 employeePojo.setEmail(email.trim());
                                 employeePojo.setAddress(address.trim());
                                 employeePojo.setPosition(Position.valueOf(position.trim()));
-                                employeePojo.setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined.trim())));
+                                employeePojo.setDateJoined(DateTimeUtil.stringToDate(dateJoined.trim()));
                                 if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
                                     employeePojo.setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave.trim())));
                                 }

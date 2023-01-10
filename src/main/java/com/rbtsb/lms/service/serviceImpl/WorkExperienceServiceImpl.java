@@ -12,6 +12,7 @@ import com.rbtsb.lms.service.mapper.WorkExpMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,11 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         List<WorkExperienceEntity> workExpEntities = workExperienceRepo.findAll();
         List<WorkExperiencePojo> leavePojoList = new ArrayList<>();
         workExpEntities.forEach(workExperienceEntity -> {
-            leavePojoList.add(workExpMapper.entityToPojo(workExperienceEntity));
+            try {
+                leavePojoList.add(workExpMapper.entityToPojo(workExperienceEntity));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         if(!leavePojoList.isEmpty()){

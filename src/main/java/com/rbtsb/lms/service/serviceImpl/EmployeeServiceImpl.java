@@ -42,36 +42,46 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.debug("Employee Entity: "+employeePojo.toString());
         employeeRepo.save(employeeMapper.pojoToEntity(employeePojo));
         return "Insert successfully.";
-
-
     }
 
     @Override
     public List<EmployeePojo> getAllEmployee() {
-        List<EmployeeEntity> employeeEntities = employeeRepo.findAll();
-        List<EmployeePojo> employeePojoList = new ArrayList<>();
-        employeeEntities.forEach(employeeEntity -> {
-            employeePojoList.add(employeeMapper.entityToPojo(employeeEntity));
-        });
+        try{
+            List<EmployeeEntity> employeeEntities = employeeRepo.findAll();
+            List<EmployeePojo> employeePojoList = new ArrayList<>();
+            employeeEntities.forEach(employeeEntity -> {
+                try {
+                    employeePojoList.add(employeeMapper.entityToPojo(employeeEntity));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
 
-        if(!employeePojoList.isEmpty()){
-            return employeePojoList;
+            if(!employeePojoList.isEmpty()){
+                return employeePojoList;
+            }
+            else{
+                return null;
+            }
         }
-        else{
+        catch(Exception ex){
             return null;
         }
-
     }
 
     @Override
     public Optional<EmployeePojo> getEmployeeById(String id) {
         Optional<EmployeeEntity> emp = employeeRepo.findById(id);
-
-        if(emp.isPresent()){
-            log.debug("Employee Entity: " + emp.get().toString());
-            return Optional.of(employeeMapper.entityToPojo(emp.get()));
+        try{
+            if(emp.isPresent()){
+                log.debug("Employee Entity: " + emp.get().toString());
+                return Optional.of(employeeMapper.entityToPojo(emp.get()));
+            }
+            else{
+                return null;
+            }
         }
-        else{
+        catch(Exception ex){
             return null;
         }
     }
@@ -80,35 +90,40 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Optional<EmployeePojo> getEmployeeByName(String name) {
         Optional<EmployeeEntity> empEntity = employeeRepo.findByName(name);
         //Map entity to pojo
-        if(empEntity.isPresent()){
-            EmployeePojo employeePojo = employeeMapper.entityToPojo(empEntity.get());
-            return Optional.ofNullable(Optional.of(employeePojo)).orElse(null);
+        try{
+            if(empEntity.isPresent()){
+                EmployeePojo employeePojo = employeeMapper.entityToPojo(empEntity.get());
+                return Optional.ofNullable(Optional.of(employeePojo)).orElse(null);
+            }
+            else{
+                throw new NullPointerException("name is not exist. Please try another name");
+            }
         }
-        else{
-            throw new NullPointerException("name is not exist. Please try another name");
+        catch(Exception ex){
+            return null;
         }
-
     }
 
     @Override
     public String updateEmployeeById(String id, String name, String phoneNo, String email, String address, String position, String dateJoined, String dateLeave) {
         try{
-            Optional<EmployeeEntity> emp = employeeRepo.findById(id);
-            if(emp.isPresent()){
-                String emp_id = emp.get().getEmpId();
-                if(!name.equalsIgnoreCase("")){
-                    if(!phoneNo.equalsIgnoreCase("")){
-                        if(!email.equalsIgnoreCase("")){
-                            if(!position.equals(null)){
-                                //if(!employeePojo.getRole().equals(null)){
+            if(id != null && !id.equalsIgnoreCase("")){
+                Optional<EmployeeEntity> emp = employeeRepo.findById(id);
+                if(emp.isPresent()){
+                    String emp_id = emp.get().getEmpId();
+                    if(!name.equalsIgnoreCase("")){
+                        if(!phoneNo.equalsIgnoreCase("")){
+                            if(!email.equalsIgnoreCase("")){
+                                if(!position.equals(null)){
+                                    //if(!employeePojo.getRole().equals(null)){
 
-                                int result = 0;
-                                if(dateJoined != null){
+                                    int result = 0;
+                                    if(dateJoined != null){
 
-                                    if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
-                                        emp.get().setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined)));
-                                        emp.get().setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave)));
-                                        //emp.get().setRole(employeePojo.getRole());
+                                        if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
+                                            emp.get().setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined)));
+                                            emp.get().setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave)));
+                                            //emp.get().setRole(employeePojo.getRole());
 //                                        employeeRepo.saveAndFlush(emp.get());
 //                                        result =employeeRepo.updateByEmployee(
 //                                                employeePojo.getName(),
@@ -123,8 +138,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                        );
 //                                        result = 1;
 //                                        return result + " updated successfully.";
-                                    }
-                                    else{
+                                        }
+                                        else{
 //                                        result = employeeRepo.save()
 //                                        updateByEmployee(
 //                                                employeePojo.getName(),
@@ -139,13 +154,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                        );
 
 
-                                        emp.get().setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined)));
-                                        emp.get().setDateLeave(null);
-                                        //emp.get().setRole(employeePojo.getRole());
+                                            emp.get().setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined)));
+                                            emp.get().setDateLeave(null);
+                                            //emp.get().setRole(employeePojo.getRole());
+                                        }
                                     }
-                                }
-                                else{
-                                    if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
+                                    else{
+                                        if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
 //                                        result = employeeRepo.updateByEmployee(
 //                                                employeePojo.getName(),
 //                                                employeePojo.getEmail(),
@@ -157,10 +172,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                                employeePojo.getRole(),
 //                                                emp_id
 //                                        );
-                                        emp.get().setDateJoined(new Date());
-                                        emp.get().setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave)));
-                                    }
-                                    else{
+                                            emp.get().setDateJoined(new Date());
+                                            emp.get().setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave)));
+                                        }
+                                        else{
 //                                        result = employeeRepo.updateByEmployee(
 //                                                employeePojo.getName(),
 //                                                employeePojo.getEmail(),
@@ -172,41 +187,45 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                                employeePojo.getRole(),
 //                                                emp_id
 //                                        );
-                                        emp.get().setDateJoined(new Date());
-                                        emp.get().setDateLeave(null);
+                                            emp.get().setDateJoined(new Date());
+                                            emp.get().setDateLeave(null);
+                                        }
                                     }
-                                }
-                                emp.get().setName(name);
-                                emp.get().setEmail(email);
-                                emp.get().setAddress(address);
-                                emp.get().setPhoneNo(phoneNo);
-                                emp.get().setPosition(Position.valueOf(position));
-                                employeeRepo.saveAndFlush(emp.get());
-                                result = 1;
-                                return result + " updated successfully.";
-                                //}
+                                    emp.get().setName(name);
+                                    emp.get().setEmail(email);
+                                    emp.get().setAddress(address);
+                                    emp.get().setPhoneNo(phoneNo);
+                                    emp.get().setPosition(Position.valueOf(position));
+                                    employeeRepo.saveAndFlush(emp.get());
+                                    result = 1;
+                                    return result + " updated successfully.";
+                                    //}
 //                            else{
 //                                return "Role cannot be null.";
 //                            }
+                                }
+                                else{
+                                    return "Position cannot be null";
+                                }
                             }
-                            else{
-                                return "Position cannot be null";
+                            else {
+                                return "email cannot be null";
                             }
                         }
-                        else {
-                            return "email cannot be null";
+                        else{
+                            return "phone no cannot be null";
                         }
                     }
                     else{
-                        return "phone no cannot be null";
+                        return "name cannot be null.";
                     }
                 }
                 else{
-                    return "name cannot be null.";
+                    return "update unsucessfully due to id is not exist.";
                 }
             }
             else{
-                return "update unsucessfully due to id is not exist.";
+                return "id is null.";
             }
         }
         catch(ParseException paEx){
@@ -232,12 +251,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<EmployeePojo> getEmployeePojo(String empId) {
         Optional<EmployeeEntity> entity = employeeRepo.findById(empId);
-        if(entity.isPresent()){
-            return Optional.of(employeeMapper.entityToPojo(entity.get()));
+        try{
+            if(entity.isPresent()){
+                return Optional.of(employeeMapper.entityToPojo(entity.get()));
+            }
+            else{
+                return null;
+            }
         }
-        else{
+        catch(Exception ex){
             return null;
         }
+
     }
 
 //    @Override

@@ -32,9 +32,12 @@ public class EducationController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<?> insertEducation(@RequestBody @Valid @NonNull EducationPojo educationPojo){
+    public ResponseEntity<?> insertEducation(@RequestParam(value = "qualification") String qualification,
+                                             @RequestParam(value = "institute") String institute,
+                                             @RequestParam(value = "course") String course,
+                                             @RequestParam(value = "employeeId") String employeeId){
         //try{
-
+            EducationPojo educationPojo = new EducationPojo();
             if(!educationPojo.getQualification().toString().equalsIgnoreCase("")){
                 if(!educationPojo.getInstitute().equalsIgnoreCase("")){
                     if(!educationPojo.getCourse().toString().equalsIgnoreCase("")){

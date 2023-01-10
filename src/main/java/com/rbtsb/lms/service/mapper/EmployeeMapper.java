@@ -2,11 +2,16 @@ package com.rbtsb.lms.service.mapper;
 
 import com.rbtsb.lms.entity.EmployeeEntity;
 import com.rbtsb.lms.pojo.EmployeePojo;
+import com.rbtsb.lms.util.DateTimeUtil;
 import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 public class EmployeeMapper {
-    public static EmployeePojo entityToPojo(EmployeeEntity employeeEntity){
+    public static EmployeePojo entityToPojo(EmployeeEntity employeeEntity) {
         EmployeePojo emp = new EmployeePojo();
         emp.setEmpId(employeeEntity.getEmpId());
         if(employeeEntity.getName() == null || employeeEntity.getName().equalsIgnoreCase("")){
