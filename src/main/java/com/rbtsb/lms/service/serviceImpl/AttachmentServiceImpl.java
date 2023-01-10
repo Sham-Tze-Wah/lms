@@ -495,10 +495,16 @@ public class AttachmentServiceImpl implements AttachmentService {
     public List<AttachmentDTO> getAttachmentByEmpIdAndDate(String empId, String startLeaveDate, String endLeaveDate) {
 
         try{
-            List<AttachmentDTO> attachmentDTOList = attachmentRepo.findByEmpIdAndStartDateLeaveAndEndDateLeave(
+            List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
+            List<AttachmentEntity> attachmentEntityList = attachmentRepo.findByEmpIdAndStartDateLeaveAndEndDateLeave(
                     empId,
                     DateTimeUtil.stringToDate(startLeaveDate),
                     DateTimeUtil.stringToDate(endLeaveDate));
+
+            for(AttachmentEntity attachmentEntity : attachmentEntityList){
+                AttachmentDTO attachmentDTO = attachmentMapper.entityToDTO(attachmentEntity);
+                attachmentDTOList.add(attachmentDTO);
+            }
 
             if(attachmentDTOList!=null && !attachmentDTOList.isEmpty()){
                 return attachmentDTOList;

@@ -17,6 +17,6 @@ public interface EducationRepo extends JpaRepository<EducationEntity, String> {
     @Query(value = "SELECT * FROM education e, employee emp WHERE e.emp_id = emp.emp_id AND e.emp_id = ?1 ", nativeQuery = true)
     EducationEntity selectEducationByEmpId(String empId);
 
-    @Query(value = "SELECT * FROM leave_application l WHERE l.emp_id = ?1", nativeQuery = true)
-    List<EducationPojo> findByEmpId(String empId);
+    @Query(value = "SELECT * FROM education e WHERE e.emp_id = ?1", nativeQuery = true)
+    List<EducationEntity> findByEmpId(String empId); //
 }

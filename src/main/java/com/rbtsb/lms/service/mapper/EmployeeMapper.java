@@ -9,13 +9,31 @@ public class EmployeeMapper {
     public static EmployeePojo entityToPojo(EmployeeEntity employeeEntity){
         EmployeePojo emp = new EmployeePojo();
         emp.setEmpId(employeeEntity.getEmpId());
+        if(employeeEntity.getName() == null || employeeEntity.getName().equalsIgnoreCase("")){
+            throw new NullPointerException("name is null");
+        }
+        else if(employeeEntity.getEmail() == null || employeeEntity.getEmail().equalsIgnoreCase("")){
+            throw new NullPointerException("email is null");
+        }
+        else if(employeeEntity.getPhoneNo() == null || employeeEntity.getPhoneNo().equalsIgnoreCase("")){
+            throw new NullPointerException("phone no is null");
+        }
+        else if(employeeEntity.getAddress() == null || employeeEntity.getAddress().equalsIgnoreCase("")){
+            throw new NullPointerException("address is null");
+        }
+        else if(employeeEntity.getDateJoined() == null){
+            throw new NullPointerException("date joined is null");
+        }
+
         emp.setName(employeeEntity.getName());
         emp.setEmail(employeeEntity.getEmail());
         emp.setPhoneNo(employeeEntity.getPhoneNo());
         emp.setPosition(employeeEntity.getPosition());
         emp.setAddress(employeeEntity.getAddress());
         emp.setDateJoined(employeeEntity.getDateJoined());
-        emp.setDateLeave(employeeEntity.getDateLeave());
+
+        if(employeeEntity.getDateJoined() != null)
+            emp.setDateLeave(employeeEntity.getDateLeave());
 
         return emp;
     }

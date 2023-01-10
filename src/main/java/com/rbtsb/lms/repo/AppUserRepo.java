@@ -17,10 +17,10 @@ public interface AppUserRepo
         extends JpaRepository<AppUserEntity,String> {
     @Query(value = "SELECT * FROM app_user a, user_roles u, roles r WHERE a.app_user_id = u.id AND u.role_id = r.role_id AND " +
             "a.username = ?1 AND r.role_name = ?2",nativeQuery = true)
-    AppUserPojo findByUsernameAndRoleName(String email, String roleName);
+    AppUserEntity findByUsernameAndRoleName(String email, String roleName);
 
 //    @Query("UPDATE AppUser")
 //    int updatePasswordByUsername(String email);
 
-    AppUserPojo findByUsername(String email);
+    AppUserEntity findByUsername(String email);
 }

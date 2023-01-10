@@ -44,7 +44,7 @@ public class LeaveApplicationController {
 
                 if(leaveDTO.getLeaveStatus()!= null && !leaveDTO.getLeaveStatus().toString().equalsIgnoreCase("")){
                     if(leaveDTO.getLeaveType() != null && !leaveDTO.getLeaveType().toString().equalsIgnoreCase("")){
-                        if(!leaveDTO.getEmployeeName().equalsIgnoreCase("")){
+                        if(leaveDTO.getEmployeeName() != null && !leaveDTO.getEmployeeName().equalsIgnoreCase("")){
                             log.debug(leaveDTO.getEmployeeName());
                             Optional<EmployeePojo> emp  = employeeService.getEmployeeByName(leaveDTO.getEmployeeName());
                             log.debug(emp.get().toString());
@@ -110,7 +110,7 @@ public class LeaveApplicationController {
         }
     }
 
-    @PutMapping("/approve/{id}")
+    @PatchMapping("/approve/{id}")
     public ResponseEntity<?> approveLeaveApplication(@PathVariable("id") String id){
         ApiErrorPojo apiErrorPojo = leaveService.approveLeaveStatus(id);
         return new ResponseEntity<>(
@@ -121,7 +121,7 @@ public class LeaveApplicationController {
         );
     }
 
-    @PutMapping("/reject/{id}")
+    @PatchMapping("/reject/{id}")
     public ResponseEntity<?> rejectLeaveApplication(@PathVariable("id") String id){
         ApiErrorPojo apiErrorPojo = leaveService.rejectLeaveStatus(id);
         return new ResponseEntity<>(

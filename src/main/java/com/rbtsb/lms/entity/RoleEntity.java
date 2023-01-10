@@ -1,15 +1,17 @@
 package com.rbtsb.lms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.rbtsb.lms.pojo.RolePojo;
 import com.rbtsb.lms.util.SqlDataType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
+
+@NamedNativeQuery(name = "RoleEntity.findByRoleName", query = "SELECT role_id as id, role_name as name FROM roles r WHERE r.role_name = ?1", resultSetMapping = "Mapping.RolePojo")
+@SqlResultSetMapping(name = "Mapping.RolePojo", classes = @ConstructorResult(targetClass = RolePojo.class,
+columns = {@ColumnResult(name = "id"), @ColumnResult(name = "name")}))
 
 @NoArgsConstructor
 @AllArgsConstructor

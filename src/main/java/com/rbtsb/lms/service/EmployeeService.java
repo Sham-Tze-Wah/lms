@@ -21,7 +21,7 @@ public interface EmployeeService {
 
      Optional<EmployeePojo> getEmployeeByName(String name);
 
-     String updateEmployeeById(String id, EmployeePojo employeePojo);
+     String updateEmployeeById(String id, String name, String phoneNo, String email, String address, String position, String dateJoined, String dateLeave);
 
      String deleteEmployeeById(String id);
 

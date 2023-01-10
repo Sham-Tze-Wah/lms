@@ -50,9 +50,9 @@ public class AppUserServiceImpl implements AppUserService {
         appUserEntity.setUsername(loginDTO.getUsername());
         appUserEntity.setPassword(passwordEncoder.encode(loginDTO.getPassword()));
         appUserEntity.setMatchingPassword(passwordEncoder.encode(loginDTO.getMatchingPassword()));
-        RoleEntity roleEntity = roleRepo.findByRoleName("USER"); //Role.Employee.toString() //TODO Checking on the proper role
+        RolePojo rolePojo = roleRepo.findByRoleName("USER"); //Role.Employee.toString() //TODO Checking on the proper role
 
-        //RoleEntity roleEntity = RoleMapper.pojoToEntity(rolePojo);
+        RoleEntity roleEntity = RoleMapper.pojoToEntity(rolePojo);
         roleEntityList.add(roleEntity);
         appUserEntity.setRoles(roleEntityList);
 
@@ -83,32 +83,37 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String validateVerificationToken(String token) {
-        VerificationTokenPojo verificationToken = verificationTokenRepository
-                .findByToken(token);
+        VerificationTokenEntity verificationTokenEntity = verificationTokenRepository.findByToken(token);
+        if(verificationTokenEntity != null){
+            VerificationTokenPojo verificationToken = VerificationTokenMapper.entityToPojo(verificationTokenEntity);
 
-        if(verificationToken == null) {
-            return "invalid";
+            if(verificationToken == null) {
+                return "invalid";
+            }
+
+            AppUserPojo user = verificationToken.getAppUserPojo();
+            Calendar cal = Calendar.getInstance();
+
+            if(verificationToken.getExpirationTime().getTime() -
+                    cal.getTime().getTime() <= 0){
+                VerificationTokenEntity tokenEntity = VerificationTokenMapper.pojoToEntity(verificationToken);
+                verificationTokenRepository.delete(tokenEntity);
+                return "expired";
+            }
+
+            user.setEnabled(true);
+            appUserRepo.save(AppUserMapper.pojoToEntity(user));
+            return "valid";
         }
-
-        AppUserPojo user = verificationToken.getAppUserPojo();
-        Calendar cal = Calendar.getInstance();
-
-        if(verificationToken.getExpirationTime().getTime() -
-                cal.getTime().getTime() <= 0){
-            VerificationTokenEntity tokenEntity = VerificationTokenMapper.pojoToEntity(verificationToken);
-            verificationTokenRepository.delete(tokenEntity);
-            return "expired";
+        else{
+            throw new NullPointerException("the token provided is invalid. Please get another token.");
         }
-
-        user.setEnabled(true);
-        appUserRepo.save(AppUserMapper.pojoToEntity(user));
-        return "valid";
     }
 
     @Override
     public VerificationTokenPojo generateNewVerificationToken(String oldToken) {
         VerificationTokenPojo verificationToken =
-                verificationTokenRepository.findByToken(oldToken);
+                VerificationTokenMapper.entityToPojo(verificationTokenRepository.findByToken(oldToken));
 
         verificationToken.setToken(UUID.randomUUID().toString());
         verificationTokenRepository.save(VerificationTokenMapper.pojoToEntity(verificationToken));
@@ -117,12 +122,16 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUserPojo findByUsername(String email) {
-        return appUserRepo.findByUsername(email);
+        AppUserEntity appUserEntity = appUserRepo.findByUsername(email);
+        AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
+        return appUserPojo;
     }
 
     @Override
     public AppUserPojo findByEmailAndRoleName(String email, String roleName) {
-        return appUserRepo.findByUsernameAndRoleName(email, roleName);
+        AppUserEntity appUserEntity =  appUserRepo.findByUsernameAndRoleName(email, roleName);
+        AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
+        return appUserPojo;
     }
 
     @Override
@@ -134,30 +143,30 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String validatePasswordResetToken(String token) {
-        PasswordResetTokenPojo passwordResetToken =
+        PasswordResetTokenEntity passwordResetTokenEntity =
                 passwordResetTokenRepository.findByToken(token);
 
-        if(passwordResetToken == null) {
+        if(passwordResetTokenEntity == null) {
             return "invalid";
         }
 
 
-        AppUserPojo user = passwordResetToken.getAppUserPojo();
+        AppUserEntity user = passwordResetTokenEntity.getAppUserEntity();
         Calendar cal = Calendar.getInstance();
 
-        if(passwordResetToken.getExpirationTime().getTime() -
+        if(passwordResetTokenEntity.getExpirationTime().getTime() -
                 cal.getTime().getTime() <= 0){
-            PasswordResetTokenEntity passwordResetTokenEntity = PasswordResetTokenMapper.pojoToEntity(passwordResetToken);
             passwordResetTokenRepository.delete(passwordResetTokenEntity);
             return "expired";
         }
 
+        PasswordResetTokenPojo passwordResetTokenPojo = PasswordResetTokenMapper.entityToPojo(passwordResetTokenEntity);
         return "valid";
     }
 
     @Override
     public Optional<AppUserPojo> getUserByPasswordResetToken(String token) {
-        return Optional.ofNullable(passwordResetTokenRepository.findByToken(token).getAppUserPojo());
+        return Optional.ofNullable(AppUserMapper.entityToPojo(passwordResetTokenRepository.findByToken(token).getAppUserEntity()));
     }
 
     @Override

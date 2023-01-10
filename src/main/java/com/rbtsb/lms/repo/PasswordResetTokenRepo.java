@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PasswordResetTokenRepo extends
         JpaRepository<PasswordResetTokenEntity, Long> {
 
-    PasswordResetTokenPojo findByToken(String token);
+    PasswordResetTokenEntity findByToken(String token);
 }

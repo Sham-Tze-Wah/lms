@@ -1,6 +1,7 @@
 package com.rbtsb.lms.service.serviceImpl;
 
 
+import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.entity.EducationEntity;
 import com.rbtsb.lms.entity.EmployeeEntity;
@@ -11,11 +12,13 @@ import com.rbtsb.lms.repo.EmployeeRepo;
 import com.rbtsb.lms.service.EmployeeService;
 import com.rbtsb.lms.service.mapper.EducationMapper;
 import com.rbtsb.lms.service.mapper.EmployeeMapper;
+import com.rbtsb.lms.util.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,34 +80,36 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Optional<EmployeePojo> getEmployeeByName(String name) {
         Optional<EmployeeEntity> empEntity = employeeRepo.findByName(name);
         //Map entity to pojo
-        EmployeePojo employeePojo = employeeMapper.entityToPojo(empEntity.get());
-        return Optional.ofNullable(Optional.of(employeePojo)).orElse(null);
+        if(empEntity.isPresent()){
+            EmployeePojo employeePojo = employeeMapper.entityToPojo(empEntity.get());
+            return Optional.ofNullable(Optional.of(employeePojo)).orElse(null);
+        }
+        else{
+            throw new NullPointerException("name is not exist. Please try another name");
+        }
+
     }
 
     @Override
-    public String updateEmployeeById(String id, EmployeePojo employeePojo) {
-        Optional<EmployeeEntity> emp = employeeRepo.findById(id);
-        if(emp.isPresent()){
-            String emp_id = emp.get().getEmpId();
-            if(!employeePojo.getName().equalsIgnoreCase("")){
-                if(!employeePojo.getPhoneNo().equalsIgnoreCase("")){
-                    if(!employeePojo.getEmail().equalsIgnoreCase("")){
-                        if(!employeePojo.getPosition().equals(null)){
-                            //if(!employeePojo.getRole().equals(null)){
+    public String updateEmployeeById(String id, String name, String phoneNo, String email, String address, String position, String dateJoined, String dateLeave) {
+        try{
+            Optional<EmployeeEntity> emp = employeeRepo.findById(id);
+            if(emp.isPresent()){
+                String emp_id = emp.get().getEmpId();
+                if(!name.equalsIgnoreCase("")){
+                    if(!phoneNo.equalsIgnoreCase("")){
+                        if(!email.equalsIgnoreCase("")){
+                            if(!position.equals(null)){
+                                //if(!employeePojo.getRole().equals(null)){
 
                                 int result = 0;
-                                if(employeePojo.getDateJoined() != null){
+                                if(dateJoined != null){
 
-                                    if(employeePojo.getDateLeave() != null){
-                                        emp.get().setName(employeePojo.getName());
-                                        emp.get().setEmail(employeePojo.getEmail());
-                                        emp.get().setAddress(employeePojo.getAddress());
-                                        emp.get().setPhoneNo(employeePojo.getPhoneNo());
-                                        emp.get().setDateJoined(employeePojo.getDateJoined());
-                                        emp.get().setDateLeave(employeePojo.getDateLeave());
-                                        emp.get().setPosition(employeePojo.getPosition());
+                                    if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
+                                        emp.get().setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined)));
+                                        emp.get().setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave)));
                                         //emp.get().setRole(employeePojo.getRole());
-                                        employeeRepo.saveAndFlush(emp.get());
+//                                        employeeRepo.saveAndFlush(emp.get());
 //                                        result =employeeRepo.updateByEmployee(
 //                                                employeePojo.getName(),
 //                                                employeePojo.getEmail(),
@@ -116,8 +121,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                                employeePojo.getRole(),
 //                                                emp_id
 //                                        );
-                                        result = 1;
-                                        return result + " updated successfully.";
+//                                        result = 1;
+//                                        return result + " updated successfully.";
                                     }
                                     else{
 //                                        result = employeeRepo.save()
@@ -133,21 +138,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                                emp_id
 //                                        );
 
-                                        emp.get().setName(employeePojo.getName());
-                                        emp.get().setEmail(employeePojo.getEmail());
-                                        emp.get().setAddress(employeePojo.getAddress());
-                                        emp.get().setPhoneNo(employeePojo.getPhoneNo());
-                                        emp.get().setDateJoined(employeePojo.getDateJoined());
+
+                                        emp.get().setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined)));
                                         emp.get().setDateLeave(null);
-                                        emp.get().setPosition(employeePojo.getPosition());
                                         //emp.get().setRole(employeePojo.getRole());
-                                        employeeRepo.saveAndFlush(emp.get());
-                                        result = 1;
-                                        return result + " updated successfully.";
                                     }
                                 }
                                 else{
-                                    if(employeePojo.getDateLeave() != null){
+                                    if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
 //                                        result = employeeRepo.updateByEmployee(
 //                                                employeePojo.getName(),
 //                                                employeePojo.getEmail(),
@@ -159,17 +157,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                                employeePojo.getRole(),
 //                                                emp_id
 //                                        );
-                                        emp.get().setName(employeePojo.getName());
-                                        emp.get().setEmail(employeePojo.getEmail());
-                                        emp.get().setAddress(employeePojo.getAddress());
-                                        emp.get().setPhoneNo(employeePojo.getPhoneNo());
                                         emp.get().setDateJoined(new Date());
-                                        emp.get().setDateLeave(employeePojo.getDateLeave());
-                                        emp.get().setPosition(employeePojo.getPosition());
-//                                        emp.get().setRole(employeePojo.getRole());
-                                        employeeRepo.saveAndFlush(emp.get());
-                                        result = 1;
-                                        return result + " updated successfully.";
+                                        emp.get().setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave)));
                                     }
                                     else{
 //                                        result = employeeRepo.updateByEmployee(
@@ -183,42 +172,48 @@ public class EmployeeServiceImpl implements EmployeeService {
 //                                                employeePojo.getRole(),
 //                                                emp_id
 //                                        );
-                                        emp.get().setName(employeePojo.getName());
-                                        emp.get().setEmail(employeePojo.getEmail());
-                                        emp.get().setAddress(employeePojo.getAddress());
-                                        emp.get().setPhoneNo(employeePojo.getPhoneNo());
                                         emp.get().setDateJoined(new Date());
                                         emp.get().setDateLeave(null);
-                                        emp.get().setPosition(employeePojo.getPosition());
-                                        //emp.get().setRole(employeePojo.getRole());
-                                        employeeRepo.saveAndFlush(emp.get());
-                                        result = 1;
-                                        return result + " updated successfully.";
                                     }
                                 }
-                            //}
+                                emp.get().setName(name);
+                                emp.get().setEmail(email);
+                                emp.get().setAddress(address);
+                                emp.get().setPhoneNo(phoneNo);
+                                emp.get().setPosition(Position.valueOf(position));
+                                employeeRepo.saveAndFlush(emp.get());
+                                result = 1;
+                                return result + " updated successfully.";
+                                //}
 //                            else{
 //                                return "Role cannot be null.";
 //                            }
+                            }
+                            else{
+                                return "Position cannot be null";
+                            }
                         }
-                        else{
-                            return "Position cannot be null";
+                        else {
+                            return "email cannot be null";
                         }
                     }
-                    else {
-                        return "email cannot be null";
+                    else{
+                        return "phone no cannot be null";
                     }
                 }
                 else{
-                    return "phone no cannot be null";
+                    return "name cannot be null.";
                 }
             }
             else{
-                return "name cannot be null.";
+                return "update unsucessfully due to id is not exist.";
             }
         }
-        else{
-            return "update unsucessfully due to id is not exist.";
+        catch(ParseException paEx){
+            return "update unsuccessfully due to "+paEx.toString();
+        }
+        catch(Exception ex){
+            return "update unsuccessfully due to "+ex.toString();
         }
     }
 

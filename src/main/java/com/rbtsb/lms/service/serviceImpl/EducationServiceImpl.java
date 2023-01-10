@@ -108,12 +108,18 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public List<EducationPojo> getEducationByEmpId(String empId) {
-        List<EducationPojo> educationPojoList = educationRepo.findByEmpId(empId);
-        if(educationPojoList != null && !educationPojoList.isEmpty()){
+        List<EducationEntity> educationEntityList = educationRepo.findByEmpId(empId);
+        List<EducationPojo> educationPojoList = new ArrayList<>();
+
+        if(educationEntityList != null && !educationEntityList.isEmpty()){
+            for(EducationEntity edu : educationEntityList){
+                EducationPojo eduPojo = educationMapper.entityToPojo(edu);
+                educationPojoList.add(eduPojo);
+            }
             return educationPojoList;
         }
         else{
-            return null;
+            throw new NullPointerException("id is not valid. Please provide another id.");
         }
     }
 }

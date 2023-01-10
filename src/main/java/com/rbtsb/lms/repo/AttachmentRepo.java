@@ -17,5 +17,5 @@ public interface AttachmentRepo extends JpaRepository<AttachmentEntity, String> 
 
     @Query(value = "SELECT * FROM attachment a, leave_application l, employee e WHERE a.leave_id = l.leave_id AND l.emp_id = e.emp_id AND " +
             "e.emp_id = ?1 AND l.start_date_leave = ?2 AND l.end_date_leave = ?3",nativeQuery = true)
-    List<AttachmentDTO> findByEmpIdAndStartDateLeaveAndEndDateLeave(String empId, Date startDateLeave, Date endDateLeave);
+    List<AttachmentEntity> findByEmpIdAndStartDateLeaveAndEndDateLeave(String empId, Date startDateLeave, Date endDateLeave);
 }

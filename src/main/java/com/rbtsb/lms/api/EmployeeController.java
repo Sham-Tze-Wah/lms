@@ -1,16 +1,21 @@
 package com.rbtsb.lms.api;
 
+import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.service.EmployeeService;
 import com.rbtsb.lms.service.serviceImpl.EmployeeServiceImpl;
+import com.rbtsb.lms.util.DateTimeUtil;
+import com.rbtsb.lms.util.validation.EmployeeValidation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
+import javax.print.attribute.standard.DateTimeAtCompleted;
 import javax.validation.Valid;
 
 @RequestMapping("/api/emp")
@@ -27,15 +32,40 @@ public class EmployeeController {
     }
     
     @PostMapping("/add")
-    public ResponseEntity<?> addEmployee(@RequestBody @Valid @NonNull EmployeePojo employeePojo){
+    public ResponseEntity<?> addEmployee(@RequestParam(value="name", required = false) String name,
+                                         @RequestParam(value="phoneNo", required = false) String phoneNo,
+                                         @RequestParam(value = "email", required = false) String email,
+                                         @RequestParam(value = "address", required = false) String address,
+                                         @RequestParam(value = "position", required = false) String position,
+                                         @RequestParam(value = "dateJoined", required = false) String dateJoined,
+                                         @RequestParam(value = "dateLeave", required = false) String dateLeave){
+        EmployeePojo employeePojo = new EmployeePojo();
         try{
-            if(!employeePojo.getName().equalsIgnoreCase("")){
-                if(!employeePojo.getPhoneNo().equalsIgnoreCase("")){
-                    if(!employeePojo.getEmail().equalsIgnoreCase("")){
-                        if(!employeePojo.getPosition().equals(null)){
+            if(!name.equalsIgnoreCase("")){
+                if(!phoneNo.equalsIgnoreCase("") && EmployeeValidation.isInteger(phoneNo)){
+                    if(!email.equalsIgnoreCase("")){
+                        if(!position.equals(null)){
 //                            if(!employeePojo.getRole().equals(null)){
                                 //if(!employeePojo.getDateJoined().equals(null)){
+                            if(dateJoined != null && !dateJoined.equalsIgnoreCase("")){
+                                if(dateLeave != null && !dateJoined.equalsIgnoreCase("")){
+                                    employeePojo.setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave)));
+                                }
+                                employeePojo.setName(name.trim());
+                                employeePojo.setPhoneNo(phoneNo.trim());
+                                employeePojo.setEmail(email.trim());
+                                employeePojo.setAddress(address.trim());
+                                employeePojo.setPosition(Position.valueOf(position.trim()));
+                                employeePojo.setDateJoined(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateJoined.trim())));
+                                if(dateLeave != null && !dateLeave.equalsIgnoreCase("")){
+                                    employeePojo.setDateLeave(DateTimeUtil.yyyyMMddDate(DateTimeUtil.stringToDate(dateLeave.trim())));
+                                }
+
                                 return new ResponseEntity<>(employeeService.insertEmployee(employeePojo),HttpStatus.CREATED);
+                            }
+                            else{
+                                return new ResponseEntity<> ( "date joined cannot be null",HttpStatus.UNPROCESSABLE_ENTITY);
+                            }
                                 //}
 //                            else{
 //                                employeePojo.setDateJoined(new Date());
@@ -69,7 +99,8 @@ public class EmployeeController {
 
         //return new ResponseEntity<>(employeeService.insertEmployee(employeePojo),HttpStatus.CREATED);
     }
-    
+
+
     @GetMapping("/get/all")
     public ResponseEntity<?> getAllEmployee(){
         return new ResponseEntity<>(employeeService.getAllEmployee(), HttpStatus.OK);
@@ -87,8 +118,14 @@ public class EmployeeController {
 
     @PutMapping("/put/{id}")
     public ResponseEntity<?> updateEmployeeById(@PathVariable("id") String id,
-                                                @RequestBody @Valid @NonNull EmployeePojo employeePojo){
-        return new ResponseEntity<>(employeeService.updateEmployeeById(id, employeePojo), HttpStatus.OK);
+                                                @RequestParam(value="name", required = false) String name,
+                                                @RequestParam(value="phoneNo", required = false) String phoneNo,
+                                                @RequestParam(value = "email", required = false) String email,
+                                                @RequestParam(value = "address", required = false) String address,
+                                                @RequestParam(value = "position", required = false) String position,
+                                                @RequestParam(value = "dateJoined", required = false) String dateJoined,
+                                                @RequestParam(value = "dateLeave", required = false) String dateLeave){
+        return new ResponseEntity<>(employeeService.updateEmployeeById(id, name, phoneNo, email, address, position, dateJoined, dateLeave), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

@@ -11,6 +11,7 @@ import com.rbtsb.lms.repo.AppUserRepo;
 import com.rbtsb.lms.repo.EmployeeRepo;
 import com.rbtsb.lms.repo.RoleRepo;
 import com.rbtsb.lms.service.RoleService;
+import com.rbtsb.lms.service.mapper.AppUserMapper;
 import com.rbtsb.lms.service.mapper.RoleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -113,31 +114,29 @@ public class RoleServiceImpl implements RoleService {
             Optional<EmployeeEntity> employeeEntity = employeeRepo.findById(empId);
             if(employeeEntity.isPresent()){
                 if(role != null && !role.equalsIgnoreCase("")){
-                    AppUserPojo appUser = appUserRepo.findByUsernameAndRoleName(employeeEntity.get().getEmail(), role);
-                    AppUserEntity appUserEntity = new AppUserEntity();
-                    RolePojo rolePojo = RoleMapper.entityToPojo(roleRepo.findByRoleName(role));
+                    AppUserEntity appUserEntity = appUserRepo.findByUsernameAndRoleName(employeeEntity.get().getEmail(), role);
+                    RoleEntity roleEntity = RoleMapper.pojoToEntity(roleRepo.findByRoleName(role)); //RoleMapper.entityToPojo(
 
-                    if(appUser != null){
-                        appUserEntity.setUsername(appUser.getUsername());
-                        appUserEntity.setPassword(appUser.getPassword());
-                        appUserEntity.setMatchingPassword(appUser.getMatchingPassword());
+                    if(appUserEntity != null){ //existin app user
+//                        appUserEntity.setUsername(appUser.getUsername());
+//                        appUserEntity.setPassword(appUser.getPassword());
+//                        appUserEntity.setMatchingPassword(appUser.getMatchingPassword());
 
-                        Set<RoleEntity> roleEntitySet = new HashSet<>();
-                        appUser.getRoles().add(rolePojo);
-                        for(RolePojo rolePojos : appUser.getRoles()){
-                            roleEntitySet.add(RoleMapper.pojoToEntity(rolePojos));
-                        }
-                        appUserEntity.setRoles(roleEntitySet);
+//                        Set<RoleEntity> roleEntitySet = new HashSet<>();
+                        appUserEntity.getRoles().add(roleEntity);
+//                        for(RoleEntity roleEntities : appUserEntity.getRoles()){
+//                            roleEntitySet.add(roleEntities);
+//                        }
+//                        appUserEntity.setRoles(roleEntitySet);
 
-                        appUserEntity.setEmployeeEntity(employeeEntity.get());
                     }
                     else{
-                        appUserEntity.setUsername(appUser.getUsername());
-                        appUserEntity.setPassword(appUser.getPassword());
-                        appUserEntity.setMatchingPassword(appUser.getMatchingPassword());
+                        appUserEntity.setUsername(appUserEntity.getUsername());
+                        appUserEntity.setPassword(appUserEntity.getPassword());
+                        appUserEntity.setMatchingPassword(appUserEntity.getMatchingPassword());
 
                         Set<RoleEntity> roleEntitySet = new HashSet<>();
-                        roleEntitySet.add(RoleMapper.pojoToEntity(rolePojo));
+                        roleEntitySet.add(roleEntity);
                         appUserEntity.setRoles(roleEntitySet);
                         appUserEntity.setEmployeeEntity(employeeEntity.get());
                     }
@@ -163,27 +162,27 @@ public class RoleServiceImpl implements RoleService {
             Optional<EmployeeEntity> employeeEntity = employeeRepo.findById(empId);
             if(employeeEntity.isPresent()){
                 if(role != null && !role.equalsIgnoreCase("")){
-                    AppUserPojo appUserFromDB = appUserRepo.findByUsernameAndRoleName(employeeEntity.get().getEmail(), role);
-                    AppUserEntity appUserEntityToBeSaved = new AppUserEntity();
-                    RolePojo rolePojoFromDB = RoleMapper.entityToPojo(roleRepo.findByRoleName(role));
+                    AppUserEntity appUserEntityFromDB = appUserRepo.findByUsernameAndRoleName(employeeEntity.get().getEmail(), role);
+                    //AppUserEntity appUserEntityToBeSaved = new AppUserEntity();
+                    RolePojo rolePojoFromDB = roleRepo.findByRoleName(role); //RoleMapper.entityToPojo(
 
-                    if(appUserFromDB != null){
-                        appUserEntityToBeSaved.setUsername(appUserFromDB.getUsername());
-                        appUserEntityToBeSaved.setPassword(appUserFromDB.getPassword());
-                        appUserEntityToBeSaved.setMatchingPassword(appUserFromDB.getMatchingPassword());
+                    if(appUserEntityFromDB != null){
+//                        appUserEntityToBeSaved.setUsername(appUserFromDB.getUsername());
+//                        appUserEntityToBeSaved.setPassword(appUserFromDB.getPassword());
+//                        appUserEntityToBeSaved.setMatchingPassword(appUserFromDB.getMatchingPassword());
 
                         Set<RoleEntity> roleEntitySet = new HashSet<>();
-                        appUserFromDB.getRoles().add(rolePojoFromDB);
-                        for(RolePojo rolePojos : appUserFromDB.getRoles()){
-                            if(!rolePojos.getRoleName().equalsIgnoreCase(role)){
-                                roleEntitySet.add(RoleMapper.pojoToEntity(rolePojos));
+                        appUserEntityFromDB.getRoles().add(RoleMapper.pojoToEntity(rolePojoFromDB));
+                        for(RoleEntity roleEntities : appUserEntityFromDB.getRoles()){
+                            if(!roleEntities.getRoleName().equalsIgnoreCase(role)){
+                                roleEntitySet.add(roleEntities);
                             }
                         }
-                        appUserEntityToBeSaved.setRoles(roleEntitySet);
-                        appUserEntityToBeSaved.setEmployeeEntity(employeeEntity.get());
+                        appUserEntityFromDB.setRoles(roleEntitySet);
+//                        appUserEntityToBeSaved.setEmployeeEntity(employeeEntity.get());
 
-                        appUserRepo.save(appUserEntityToBeSaved);
-                        return appUserEntityToBeSaved + "unassign role successfully.";
+                        appUserRepo.save(appUserEntityFromDB);
+                        return appUserEntityFromDB + "unassign role successfully.";
                     }
                     else{
                         throw new NullPointerException("This employee is not assign with this role yet");
@@ -204,6 +203,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleEntity getRoleByName(String roleName) {
-        return roleRepo.findByRoleName(roleName);
+        return RoleMapper.pojoToEntity(roleRepo.findByRoleName(roleName));
     }
 }

@@ -1,5 +1,7 @@
 package com.rbtsb.lms.entity;
 
+import com.rbtsb.lms.pojo.RolePojo;
+import com.rbtsb.lms.pojo.VerificationTokenPojo;
 import com.rbtsb.lms.util.DateTimeUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +10,12 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
+
+//@NamedNativeQuery(name = "VerificationTokenEntity.findByToken", query = "SELECT verification_token_id AS id, expiration_time AS time, token, app_user_id AS user_id  FROM verification_token WHERE token = ?1", resultSetMapping = "Mapping.VerificationTokenPojo, Mapping.")
+//@SqlResultSetMapping(name = "Mapping.VerificationTokenPojo",
+//        classes = @ConstructorResult(targetClass = VerificationTokenPojo.class,
+//        columns = {@ColumnResult(name = "id"), @ColumnResult(name = "time"), @ColumnResult(name = "token"), @ColumnResult(name = "user_id")},
+//        ))
 
 @Entity
 @Table(name="verification_token")

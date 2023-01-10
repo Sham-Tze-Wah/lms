@@ -26,5 +26,5 @@ public interface LeaveDTORepo extends JpaRepository<LeaveEntity, String> {
     Optional<LeaveEntity> findByEmployeeNameAndStartDateLeaveAndEndDateLeave(String employeeName, Date startDateLeave, Date endDateLeave);
 
     @Query(value = "SELECT * FROM leave_application l WHERE l.emp_id = ?1", nativeQuery = true)
-    List<LeaveDTO> findByEmpId(String empId);
+    List<LeaveEntity> findByEmpId(String empId);
 }

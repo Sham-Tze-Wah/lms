@@ -180,7 +180,7 @@ class EmployeeControllerTest {
                         .value(employeePojo.getName())
                 );
 
-        Mockito.when(employeeService.updateEmployeeById(id,employeePojo))
+        Mockito.when(employeeService.updateEmployeeById(id,employeePojo.getName(), employeePojo.getPhoneNo(), employeePojo.getEmail(), employeePojo.getAddress(), employeePojo.getPosition().name(), DateTimeUtil.DateToString(employeePojo.getDateJoined()), DateTimeUtil.DateToString(employeePojo.getDateLeave()))) //TODO check this is correct?
                 .thenReturn("updated successfully.");
 
         mockMvc.perform(put("/api/emp/put/" + id)

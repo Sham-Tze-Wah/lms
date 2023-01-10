@@ -15,4 +15,13 @@ public class VerificationTokenMapper {
         entity.setAppUserEntity(appUserEntity);
         return entity;
     }
+
+    public static VerificationTokenPojo entityToPojo(VerificationTokenEntity byToken) {
+        VerificationTokenPojo pojo = new VerificationTokenPojo();
+        pojo.setId(byToken.getId());
+        pojo.setToken(byToken.getToken());
+        pojo.setExpirationTime(byToken.getExpirationTime());
+        pojo.setAppUserPojo(AppUserMapper.entityToPojo(byToken.getAppUserEntity()));
+        return pojo;
+    }
 }

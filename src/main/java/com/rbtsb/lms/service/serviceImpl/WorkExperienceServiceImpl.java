@@ -107,9 +107,14 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
 
     @Override
     public List<WorkExperiencePojo> getWorkExperienceByEmpId(String empId) {
-        List<WorkExperiencePojo> workExpList = workExperienceRepo.findByEmpId(empId);
-        if(workExpList != null && !workExpList.isEmpty()){
-            return workExpList;
+        List<WorkExperiencePojo> workExpPojoList = new ArrayList<>();
+        List<WorkExperienceEntity> workExpEntityList = workExperienceRepo.findByEmpId(empId);
+        if(workExpEntityList != null && !workExpEntityList.isEmpty()){
+            for(WorkExperienceEntity workExperienceEntity : workExpEntityList){
+                WorkExperiencePojo workExperiencePojo = workExpMapper.entityToPojo(workExperienceEntity);
+                workExpPojoList.add(workExperiencePojo);
+            }
+            return workExpPojoList;
         }
         else{
             return null;

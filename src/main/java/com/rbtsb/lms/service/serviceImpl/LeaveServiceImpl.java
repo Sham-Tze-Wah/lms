@@ -87,8 +87,14 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Override
     public List<LeaveDTO> getLeaveApplicationByEmpId(String empId) {
-        List<LeaveDTO> leaveDTOList = leaveDTORepo.findByEmpId(empId);
-        if(leaveDTOList != null && !leaveDTOList.isEmpty()){
+        List<LeaveDTO> leaveDTOList = new ArrayList<>();
+        List<LeaveEntity> leaveEntityList = leaveDTORepo.findByEmpId(empId);
+        if(leaveEntityList != null && !leaveEntityList.isEmpty()){
+            for(LeaveEntity leaveEntity : leaveEntityList){
+                LeaveDTO leaveDTO = leaveMapper.entityToDTO(leaveEntity);
+                leaveDTOList.add(leaveDTO);
+            }
+
             return leaveDTOList;
         }
         else{

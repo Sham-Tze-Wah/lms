@@ -13,6 +13,8 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.UUID;
 
+
+
 @Entity
 @Table(name="app_user")
 @Data
@@ -38,7 +40,7 @@ public class AppUserEntity {
     @Column(name = "enabled")
     private boolean enabled = true;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(

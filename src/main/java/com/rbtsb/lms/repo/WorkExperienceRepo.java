@@ -17,5 +17,5 @@ public interface WorkExperienceRepo extends JpaRepository<WorkExperienceEntity, 
 
     //@Query(nativeQuery = false)
     @Query(value = "SELECT * FROM work_experience w WHERE w.emp_id = ?1", nativeQuery = true)
-    List<WorkExperiencePojo> findByEmpId(String empId);
+    List<WorkExperienceEntity> findByEmpId(String empId);
 }

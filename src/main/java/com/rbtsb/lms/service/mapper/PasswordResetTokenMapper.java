@@ -12,4 +12,13 @@ public class PasswordResetTokenMapper {
         passwordResetTokenEntity.setAppUserEntity(passwordResetTokenEntity.getAppUserEntity());
         return passwordResetTokenEntity;
     }
+
+    public static PasswordResetTokenPojo entityToPojo(PasswordResetTokenEntity passwordResetTokenEntity) {
+        PasswordResetTokenPojo passwordResetTokenPojo = new PasswordResetTokenPojo();
+        passwordResetTokenPojo.setId(passwordResetTokenEntity.getId());
+        passwordResetTokenPojo.setToken(passwordResetTokenEntity.getToken());
+        passwordResetTokenPojo.setExpirationTime(passwordResetTokenEntity.getExpirationTime());
+        passwordResetTokenPojo.setAppUserPojo(AppUserMapper.entityToPojo(passwordResetTokenEntity.getAppUserEntity()));
+        return passwordResetTokenPojo;
+    }
 }
