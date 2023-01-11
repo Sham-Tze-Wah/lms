@@ -1,5 +1,7 @@
 package com.rbtsb.lms.api;
 
+import com.rbtsb.lms.constant.LeaveStatus;
+import com.rbtsb.lms.constant.LeaveType;
 import com.rbtsb.lms.dto.LeaveDTO;
 import com.rbtsb.lms.entity.LeaveEntity;
 import com.rbtsb.lms.error.ErrorStatus;
@@ -10,6 +12,7 @@ import com.rbtsb.lms.service.EmployeeService;
 import com.rbtsb.lms.service.LeaveService;
 import com.rbtsb.lms.service.mapper.EmployeeMapper;
 import com.rbtsb.lms.service.mapper.LeaveMapper;
+import com.rbtsb.lms.util.DateTimeUtil;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,18 +40,43 @@ public class LeaveApplicationController {
     private final Logger log = LoggerFactory.getLogger(LeaveApplicationController.class);
 
     @PostMapping("/post")
-    public ResponseEntity<?> insertLeaveApplication(@RequestBody @Valid @NonNull LeaveDTO leaveDTO){
+    public ResponseEntity<?> insertLeaveApplication(@RequestParam(value = "leaveStatus", required = false) String leaveStatus,
+                                                    @RequestParam(value = "reason", required = false) String reason,
+                                                    @RequestParam(value = "description", required = false) String description,
+                                                    @RequestParam(value = "leaveType", required = false) String leaveType,
+                                                    @RequestParam(value = "startDateLeave", required = false) String startDateLeave,
+                                                    @RequestParam(value = "endDateLeave", required = false) String endDateLeave,
+                                                    @RequestParam(value = "empId", required = false) String employeeId){
         try{
-            if(!leaveDTO.getReason().equalsIgnoreCase("")){
+            LeaveDTO leaveDTO = new LeaveDTO();
+            if(reason != null && !reason.equalsIgnoreCase("")){
                 // TODO: check on duplicate reason for this employee (might not needed)
 
-                if(leaveDTO.getLeaveStatus()!= null && !leaveDTO.getLeaveStatus().toString().equalsIgnoreCase("")){
-                    if(leaveDTO.getLeaveType() != null && !leaveDTO.getLeaveType().toString().equalsIgnoreCase("")){
-                        if(leaveDTO.getEmployeeName() != null && !leaveDTO.getEmployeeName().equalsIgnoreCase("")){
-                            log.debug(leaveDTO.getEmployeeName());
-                            Optional<EmployeePojo> emp  = employeeService.getEmployeeByName(leaveDTO.getEmployeeName());
+                if(leaveStatus!= null && !leaveStatus.equalsIgnoreCase("")){
+                    if(leaveType != null && !leaveType.equalsIgnoreCase("")){
+                        if(employeeId != null && !employeeId.equalsIgnoreCase("")){
+                            Optional<EmployeePojo> emp  = employeeService.getEmployeeById(employeeId);
                             log.debug(emp.get().toString());
                             if(emp.isPresent()){
+                                leaveDTO.setLeaveStatus(LeaveStatus.valueOf(leaveStatus));
+                                leaveDTO.setReason(reason);
+                                if(description != null && !description.equalsIgnoreCase("")){
+                                    leaveDTO.setDescription(description);
+                                }
+                                leaveDTO.setLeaveType(LeaveType.valueOf(leaveType));
+                                leaveDTO.setEmployeeId(employeeId);
+                                if(startDateLeave != null && !startDateLeave.equalsIgnoreCase("")){
+                                    leaveDTO.setStartDateLeave(DateTimeUtil.stringToDate(startDateLeave));
+                                }
+                                else{
+                                    return new ResponseEntity<>("start date leave is null", HttpStatus.UNPROCESSABLE_ENTITY);
+                                }
+                                if(endDateLeave != null && !endDateLeave.equalsIgnoreCase("")){
+                                    leaveDTO.setEndDateLeave(DateTimeUtil.stringToDate(endDateLeave));
+                                }
+                                else{
+                                    return new ResponseEntity<>("end date leave is null", HttpStatus.UNPROCESSABLE_ENTITY);
+                                }
                                 ApiErrorPojo apiErrorPojo = leaveService.insertLeave(leaveDTO);
                                 return new ResponseEntity<>(
                                         apiErrorPojo.getResponseMessage(),
@@ -91,9 +119,16 @@ public class LeaveApplicationController {
         return new ResponseEntity<>(leaveService.getLeaveApplicationByEmpId(empId), HttpStatus.OK);
     }
 
-    @PutMapping("/put/{id}")
-    public ResponseEntity<?> updateLeaveApplicationByLeaveId(@PathVariable("id") String leaveId, @RequestBody @Valid @NonNull LeaveDTO leaveDTO){
-        ApiErrorPojo apiErrorPojo = leaveService.updateLeaveApplication(leaveId, leaveDTO);
+    @PatchMapping("/put/{id}")
+    public ResponseEntity<?> updateLeaveApplicationByLeaveId(@PathVariable("id") String leaveId,
+                                                             @RequestParam(value = "leaveStatus") String leaveStatus,
+                                                             @RequestParam(value = "reason") String reason,
+                                                             @RequestParam(value = "description") String description,
+                                                             @RequestParam(value = "leaveType") String leaveType,
+                                                             @RequestParam(value = "startDateLeave") String startDateLeave,
+                                                             @RequestParam(value = "endDateLeave") String endDateLeave,
+                                                             @RequestParam(value = "empId") String employeeId){
+        ApiErrorPojo apiErrorPojo = leaveService.updateLeaveApplication(leaveId, leaveStatus, reason, description, leaveType, startDateLeave, endDateLeave, employeeId);
         return new ResponseEntity<>(apiErrorPojo.getResponseMessage(), ErrorStatus.codeMapResponse.get(
                 apiErrorPojo.getResponseStatus()
         ));

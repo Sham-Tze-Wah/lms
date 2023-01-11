@@ -12,7 +12,7 @@ public interface LeaveService {
 
     public List<LeaveDTO> getAllLeave();
 
-    public ApiErrorPojo updateLeaveApplication(String id, LeaveDTO leaveDTO);
+    public ApiErrorPojo updateLeaveApplication(String id, String leaveStatus, String reason, String description, String leaveType, String startDateLeave, String endDateLeave, String employeeId);
 
     public String deleteLeaveById(String id);
 

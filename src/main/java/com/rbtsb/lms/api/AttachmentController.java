@@ -287,7 +287,7 @@ public class AttachmentController {
         return new ResponseEntity(attachmentService.getAttachmentByEmpIdAndDate(id, startLeaveDate, endLeaveDate), HttpStatus.OK);
     }
 
-    @PutMapping("/put")
+    @PatchMapping("/put")
     public ResponseEntity<?> updateAnAttachmentByAttachmentId(@RequestParam(value = "id", required = false) String id,
                                                     //@RequestParam("fileName") String fileName,
                                                     //@RequestParam("fileType") FileType fileType,

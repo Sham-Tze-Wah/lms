@@ -265,6 +265,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    @Override
+    public Optional<EmployeePojo> getEmployeePojoById(String empId) {
+        Optional<EmployeeEntity> empEntity = employeeRepo.findById(empId);
+        if(empEntity.isPresent()){
+            EmployeePojo empPojo = EmployeeMapper.entityToPojo(empEntity.get());
+            if(empPojo == null){
+                return null;
+            }
+            return Optional.of(empPojo);
+        }
+        else{
+            return null;
+        }
+    }
+
 //    @Override
 //    public Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName) {
 //        return employeeRepo.findByName(employeeName);

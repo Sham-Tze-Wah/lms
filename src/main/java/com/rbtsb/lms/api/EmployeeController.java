@@ -3,6 +3,7 @@ package com.rbtsb.lms.api;
 import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.service.EmployeeService;
+import com.rbtsb.lms.service.mapper.EmployeeMapper;
 import com.rbtsb.lms.service.serviceImpl.EmployeeServiceImpl;
 import com.rbtsb.lms.util.DateTimeUtil;
 import com.rbtsb.lms.util.validation.EmployeeValidation;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.DateTimeAtCompleted;
 import javax.validation.Valid;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RequestMapping("/api/emp")
 @RestController
@@ -116,7 +120,7 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.getEmployeeByName(name), HttpStatus.OK);
     }
 
-    @PutMapping("/put/{id}")
+    @PatchMapping("/put/{id}")
     public ResponseEntity<?> updateEmployeeById(@PathVariable("id") String id,
                                                 @RequestParam(value="name", required = false) String name,
                                                 @RequestParam(value="phoneNo", required = false) String phoneNo,
@@ -133,5 +137,9 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.deleteEmployeeById(id), HttpStatus.OK);
     }
 
-
+    //TODO find a solution to solve timestamp
+    @GetMapping("/testDate")
+    public ResponseEntity<?> getDateTime() throws ParseException {
+        return new ResponseEntity<>(employeeService.getAllEmployee().get(0).getDateJoined(), HttpStatus.OK);
+    }
 }

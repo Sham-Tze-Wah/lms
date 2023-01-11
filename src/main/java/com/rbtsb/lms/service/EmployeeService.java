@@ -27,5 +27,7 @@ public interface EmployeeService {
 
      Optional<EmployeePojo> getEmployeePojo(String empId);
 
+     Optional<EmployeePojo> getEmployeePojoById(String empId);
+
     //Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName);
 }

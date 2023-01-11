@@ -1,5 +1,7 @@
 package com.rbtsb.lms.api;
 
+import com.rbtsb.lms.constant.Course;
+import com.rbtsb.lms.constant.Qualification;
 import com.rbtsb.lms.dto.AttachmentDTO;
 import com.rbtsb.lms.pojo.EducationPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
@@ -32,20 +34,22 @@ public class EducationController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<?> insertEducation(@RequestParam(value = "qualification") String qualification,
-                                             @RequestParam(value = "institute") String institute,
-                                             @RequestParam(value = "course") String course,
-                                             @RequestParam(value = "employeeId") String employeeId){
+    public ResponseEntity<?> insertEducation(@RequestParam(value = "qualification", required = false) String qualification,
+                                             @RequestParam(value = "institute", required = false) String institute,
+                                             @RequestParam(value = "course", required = false) String course,
+                                             @RequestParam(value = "employeeId", required = false) String employeeId){
         //try{
             EducationPojo educationPojo = new EducationPojo();
-            if(!educationPojo.getQualification().toString().equalsIgnoreCase("")){
-                if(!educationPojo.getInstitute().equalsIgnoreCase("")){
-                    if(!educationPojo.getCourse().toString().equalsIgnoreCase("")){
-                        Optional<EmployeePojo> empPojo = employeeService.getEmployeeByName(educationPojo.getEmployeePojo().getName());
+            if(qualification != null && !qualification.equalsIgnoreCase("")){
+                if(institute != null && !institute.equalsIgnoreCase("")){
+                    if(course != null && !course.equalsIgnoreCase("")){
+                        Optional<EmployeePojo> empPojo = employeeService.getEmployeeById(employeeId);
 
-                        if(educationPojo.getEmployeePojo() != null &&
-                                empPojo.isPresent()){
-                            educationPojo.getEmployeePojo().setEmpId(empPojo.get().getEmpId());
+                        if(empPojo.isPresent()){
+                            educationPojo.setQualification(Qualification.valueOf(qualification));
+                            educationPojo.setInstitute(institute);
+                            educationPojo.setCourse(Course.valueOf(course));
+                            educationPojo.setEmployeePojo(empPojo.get());
                             return new ResponseEntity<>(educationService.insertEducationByEmpId(educationPojo), HttpStatus.OK);
                         }
                         else{
@@ -84,10 +88,14 @@ public class EducationController {
         return new ResponseEntity<>(educationService.getEducationByEmpId(empId), HttpStatus.OK);
     }
 
-    @PutMapping("/put/{id}")
-    public ResponseEntity<?> updateEducationById(@PathVariable("id") String empId,
-                                                 @RequestBody @Valid @NonNull EducationPojo educationPojo){
-        return new ResponseEntity<>(educationService.updateEducationByEmpId(empId, educationPojo), HttpStatus.OK);
+    @PatchMapping("/put/{id}")
+    public ResponseEntity<?> updateEducationById(@PathVariable("id") String eduId,
+                                                 @RequestParam(value = "qualification", required = false) String qualification,
+                                                 @RequestParam(value = "institute", required = false) String institute,
+                                                 @RequestParam(value = "course", required = false) String course,
+                                                 @RequestParam(value = "employeeId", required = false) String employeeId
+                                                 ){
+        return new ResponseEntity<>(educationService.updateEducationByEmpId(eduId, qualification, institute, course, employeeId), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

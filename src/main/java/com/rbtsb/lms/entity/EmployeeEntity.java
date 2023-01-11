@@ -1,5 +1,6 @@
 package com.rbtsb.lms.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.constant.Role;
@@ -55,11 +56,13 @@ public class EmployeeEntity {
 
     @Column(name = "date_joined") //in format of dd/mm/yyyy
     @Temporal(TemporalType.TIMESTAMP)
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
     @NonNull
     private Date dateJoined;
 
     @Column(name = "date_leave") //in format of dd/mm/yyyy
     @Temporal(TemporalType.TIMESTAMP)
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
     private Date dateLeave;
 
 //    @PrePersist

@@ -15,5 +15,5 @@ public class LeaveDTO {
     private LeaveType leaveType;
     private Date startDateLeave = new Date();
     private Date endDateLeave = new Date();
-    private String employeeName;
+    private String employeeId;
 }

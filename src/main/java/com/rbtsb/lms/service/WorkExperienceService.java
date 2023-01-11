@@ -13,7 +13,7 @@ public interface WorkExperienceService {
 
     public List<WorkExperiencePojo> getAllWorkExperience();
 
-    public String updateWorkExperienceByEmpId(String empId, WorkExperiencePojo workExperiencePojo);
+    public String updateWorkExperience(String workId, String workTitle, String yearsOfExperience, String companyName, String dateJoined, String dateResign, String empId);
 
     public String deleteWorkExperienceById(String id);
 

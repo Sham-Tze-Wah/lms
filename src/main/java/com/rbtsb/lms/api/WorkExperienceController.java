@@ -1,11 +1,13 @@
 package com.rbtsb.lms.api;
 
+import com.rbtsb.lms.constant.Position;
 import com.rbtsb.lms.pojo.EducationPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.pojo.WorkExperiencePojo;
 import com.rbtsb.lms.service.EducationService;
 import com.rbtsb.lms.service.EmployeeService;
 import com.rbtsb.lms.service.WorkExperienceService;
+import com.rbtsb.lms.util.DateTimeUtil;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,21 +31,37 @@ public class WorkExperienceController {
     private Logger log = LoggerFactory.getLogger(WorkExperienceController.class);
 
     @PostMapping("/post")
-    public ResponseEntity<?> insertWorkExperience(@RequestBody @Valid @NonNull WorkExperiencePojo workExperiencePojo){
+    public ResponseEntity<?> insertWorkExperience(@RequestParam(value = "workTitle") String workTitle,
+                                                  @RequestParam(value = "yearsOfExperience") String yearsOfExperience,
+                                                  @RequestParam(value = "companyName") String companyName,
+                                                  @RequestParam(value = "dateJoined") String dateJoined,
+                                                  @RequestParam(value = "dateResign") String dateResign,
+                                                  @RequestParam(value = "empId") String empId
+                                                  ){
         try{
-            if(!workExperiencePojo.equals(null)){
-                if(!workExperiencePojo.getWorkTitle().equals(null)){
-                    if(!workExperiencePojo.getCompanyName().equalsIgnoreCase("")){
-                        if(!workExperiencePojo.getYearsOfExperience().equalsIgnoreCase("")){
-                            if(!workExperiencePojo.getDateJoined().equals(null)){
-                                Optional<EmployeePojo> empPojo = Optional.ofNullable(employeeService.getEmployeeByName(workExperiencePojo.getEmployeePojo().getName()))
-                                        .orElse(null);
-                                workExperiencePojo.getEmployeePojo().setEmpId(empPojo.get().getEmpId());
-                                if(!workExperiencePojo.getEmployeePojo().equals(null)){
-                                    return new ResponseEntity<>(workExperienceService.insertWorkExperience(workExperiencePojo), HttpStatus.OK);
+            WorkExperiencePojo workExperiencePojo = new WorkExperiencePojo();
+                if(workTitle != null && !workTitle.equalsIgnoreCase("")){
+                    if(companyName != null && !companyName.equalsIgnoreCase("")){
+                        if(yearsOfExperience != null && !yearsOfExperience.equalsIgnoreCase("")){
+                            if(dateJoined != null && !dateJoined.equalsIgnoreCase("")){
+                                if(empId != null && !empId.equalsIgnoreCase("")){
+                                    Optional<EmployeePojo> empPojo = Optional.ofNullable(employeeService.getEmployeeById(empId))
+                                            .orElse(null);
+                                    if(empPojo.isPresent()){
+                                        workExperiencePojo.setWorkTitle(Position.valueOf(workTitle));
+                                        workExperiencePojo.setYearsOfExperience(yearsOfExperience);
+                                        workExperiencePojo.setCompanyName(companyName);
+                                        workExperiencePojo.setDateJoined(DateTimeUtil.stringToDate(dateJoined));
+                                        workExperiencePojo.setDateResign(DateTimeUtil.stringToDate(dateResign));
+                                        workExperiencePojo.setEmployeePojo(empPojo.get());
+                                        return new ResponseEntity<>(workExperienceService.insertWorkExperience(workExperiencePojo), HttpStatus.OK);
+                                    }
+                                    else{
+                                        return new ResponseEntity<>("emp id is not exist", HttpStatus.UNPROCESSABLE_ENTITY);
+                                    }
                                 }
                                 else{
-                                    return new ResponseEntity<>("The work experience does not belongs to any employee", HttpStatus.UNPROCESSABLE_ENTITY);
+                                    return new ResponseEntity<>("empId is null", HttpStatus.UNPROCESSABLE_ENTITY);
                                 }
                             }
                             else{
@@ -62,10 +80,6 @@ public class WorkExperienceController {
                 else{
                     return new ResponseEntity<> ("work title cannot be null",HttpStatus.UNPROCESSABLE_ENTITY);
                 }
-            }
-            else{
-                return new ResponseEntity<> ("requested body cannot be null",HttpStatus.UNPROCESSABLE_ENTITY);
-            }
         }
         catch(Exception ex){
             return new ResponseEntity<>(ex.toString(),HttpStatus.BAD_REQUEST);
@@ -83,11 +97,15 @@ public class WorkExperienceController {
         return new ResponseEntity<>(workExperienceService.getWorkExperienceByEmpId(empId), HttpStatus.OK);
     }
 
-    @PutMapping("/put/{id}")
-    public ResponseEntity<?> updateWorkExperienceByEmpId(@PathVariable("id") String empId,
-            @RequestBody @Valid @NonNull WorkExperiencePojo workExperiencePojo){
-        return new ResponseEntity<>(workExperienceService.updateWorkExperienceByEmpId(empId, workExperiencePojo)
-        ,HttpStatus.OK);
+    @PatchMapping("/put/{id}")
+    public ResponseEntity<?> updateWorkExperience(@PathVariable("id") String workId,
+                                                         @RequestParam(value = "workTitle") String workTitle,
+                                                         @RequestParam(value = "yearsOfExperience") String yearsOfExperience,
+                                                         @RequestParam(value = "companyName") String companyName,
+                                                         @RequestParam(value = "dateJoined") String dateJoined,
+                                                         @RequestParam(value = "dateResign") String dateResign,
+                                                         @RequestParam(value = "empId") String empId ){
+        return new ResponseEntity<>(workExperienceService.updateWorkExperience(workId, workTitle, yearsOfExperience, companyName, dateJoined, dateResign, empId), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

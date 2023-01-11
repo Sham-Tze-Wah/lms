@@ -25,7 +25,7 @@ public class DateTimeUtil {
         }
     }
 
-    public static String removeMilliSecond(String inputDate){
+    private static String removeMilliSecond(String inputDate){
         //remove millisecondIndex
         int millisecondIndex = inputDate.toString().indexOf('.');
         if(millisecondIndex > 0){

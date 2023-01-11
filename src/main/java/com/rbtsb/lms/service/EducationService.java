@@ -11,7 +11,7 @@ public interface EducationService {
 
     public List<EducationPojo> getAllEducation();
 
-    public String updateEducationByEmpId(String empId, EducationPojo educationPojo);
+    public String updateEducationByEmpId(String empId, String qualification, String institute, String course, String employeeId);
 
     public String deleteEducationById(String id);
 
