@@ -4,12 +4,13 @@ import com.rbtsb.lms.dao.AppUserDao;
 import com.rbtsb.lms.dto.LoginDTO;
 import com.rbtsb.lms.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class AuthenticationController {
     //private final UserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
     private final AppUserDao userDao;
+    private final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
     @PostMapping(path = "/authenticate")
     public ResponseEntity<?> authenticate(
@@ -36,6 +38,7 @@ public class AuthenticationController {
         try{
             authenticate(request.getUsername(), request.getPassword());
             final UserDetails user = userDao.findByEmail(request.getUsername());//userDetailsService.loadUserByUsername(request.getUsername());
+            log.info(user.toString());
             if(user != null){
                 return new ResponseEntity<>(jwtUtils.generateToken(user), HttpStatus.OK);
             }
@@ -52,11 +55,16 @@ public class AuthenticationController {
         Objects.requireNonNull(password);
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            log.info("authenticate");
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+            log.info(token.toString());
+            authenticationManager.authenticate(token);
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
+        } catch(InternalAuthenticationServiceException e){
+            throw new Exception("NO IDEA", e);
         }
     }
 }

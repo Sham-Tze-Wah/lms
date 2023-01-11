@@ -2,8 +2,10 @@ package com.rbtsb.lms.config;
 import com.rbtsb.lms.dao.AppUserDao;
 import com.sun.tracing.ProbeName;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,6 +41,8 @@ import java.util.stream.Stream;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Configuration
+@Slf4j
 public class SecurityConfig {
 
     private final JwtAthFilter jwtAuthFilter;
@@ -229,13 +233,18 @@ public class SecurityConfig {
         final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
+        log.info(authenticationProvider.toString());
         return authenticationProvider;
+//        return new AtlassianCrowAuthenticationProvider();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+        log.info("finding config auth manager");
         return config.getAuthenticationManager();
     }
+
+
 
 
     @Bean
@@ -249,7 +258,15 @@ public class SecurityConfig {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-                return userDao.findByEmail(email);
+                UserDetails user = userDao.findByEmail(email);
+                log.info("Try to get user: " + user.toString());
+                if(user == null){
+                    throw new UsernameNotFoundException("Something wrong with your credential or token.");
+                }
+                List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorities().stream().
+                        map(authority -> new SimpleGrantedAuthority(authority.toString())).
+                        collect(Collectors.toList());
+                return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
             }
         };
     }
