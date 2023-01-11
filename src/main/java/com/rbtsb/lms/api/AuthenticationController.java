@@ -7,18 +7,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 @RequiredArgsConstructor
+@CrossOrigin
 public class AuthenticationController {
+
+    //https://www.javainuse.com/spring/boot-jwt
 
     private final AuthenticationManager authenticationManager;
     //private final UserDetailsService userDetailsService;
@@ -29,13 +33,30 @@ public class AuthenticationController {
     public ResponseEntity<?> authenticate(
             @RequestBody LoginDTO request
     ){
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-        final UserDetails user = userDao.findByEmail(request.getUsername());//userDetailsService.loadUserByUsername(request.getUsername());
-        if(user != null){
-            return new ResponseEntity<>(jwtUtils.generateToken(user), HttpStatus.OK);
+        try{
+            authenticate(request.getUsername(), request.getPassword());
+            final UserDetails user = userDao.findByEmail(request.getUsername());//userDetailsService.loadUserByUsername(request.getUsername());
+            if(user != null){
+                return new ResponseEntity<>(jwtUtils.generateToken(user), HttpStatus.OK);
+            }
+            return new ResponseEntity<>("failed to login. Please contact the system administration.", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("failed to login. Please contact the system administration.", HttpStatus.BAD_REQUEST);
+
+    }
+
+    //https://stackoverflow.com/questions/39789408/how-to-handle-spring-security-internalauthenticationserviceexception-thrown-in-s
+    private void authenticate(String username, String password) throws Exception {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(password);
+
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
+        }
     }
 }

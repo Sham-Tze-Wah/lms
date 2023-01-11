@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -31,10 +32,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,6 +54,7 @@ public class SecurityConfig {
     private static final String role_prefix = "/api/role";
 
     private static final String[] WHITE_LIST_URLS_FOR_EVERYONE={
+            "/api/authenticate",
             reg_prefix + "/register",
             reg_prefix + "/verifyRegistration*",
             reg_prefix + "/resendVerifyToken*",
@@ -140,67 +139,87 @@ public class SecurityConfig {
     @Order(SecurityProperties.BASIC_AUTH_ORDER) //2147483642
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .cors()
-                .and()
-                .csrf()
-                .disable()
-                .authorizeHttpRequests()
-                .antMatchers(WHITE_LIST_URLS_FOR_EVERYONE).permitAll()
-                .antMatchers(
-                        String.valueOf(WHITE_LIST_URLS_FOR_EMPLOYEE))
-                .hasAnyRole("USER", "ADMIN", "ASSIGNER", "SUPER_ADMIN")
-
-                .antMatchers(
-                        String.valueOf(WHITE_LIST_URLS_FOR_HR))
-                .hasAnyRole("ADMIN", "ASSIGNER", "SUPER_ADMIN")
-
-                .antMatchers(
-                        String.valueOf(WHITE_LIST_URLS_FOR_MANAGER))
-                .hasAnyRole("ASSIGNER", "SUPER_ADMIN")
-
-                .antMatchers(
-                        String.valueOf(WHITE_LIST_URLS_FOR_BOSS))
-                .hasRole("SUPER_ADMIN")
-                .anyRequest().permitAll();
-//                .antMatchers("/api/**")
-//                .authenticated()
+//        http
+//                .cors()
 //                .and()
-//                .oauth2Login(oauth2login ->
-//                        oauth2login.loginPage("/oauth2/authorization/api-client-oidc"))
-//                .oauth2Client(Customizer.withDefaults());
-
-        //        http
-//                .csrf().disable()
-//                .authorizeHttpRequests(req -> req
-//                        .requestMatchers("")
-//                        .permitAll()
-//                        .anyRequest()
-//                        .authenticated())
+//                .csrf()
+//                .disable()
+//                .authorizeHttpRequests()
+//                .antMatchers(WHITE_LIST_URLS_FOR_EVERYONE).permitAll()
+////                .antMatchers(
+////                        String.valueOf(WHITE_LIST_URLS_FOR_EMPLOYEE))
+////                .hasAnyRole("USER", "ADMIN", "ASSIGNER", "SUPER_ADMIN")
+////
+////                .antMatchers(
+////                        String.valueOf(WHITE_LIST_URLS_FOR_HR))
+////                .hasAnyRole("ADMIN", "ASSIGNER", "SUPER_ADMIN")
+////
+////                .antMatchers(
+////                        String.valueOf(WHITE_LIST_URLS_FOR_MANAGER))
+////                .hasAnyRole("ASSIGNER", "SUPER_ADMIN")
+////
+////                .antMatchers(
+////                        String.valueOf(WHITE_LIST_URLS_FOR_BOSS))
+////                .hasRole("SUPER_ADMIN")
+//                .anyRequest().authenticated()
+//                .and()
 //                .sessionManagement()
 //                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 //                .and()
 //                .authenticationProvider(authenticationProvider())
 //                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-
-//.csrf().disable().headers().frameOptions().disable().and()
-//                .authorizeHttpRequests(req -> req
-//                        .requestMatchers(HttpMethod.POST,"/v1/auth/authenticate")
-//                        .permitAll()
-//                        .anyRequest()
-//                        .authenticated())
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authenticationProvider(authenticationProvider())
-//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+////                .antMatchers("/api/**")
+////                .authenticated()
+////                .and()
+////                .oauth2Login(oauth2login ->
+////                        oauth2login.loginPage("/oauth2/authorization/api-client-oidc"))
+////                .oauth2Client(Customizer.withDefaults());
 //
-//                .and()
-//                .httpBasic();
+//        //        http
+////                .csrf().disable()
+////                .authorizeHttpRequests(req -> req
+////                        .requestMatchers("")
+////                        .permitAll()
+////                        .anyRequest()
+////                        .authenticated())
+////                .sessionManagement()
+////                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+////                .and()
+////                .authenticationProvider(authenticationProvider())
+////                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//
+////.csrf().disable().headers().frameOptions().disable().and()
+////                .authorizeHttpRequests(req -> req
+////                        .requestMatchers(HttpMethod.POST,"/v1/auth/authenticate")
+////                        .permitAll()
+////                        .anyRequest()
+////                        .authenticated())
+////                .sessionManagement()
+////                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+////                .and()
+////                .authenticationProvider(authenticationProvider())
+////                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+////
+////                .and()
+////                .httpBasic();
+//
+////        http.formLogin();
+////        http.httpBasic();
 
-//        http.formLogin();
-//        http.httpBasic();
+        // We don't need CSRF for this example
+        http.csrf().disable()
+                // dont authenticate this particular request
+                .authorizeRequests().antMatchers("/api/authenticate").permitAll().
+                // all other requests need to be authenticated
+                        anyRequest().permitAll().and()
+                // make sure we use stateless session; session won't be used to
+                // store user's state.
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        // Add a filter to validate the tokens with every request
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return (SecurityFilterChain)http.build();
     }
@@ -244,5 +263,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
 
 }

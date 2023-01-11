@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 import static com.rbtsb.lms.util.DateTimeUtil.calculateExpirationDate;
 
@@ -19,7 +20,7 @@ public class PasswordResetTokenEntity {
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Column(name="password_reset_token_id", unique = true, nullable = false)
-    private String id;
+    private String id = UUID.randomUUID().toString();
     private String token;
     private Date expirationTime;
 

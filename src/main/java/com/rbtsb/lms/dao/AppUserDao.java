@@ -30,7 +30,6 @@ public class AppUserDao {
         return APPLICATION_USERS
                 .stream()
                 .filter(u -> u.getUsername().equals(email))
-                .findFirst()
-                .orElseThrow(() -> new UsernameNotFoundException("No user was found"));
+                .findFirst().orElse(null);
     }
 }
