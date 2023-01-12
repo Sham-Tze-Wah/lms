@@ -3,6 +3,7 @@ import com.rbtsb.lms.dao.AppUserDao;
 import com.sun.tracing.ProbeName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -47,6 +49,9 @@ public class SecurityConfig {
 
     private final JwtAthFilter jwtAuthFilter;
     private AppUserDao userDao;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     private static final String attch_prefix = "/api/attachment";
     private static final String edu_prefix = "/api/education";
@@ -219,8 +224,11 @@ public class SecurityConfig {
                         anyRequest().permitAll().and()
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.cors();
 
         // Add a filter to validate the tokens with every request
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -258,6 +266,9 @@ public class SecurityConfig {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                if(email == null){
+                    throw new UsernameNotFoundException("username cannot be null.");
+                }
                 UserDetails user = userDao.findByEmail(email);
                 log.info("Try to get user: " + user.toString());
                 if(user == null){

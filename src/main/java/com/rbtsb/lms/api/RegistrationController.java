@@ -7,9 +7,11 @@ import com.rbtsb.lms.pojo.AppUserPojo;
 import com.rbtsb.lms.pojo.PasswordPojo;
 import com.rbtsb.lms.pojo.VerificationTokenPojo;
 import com.rbtsb.lms.service.AppUserService;
+import com.rbtsb.lms.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,9 @@ public class RegistrationController {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @PostMapping("/register")
     public String registerUser(@RequestBody LoginDTO loginDTO, final HttpServletRequest request){
         AppUserPojo user = appUserService.registerUser(loginDTO);
@@ -40,13 +45,12 @@ public class RegistrationController {
     public String verifyRegistration(@RequestParam("token") String token){
         String result = appUserService.validateVerificationToken(token);
         if(result.equalsIgnoreCase("valid")){
-            return "User Verifies Successfully";
+            return "User Verifies Successfully.";
         }
         return "Bad User";
     }
 
     private String applicationUrl(HttpServletRequest request) {
-
 
         return "http://" + request.getServerName() +
                 ":" + request.getServerPort() + GlobalConstant.ENTITY_PATH_REGISTRATION +

@@ -11,16 +11,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:8080", exposedHeaders = "token")
 public class AuthenticationController {
 
     //https://www.javainuse.com/spring/boot-jwt
@@ -31,11 +33,17 @@ public class AuthenticationController {
     private final AppUserDao userDao;
     private final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
+    @PostMapping(path = "/login")
+    private String generateAuthorizationHeader(LoginDTO request){
+        return jwtUtils.generateToken(new User(request.getUsername(), request.getPassword(), new ArrayList<>()));
+    }
+
     @PostMapping(path = "/authenticate")
     public ResponseEntity<?> authenticate(
             @RequestBody LoginDTO request
     ){
         try{
+            log.info("Authentication header: " + generateAuthorizationHeader(request));
             authenticate(request.getUsername(), request.getPassword());
             final UserDetails user = userDao.findByEmail(request.getUsername());//userDetailsService.loadUserByUsername(request.getUsername());
             log.info(user.toString());

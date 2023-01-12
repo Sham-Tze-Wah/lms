@@ -18,14 +18,14 @@ public class LmsApplication {
 		SpringApplication.run(LmsApplication.class, args);
 	}
 
-	@Configuration
-	@EnableWebMvc
-	public class WebConfig extends WebMvcConfigurerAdapter {
-
-		@Override
-		public void addCorsMappings(CorsRegistry registry) {
-			registry.addMapping("/**");
-		}
-	}
+//	@Configuration
+//	@EnableWebMvc
+//	public class WebConfig extends WebMvcConfigurerAdapter {
+//
+//		@Override
+//		public void addCorsMappings(CorsRegistry registry) {
+//			registry.addMapping("/**");
+//		}
+//	}
 
 }
