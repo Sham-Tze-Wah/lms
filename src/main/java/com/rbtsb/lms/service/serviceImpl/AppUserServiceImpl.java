@@ -11,8 +11,10 @@ import com.rbtsb.lms.pojo.VerificationTokenPojo;
 import com.rbtsb.lms.repo.*;
 import com.rbtsb.lms.service.AppUserService;
 import com.rbtsb.lms.service.mapper.*;
+import com.rbtsb.lms.util.JwtUtils;
 import com.rbtsb.lms.util.validation.AppUserPojoValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,9 @@ public class AppUserServiceImpl implements AppUserService {
     @Autowired
     private EmployeeRepo employeeRepo;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @Override
     public AppUserPojo registerUser(LoginDTO loginDTO) {
         AppUserEntity appUserEntity = new AppUserEntity();
@@ -61,6 +66,7 @@ public class AppUserServiceImpl implements AppUserService {
             appUserEntity.setEmployeeEntity(emp.get());
             //appUserEntity.setEmployeeEntity();
 
+            appUserEntity.setPassword(appUserEntity.getPassword());
             appUserRepo.save(appUserEntity);
             AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
             return appUserPojo;
@@ -111,13 +117,55 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public String validateJwtToken(String token) {
+        VerificationTokenEntity verificationTokenEntity = verificationTokenRepository.findByToken(token);
+        if(verificationTokenEntity != null){
+            VerificationTokenPojo verificationToken = VerificationTokenMapper.entityToPojo(verificationTokenEntity);
+
+            if(verificationToken == null) {
+                return "invalid";
+            }
+
+            AppUserPojo user = verificationToken.getAppUserPojo();
+            Calendar cal = Calendar.getInstance();
+
+            if(verificationToken.getExpirationTime().getTime() -
+                    cal.getTime().getTime() <= 0){
+                VerificationTokenEntity tokenEntity = VerificationTokenMapper.pojoToEntity(verificationToken);
+                verificationTokenRepository.delete(tokenEntity);
+                return "expired";
+            }
+            else if(!user.getUsername().equalsIgnoreCase(jwtUtils.extractUsername(token))){
+                return "token not belongs to you.";
+            }
+
+            user.setEnabled(true);
+            appUserRepo.save(AppUserMapper.pojoToEntity(user));
+            return "valid";
+        }
+        else{
+            throw new NullPointerException("the token provided is invalid. Please get another token.");
+        }
+    }
+
+    @Override
     public VerificationTokenPojo generateNewVerificationToken(String oldToken) {
         VerificationTokenPojo verificationToken =
                 VerificationTokenMapper.entityToPojo(verificationTokenRepository.findByToken(oldToken));
 
-        verificationToken.setToken(UUID.randomUUID().toString());
-        verificationTokenRepository.save(VerificationTokenMapper.pojoToEntity(verificationToken));
-        return verificationToken;
+        String username = jwtUtils.extractUsername(oldToken);
+        AppUserEntity appUserEntity = appUserRepo.findByUsername(username);
+
+        if(appUserEntity != null){
+            UserDetails user = AppUserMapper.entityToUserDetails(appUserEntity);
+            String newToken = jwtUtils.generateToken(user);
+            verificationToken.setToken(newToken);
+            verificationTokenRepository.save(VerificationTokenMapper.pojoToEntity(verificationToken));
+            return verificationToken;
+        }
+        else{
+            throw new NullPointerException("cannot resend verification token");
+        }
     }
 
     @Override

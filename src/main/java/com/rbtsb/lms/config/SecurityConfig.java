@@ -53,6 +53,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+    @Autowired
+    private ApplicationConfig applicationConfig;
+
     private static final String attch_prefix = "/api/attachment";
     private static final String edu_prefix = "/api/education";
     private static final String emp_prefix = "/api/emp";
@@ -63,6 +66,7 @@ public class SecurityConfig {
     private static final String role_prefix = "/api/role";
 
     private static final String[] WHITE_LIST_URLS_FOR_EVERYONE={
+            "/api/login",
             "/api/authenticate",
             reg_prefix + "/register",
             reg_prefix + "/verifyRegistration*",
@@ -144,8 +148,16 @@ public class SecurityConfig {
 //    private static final Set<String> FINAL_WHITE_LIST_URLS_FOR_BOSS = Stream.concat(FINAL_WHITE_LIST_URLS_FOR_MANAGER.stream(),
 //            Arrays.stream(WHITE_LIST_URLS_FOR_BOSS)).collect(Collectors.toSet());
 
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        // configure AuthenticationManager so that it knows from where to load
+        // user for matching credentials
+        // Use BCryptPasswordEncoder
+        auth.userDetailsService(applicationConfig.userDetailsService()).passwordEncoder(applicationConfig.passwordEncoder());
+    }
+
     @Bean
-    @Order(SecurityProperties.BASIC_AUTH_ORDER) //2147483642
+    //@Order(SecurityProperties.BASIC_AUTH_ORDER) //2147483642
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 //        http
@@ -219,7 +231,7 @@ public class SecurityConfig {
         // We don't need CSRF for this example
         http.csrf().disable()
                 // dont authenticate this particular request
-                .authorizeRequests().antMatchers("/api/authenticate").permitAll().
+                .authorizeRequests().antMatchers("/api/authenticate", "/api/login").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().permitAll().and()
                 // make sure we use stateless session; session won't be used to
@@ -235,63 +247,5 @@ public class SecurityConfig {
 
         return (SecurityFilterChain)http.build();
     }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(){
-        final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        log.info(authenticationProvider.toString());
-        return authenticationProvider;
-//        return new AtlassianCrowAuthenticationProvider();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
-        log.info("finding config auth manager");
-        return config.getAuthenticationManager();
-    }
-
-
-
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(11);//new BCryptPasswordEncoder();
-    }
-
-
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-                if(email == null){
-                    throw new UsernameNotFoundException("username cannot be null.");
-                }
-                UserDetails user = userDao.findByEmail(email);
-                log.info("Try to get user: " + user.toString());
-                if(user == null){
-                    throw new UsernameNotFoundException("Something wrong with your credential or token.");
-                }
-                List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorities().stream().
-                        map(authority -> new SimpleGrantedAuthority(authority.toString())).
-                        collect(Collectors.toList());
-                return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
-            }
-        };
-    }
-
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080/"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-
 
 }

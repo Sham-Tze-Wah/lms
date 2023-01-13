@@ -3,10 +3,12 @@ package com.rbtsb.lms.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +18,7 @@ import java.util.function.Function;
 //https://medium.com/innoventes/spring-boot-with-jwt-7970e5be4540
 
 @Component
+@Slf4j
 public class JwtUtils {
     private String jwtSigningKey = "secret";
 
@@ -47,6 +50,8 @@ public class JwtUtils {
 
     public String generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
+//        log.info(claims.toString());
+//        log.info(userDetails.getAuthorities().toString());
         return createToken(claims, userDetails);
     }
 
@@ -55,12 +60,18 @@ public class JwtUtils {
     }
 
     private String createToken(Map<String, Object> claims, UserDetails userDetails){
-        return Jwts.builder().setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .claim("authorities", userDetails.getAuthorities())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
-                .signWith(SignatureAlgorithm.HS256, jwtSigningKey).compact();
+        try{
+//            log.info(userDetails.getAuthorities().toString());
+            return Jwts.builder().setClaims(claims)
+                    .setSubject(userDetails.getUsername())
+                    .claim("authorities", userDetails.getAuthorities())
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
+                    .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
+                    .signWith(SignatureAlgorithm.HS256, jwtSigningKey).compact();
+        }
+        catch(Exception ex){
+            return "signing failed";
+        }
     }
 
     public Boolean isTokenValid(String token, UserDetails userDetails){

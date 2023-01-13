@@ -4,9 +4,13 @@ import com.rbtsb.lms.entity.AppUserEntity;
 import com.rbtsb.lms.entity.RoleEntity;
 import com.rbtsb.lms.pojo.AppUserPojo;
 import com.rbtsb.lms.pojo.RolePojo;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,5 +43,16 @@ public class AppUserMapper {
                 .map(roleEntity -> RoleMapper.entityToPojo(roleEntity)).collect(Collectors.toList()));
         appUserPojo.setEmployeePojo(EmployeeMapper.entityToPojo(appUserEntity.getEmployeeEntity()));
         return appUserPojo;
+    }
+
+    public static UserDetails entityToUserDetails(AppUserEntity appUserEntity){
+        Collection<SimpleGrantedAuthority> roles = RoleMapper.entityToSGA(appUserEntity.getRoles());
+        if(roles == null){
+            return new User(appUserEntity.getUsername(), appUserEntity.getPassword(), new ArrayList<>());
+        }
+        else{
+            return new User(appUserEntity.getUsername(), appUserEntity.getPassword(), roles);
+        }
+
     }
 }

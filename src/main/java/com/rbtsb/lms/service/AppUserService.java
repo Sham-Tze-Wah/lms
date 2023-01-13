@@ -12,7 +12,10 @@ public interface AppUserService {
 
     void saveVerificationTokenForUser(String token, AppUserPojo appUserPojo);
 
+    @Deprecated
     String validateVerificationToken(String token);
+
+    String validateJwtToken(String token);
 
     VerificationTokenPojo generateNewVerificationToken(String oldToken);
 

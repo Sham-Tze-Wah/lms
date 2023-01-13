@@ -2,19 +2,25 @@ package com.rbtsb.lms.api;
 
 import com.rbtsb.lms.constant.GlobalConstant;
 import com.rbtsb.lms.dto.LoginDTO;
+import com.rbtsb.lms.entity.AppUserEntity;
 import com.rbtsb.lms.event.RegistrationCompleteEvent;
 import com.rbtsb.lms.pojo.AppUserPojo;
 import com.rbtsb.lms.pojo.PasswordPojo;
+import com.rbtsb.lms.pojo.RolePojo;
 import com.rbtsb.lms.pojo.VerificationTokenPojo;
 import com.rbtsb.lms.service.AppUserService;
+import com.rbtsb.lms.service.mapper.RoleMapper;
 import com.rbtsb.lms.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,7 +49,7 @@ public class RegistrationController {
 
     @GetMapping("/verifyRegistration")
     public String verifyRegistration(@RequestParam("token") String token){
-        String result = appUserService.validateVerificationToken(token);
+        String result = appUserService.validateJwtToken(token);
         if(result.equalsIgnoreCase("valid")){
             return "User Verifies Successfully.";
         }
@@ -52,9 +58,16 @@ public class RegistrationController {
 
     private String applicationUrl(HttpServletRequest request) {
 
+//        String username = appUser.getUsername();
+//        String password = appUser.getPassword();
+//        Collection<RolePojo> rolePojos = appUser.getRoles();
+//        Collection<SimpleGrantedAuthority> roles = RoleMapper.pojoToSGA(rolePojos);
+//
+//        UserDetails user = new User(username, password, roles);
+//        String token = jwtUtils.generateToken(user);
+
         return "http://" + request.getServerName() +
-                ":" + request.getServerPort() + GlobalConstant.ENTITY_PATH_REGISTRATION +
-                request.getContextPath();
+                ":" + request.getServerPort() + GlobalConstant.ENTITY_PATH_REGISTRATION + request.getContextPath();
     }
 
     @GetMapping("/resendVerifyToken")
