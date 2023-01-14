@@ -37,33 +37,33 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-//        return new UserDetailsService() {
-//            @Override
-//            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//                if(email == null){
-//                    throw new UsernameNotFoundException("username cannot be null.");
-//                }
-//                log.info("Start to initialize user details service");
-//                AppUserEntity appUserEntity = appUserRepo.findByEmail(email);
-//                log.info("App user entity might be null: "+email+"@"+appUserEntity);
-//                if(appUserEntity != null){
-//                    UserDetails user = AppUserMapper.entityToUserDetails(appUserEntity);
-//                    log.info("Try to get user: " + user.toString());
-//                    if(user == null){
-//                        throw new UsernameNotFoundException("conversion of user entity failed.");
-//                    }
-//                    List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorities().stream().
-//                            map(authority -> new SimpleGrantedAuthority(authority.toString())).
-//                            collect(Collectors.toList());
-//                    return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
-//                }
-//                else{
-//                    throw new UsernameNotFoundException("Something wrong with your credential or token.");
-//                }
-//            }
-//        };
-        return username -> Optional.ofNullable(AppUserMapper.entityToUserDetails(appUserRepo.findByEmail(username)))
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                if(email == null){
+                    throw new UsernameNotFoundException("username cannot be null.");
+                }
+                log.info("Start to initialize user details service");
+                AppUserEntity appUserEntity = appUserRepo.findByEmail(email);
+                log.info("App user entity might be null: "+email+"@"+appUserEntity);
+                if(appUserEntity != null){
+                    UserDetails user = AppUserMapper.entityToUserDetails(appUserEntity);
+                    log.info("Try to get user: " + user.toString());
+                    if(user == null){
+                        throw new UsernameNotFoundException("conversion of user entity failed.");
+                    }
+                    List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorities().stream().
+                            map(authority -> new SimpleGrantedAuthority(authority.toString())).
+                            collect(Collectors.toList());
+                    return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
+                }
+                else{
+                    throw new UsernameNotFoundException("Something wrong with your credential or token.");
+                }
+            }
+        };
+//        return username -> Optional.ofNullable(AppUserMapper.entityToUserDetails(appUserRepo.findByEmail(username)))
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean

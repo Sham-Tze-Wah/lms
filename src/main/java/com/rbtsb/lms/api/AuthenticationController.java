@@ -103,7 +103,7 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponsePojo> authenticate(
             @RequestBody AuthenticationRequestPojo request
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(service.authenticate(request));
     }
 }

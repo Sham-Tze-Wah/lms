@@ -3,8 +3,6 @@ package com.rbtsb.lms.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rbtsb.lms.constant.LeaveStatus;
 import com.rbtsb.lms.constant.LeaveType;
-import com.rbtsb.lms.dto.AttachmentDTO;
-import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.util.SqlDataType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -64,4 +62,18 @@ public class LeaveEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="emp_id", referencedColumnName = "emp_id")
     private EmployeeEntity employeeEntity;
+
+    @ManyToOne()
+    @JoinColumn(name = "assigner_id", referencedColumnName = "assigner_id")
+    private AssignerEntity assignerEntity;
+
+    @ManyToOne()
+    @JoinColumn(name="hr_id", referencedColumnName = "hr_id")
+    private HREntity hrEntity;
+
+    @ManyToOne()
+    @JoinColumn(name="boss_id", referencedColumnName = "boss_id")
+    private BossEntity bossEntity;
+
+
 }

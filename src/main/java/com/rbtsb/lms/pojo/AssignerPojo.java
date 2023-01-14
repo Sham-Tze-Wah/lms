@@ -1,18 +1,16 @@
 package com.rbtsb.lms.pojo;
 
+import com.rbtsb.lms.entity.EmployeeEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class AuthenticationRequestPojo {
+@Data
+public class AssignerPojo {
     private String id = UUID.randomUUID().toString();
-    private String username;
-    private String password;
+    private EmployeePojo employeePojo;
 }

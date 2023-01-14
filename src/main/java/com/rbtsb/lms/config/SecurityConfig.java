@@ -56,6 +56,8 @@ public class SecurityConfig {
     @Autowired
     private ApplicationConfig applicationConfig;
 
+    private final AuthenticationProvider authenticationProvider;
+
     private static final String attch_prefix = "/api/attachment";
     private static final String edu_prefix = "/api/education";
     private static final String emp_prefix = "/api/emp";
@@ -238,12 +240,13 @@ public class SecurityConfig {
                 // store user's state.
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Add a filter to validate the tokens with every request
 
         http.cors();
 
-        // Add a filter to validate the tokens with every request
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return (SecurityFilterChain)http.build();
     }

@@ -13,16 +13,22 @@ import com.rbtsb.lms.service.AppUserService;
 import com.rbtsb.lms.service.mapper.*;
 import com.rbtsb.lms.util.JwtUtils;
 import com.rbtsb.lms.util.validation.AppUserPojoValidation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class AppUserServiceImpl implements AppUserService {
+@Slf4j
+public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
     @Autowired
     private AppUserRepo appUserRepo;
@@ -62,7 +68,7 @@ public class AppUserServiceImpl implements AppUserService {
         appUserEntity.setRoles(roleEntityList);
 
         Optional<EmployeeEntity> emp = employeeRepo.findByEmail(loginDTO.getUsername());
-        if(emp.isPresent()){
+        if (emp.isPresent()) {
             appUserEntity.setEmployeeEntity(emp.get());
             //appUserEntity.setEmployeeEntity();
 
@@ -70,8 +76,7 @@ public class AppUserServiceImpl implements AppUserService {
             appUserRepo.save(appUserEntity);
             AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
             return appUserPojo;
-        }
-        else{
+        } else {
             throw new NullPointerException("username is not found.");
         }
 
@@ -90,18 +95,18 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String validateVerificationToken(String token) {
         VerificationTokenEntity verificationTokenEntity = verificationTokenRepository.findByToken(token);
-        if(verificationTokenEntity != null){
+        if (verificationTokenEntity != null) {
             VerificationTokenPojo verificationToken = VerificationTokenMapper.entityToPojo(verificationTokenEntity);
 
-            if(verificationToken == null) {
+            if (verificationToken == null) {
                 return "invalid";
             }
 
             AppUserPojo user = verificationToken.getAppUserPojo();
             Calendar cal = Calendar.getInstance();
 
-            if(verificationToken.getExpirationTime().getTime() -
-                    cal.getTime().getTime() <= 0){
+            if (verificationToken.getExpirationTime().getTime() -
+                    cal.getTime().getTime() <= 0) {
                 VerificationTokenEntity tokenEntity = VerificationTokenMapper.pojoToEntity(verificationToken);
                 verificationTokenRepository.delete(tokenEntity);
                 return "expired";
@@ -110,8 +115,7 @@ public class AppUserServiceImpl implements AppUserService {
             user.setEnabled(true);
             appUserRepo.save(AppUserMapper.pojoToEntity(user));
             return "valid";
-        }
-        else{
+        } else {
             throw new NullPointerException("the token provided is invalid. Please get another token.");
         }
     }
@@ -119,31 +123,29 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String validateJwtToken(String token) {
         VerificationTokenEntity verificationTokenEntity = verificationTokenRepository.findByToken(token);
-        if(verificationTokenEntity != null){
+        if (verificationTokenEntity != null) {
             VerificationTokenPojo verificationToken = VerificationTokenMapper.entityToPojo(verificationTokenEntity);
 
-            if(verificationToken == null) {
+            if (verificationToken == null) {
                 return "invalid";
             }
 
             AppUserPojo user = verificationToken.getAppUserPojo();
             Calendar cal = Calendar.getInstance();
 
-            if(verificationToken.getExpirationTime().getTime() -
-                    cal.getTime().getTime() <= 0){
+            if (verificationToken.getExpirationTime().getTime() -
+                    cal.getTime().getTime() <= 0) {
                 VerificationTokenEntity tokenEntity = VerificationTokenMapper.pojoToEntity(verificationToken);
                 verificationTokenRepository.delete(tokenEntity);
                 return "expired";
-            }
-            else if(!user.getUsername().equalsIgnoreCase(jwtUtils.extractUsername(token))){
+            } else if (!user.getUsername().equalsIgnoreCase(jwtUtils.extractUsername(token))) {
                 return "token not belongs to you.";
             }
 
             user.setEnabled(true);
             appUserRepo.save(AppUserMapper.pojoToEntity(user));
             return "valid";
-        }
-        else{
+        } else {
             throw new NullPointerException("the token provided is invalid. Please get another token.");
         }
     }
@@ -156,14 +158,13 @@ public class AppUserServiceImpl implements AppUserService {
         String username = jwtUtils.extractUsername(oldToken);
         AppUserEntity appUserEntity = appUserRepo.findByUsername(username);
 
-        if(appUserEntity != null){
+        if (appUserEntity != null) {
             UserDetails user = AppUserMapper.entityToUserDetails(appUserEntity);
             String newToken = jwtUtils.generateToken(user);
             verificationToken.setToken(newToken);
             verificationTokenRepository.save(VerificationTokenMapper.pojoToEntity(verificationToken));
             return verificationToken;
-        }
-        else{
+        } else {
             throw new NullPointerException("cannot resend verification token");
         }
     }
@@ -177,7 +178,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUserPojo findByEmailAndRoleName(String email, String roleName) {
-        AppUserEntity appUserEntity =  appUserRepo.findByUsernameAndRoleName(email, roleName);
+        AppUserEntity appUserEntity = appUserRepo.findByUsernameAndRoleName(email, roleName);
         AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
         return appUserPojo;
     }
@@ -194,7 +195,7 @@ public class AppUserServiceImpl implements AppUserService {
         PasswordResetTokenEntity passwordResetTokenEntity =
                 passwordResetTokenRepository.findByToken(token);
 
-        if(passwordResetTokenEntity == null) {
+        if (passwordResetTokenEntity == null) {
             return "invalid";
         }
 
@@ -202,8 +203,8 @@ public class AppUserServiceImpl implements AppUserService {
         AppUserEntity user = passwordResetTokenEntity.getAppUserEntity();
         Calendar cal = Calendar.getInstance();
 
-        if(passwordResetTokenEntity.getExpirationTime().getTime() -
-                cal.getTime().getTime() <= 0){
+        if (passwordResetTokenEntity.getExpirationTime().getTime() -
+                cal.getTime().getTime() <= 0) {
             passwordResetTokenRepository.delete(passwordResetTokenEntity);
             return "expired";
         }
@@ -227,5 +228,28 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public boolean checkIfValidOldPassword(AppUserPojo appUser, String oldPassword) {
         return passwordEncoder.matches(oldPassword, appUser.getPassword());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        if (email == null) {
+            throw new UsernameNotFoundException("username cannot be null.");
+        }
+        log.info("Start to initialize user details service");
+        AppUserEntity appUserEntity = appUserRepo.findByEmail(email);
+        log.info("App user entity might be null: " + email + "@" + appUserEntity);
+        if (appUserEntity != null) {
+            UserDetails user = AppUserMapper.entityToUserDetails(appUserEntity);
+            log.info("Try to get user: " + user.toString());
+            if (user == null) {
+                throw new UsernameNotFoundException("conversion of user entity failed.");
+            }
+            List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorities().stream().
+                    map(authority -> new SimpleGrantedAuthority(authority.toString())).
+                    collect(Collectors.toList());
+            return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
+        } else {
+            throw new UsernameNotFoundException("Something wrong with your credential or token.");
+        }
     }
 }

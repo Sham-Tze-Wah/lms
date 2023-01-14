@@ -10,8 +10,7 @@ import com.rbtsb.lms.service.mapper.AppUserMapper;
 import com.rbtsb.lms.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,10 +20,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AuthenticationServiceImpl {
 
-        private final AppUserRepo repository;
-        private final PasswordEncoder passwordEncoder;
-        private final JwtUtils jwtUtils;
-        private final AuthenticationManager authenticationManager;
+    private final AppUserRepo repository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
+    private final AuthenticationManager authenticationManager;
 
 //        public AuthenticationResponsePojo register(RegisterRequestPojo request) {
 //            AppUserPojo user = User.builder()
@@ -41,23 +40,25 @@ public class AuthenticationServiceImpl {
 //                    .build();
 //        }
 
-        public AuthenticationResponsePojo authenticate(AuthenticationRequestPojo request) {
-            log.info("Start to authenticating...");
-
+    public AuthenticationResponsePojo authenticate(AuthenticationRequestPojo request) throws Exception {
+        log.info("Start to authenticating...");
+        try {
+            log.info("Username : " + request.getUsername());
+            log.info("Credentials: " + request.getPassword());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
+                            request.getUsername(),
                             request.getPassword()
                     )
             );
 
             log.info("Checking from db...");
 
-            AppUserEntity appUser = repository.findByEmail(request.getEmail());
+            AppUserEntity appUser = repository.findByEmail(request.getUsername());
 
             log.info(appUser.toString());
             if (appUser != null) {
-                log.info("Username: "+ appUser.getUsername());
+                log.info("Username: " + appUser.getUsername());
                 UserDetails user = AppUserMapper.entityToUserDetails(appUser);
                 String jwtToken = jwtUtils.generateToken(user);
                 return AuthenticationResponsePojo.builder()
@@ -66,6 +67,14 @@ public class AuthenticationServiceImpl {
             } else {
                 throw new NullPointerException("the username is not exist");
             }
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
+        } catch (InternalAuthenticationServiceException e) {
+            throw new Exception(e.toString(), e);
         }
+
+    }
 
 }

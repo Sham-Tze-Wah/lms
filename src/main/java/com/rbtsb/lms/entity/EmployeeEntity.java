@@ -18,7 +18,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "Employee")
 @Builder
-public class EmployeeEntity {
+public class EmployeeEntity { //Account details
 
     //@GeneratedValue(generator = "uuid") //you need to make the dao throw error as it is generated and set into entity.
     //https://stackoverflow.com/questions/27672337/detached-entity-passed-to-persist-when-save-the-child-data (24 vote)
