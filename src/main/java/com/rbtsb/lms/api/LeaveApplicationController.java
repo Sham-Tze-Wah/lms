@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.xml.ws.Response;
 import java.util.Optional;
 
 @RequestMapping("/api/leave")
@@ -144,6 +145,49 @@ public class LeaveApplicationController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
+
+    //for manager
+    @PatchMapping("/assign")
+    public ResponseEntity<?> assignHR(@RequestParam(value = "leaveId", required = false) String leaveId,
+                                      @RequestParam(value = "assignerId", required = false) String assignerId,
+                                      @RequestParam(value = "HRId", required = false) String HRId
+                                      ){
+        try{
+            if(leaveId != null && !leaveId.equalsIgnoreCase("")){
+                if(assignerId != null && !assignerId.equalsIgnoreCase("")){
+                    if(HRId != null && !HRId.equalsIgnoreCase("")){
+                        return new ResponseEntity<>(leaveService.assignHR(leaveId, assignerId, HRId), HttpStatus.OK);
+                    }
+                    else{
+                        return new ResponseEntity<>("hr id cannot be null", HttpStatus.BAD_REQUEST);
+                    }
+                }
+                else{
+                    return new ResponseEntity<>("assigner id cannot be null", HttpStatus.BAD_REQUEST);
+                }
+            }
+            else{
+                return new ResponseEntity<>("leave id cannot be null", HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch(NullPointerException ex){
+            return new ResponseEntity<>("Invalid input on certain field", HttpStatus.BAD_REQUEST);
+        }
+        catch(Exception ex){
+            return new ResponseEntity<>(ex.toString(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    //TODO check for the date so that it is not expired (max 5 working days)
+    // for HR
+    @PatchMapping("/validate")
+    public ResponseEntity<?> validateLeave(@RequestParam(value = "leaveId", required = false) String leaveId,
+                                           @RequestParam(value = "assignerId", required = false) String assignerId,
+                                           @RequestParam(value = "HRId", required = false) String HRId){
+        return new ResponseEntity<>(leaveService.validateLeave(leaveId, assignerId, HRId), HttpStatus.OK);
+    }
+
+
 
     @PatchMapping("/approve/{id}")
     public ResponseEntity<?> approveLeaveApplication(@PathVariable("id") String id){

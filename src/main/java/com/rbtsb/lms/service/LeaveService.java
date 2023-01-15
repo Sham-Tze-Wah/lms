@@ -24,4 +24,6 @@ public interface LeaveService {
     ApiErrorPojo checkDuplicateReason(LeaveDTO leaveDTO);
 
     List<LeaveDTO> getLeaveApplicationByEmpId(String empId);
+
+    String assignHR(String leaveId, String assignerId, String hrId);
 }

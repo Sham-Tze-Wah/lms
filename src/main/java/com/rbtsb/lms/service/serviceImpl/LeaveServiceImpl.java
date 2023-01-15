@@ -3,12 +3,16 @@ package com.rbtsb.lms.service.serviceImpl;
 import com.rbtsb.lms.constant.LeaveStatus;
 import com.rbtsb.lms.constant.LeaveType;
 import com.rbtsb.lms.dto.LeaveDTO;
+import com.rbtsb.lms.entity.AssignerEntity;
 import com.rbtsb.lms.entity.EmployeeEntity;
+import com.rbtsb.lms.entity.HREntity;
 import com.rbtsb.lms.entity.LeaveEntity;
 import com.rbtsb.lms.pojo.ApiErrorPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.pojo.LeavePojo;
+import com.rbtsb.lms.repo.AssignerRepo;
 import com.rbtsb.lms.repo.EmployeeRepo;
+import com.rbtsb.lms.repo.HRRepo;
 import com.rbtsb.lms.repo.LeaveDTORepo;
 import com.rbtsb.lms.service.LeaveService;
 import com.rbtsb.lms.service.mapper.AttachmentMapper;
@@ -35,6 +39,12 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Autowired
     private EmployeeRepo employeeRepo;
+
+    @Autowired
+    private AssignerRepo assignerRepo;
+
+    @Autowired
+    private HRRepo hrRepo;
 
     @Override
     public ApiErrorPojo insertLeave(LeaveDTO leaveDTO) {
@@ -103,6 +113,37 @@ public class LeaveServiceImpl implements LeaveService {
         else{
             return null;
         }
+    }
+
+    @Override
+    public String assignHR(String leaveId, String assignerId, String hrId) {
+        Optional<LeaveEntity> leaveEntity = leaveDTORepo.findById(leaveId);
+        if(leaveEntity.isPresent()){
+            if(leaveEntity.get().getLeaveStatus() != null &&
+                    leaveEntity.get().getLeaveStatus().toString().equalsIgnoreCase("New")){
+                Optional<AssignerEntity> assignerEntity = assignerRepo.findById(assignerId);
+                if(assignerEntity.isPresent()){
+                    Optional<HREntity> hrEntity = hrRepo.findById(hrId);
+                    if(hrEntity.isPresent()){
+                        leaveDTORepo.saveAndFlush(leaveEntity.get());
+                        return "Assign successfully.";
+                    }
+                    else{
+                        throw new NullPointerException("The hr id is not exist.");
+                    }
+                }
+                else{
+                    throw new NullPointerException("The assigner id is not exist.");
+                }
+            }
+            else{
+                throw new NullPointerException("This leave application cannot be assigned as it is not new.");
+            }
+        }
+        else{
+            throw new NullPointerException("The leave id is not exist.");
+        }
+
     }
 
     @Override
