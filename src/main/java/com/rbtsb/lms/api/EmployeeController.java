@@ -50,8 +50,8 @@ public class EmployeeController {
         try{
             if(!name.equalsIgnoreCase("")){
                 if(!phoneNo.equalsIgnoreCase("") && EmployeeValidation.isInteger(phoneNo)){
-                    if(!email.equalsIgnoreCase("")){
-                        if(!position.equals(null)){
+                    if(email != null && !email.equalsIgnoreCase("")){
+                        if(!position.equals(null) && !position.toString().equalsIgnoreCase("")){
 //                            if(!employeePojo.getRole().equals(null)){
                                 //if(!employeePojo.getDateJoined().equals(null)){
                             if(dateJoined != null && !dateJoined.equalsIgnoreCase("")){
