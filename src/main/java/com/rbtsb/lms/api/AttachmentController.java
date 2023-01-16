@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,6 +98,7 @@ public class AttachmentController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
     @PostMapping("/post")
     public ResponseEntity<?> insertAttachments(//@RequestParam("fileName") String fileName,
                                                //@RequestParam("fileType") FileType fileType,
@@ -251,6 +253,7 @@ public class AttachmentController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
     @GetMapping(path = "/get/all")//, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE,MediaType.IMAGE_JPEG_VALUE})
     public ResponseEntity<?> getAllAttachment() throws UnsupportedEncodingException {
         List<VisibleAttachmentDTO> empList = attachmentService.getAllAttachment();
@@ -280,6 +283,7 @@ public class AttachmentController {
         );
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
     @GetMapping(path = "/get")
     public ResponseEntity<?> getAttachmentByEmpNameAndDate(@RequestParam(value = "id", required = false) String id,
                                                          @RequestParam(value = "startLeaveData", required = false) String startLeaveDate,
@@ -287,6 +291,7 @@ public class AttachmentController {
         return new ResponseEntity(attachmentService.getAttachmentByEmpIdAndDate(id, startLeaveDate, endLeaveDate), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
     @PatchMapping("/put")
     public ResponseEntity<?> updateAnAttachmentByAttachmentId(@RequestParam(value = "id", required = false) String id,
                                                     //@RequestParam("fileName") String fileName,
@@ -374,6 +379,7 @@ public class AttachmentController {
 
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteAnAttachmentById(@PathVariable("id") String id) {
         return new ResponseEntity<>(attachmentService.deleteAttachmentById(id), HttpStatus.OK);
@@ -458,6 +464,7 @@ public class AttachmentController {
 //
 //    }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
     @PostMapping(path = "/post/download")
     public ResponseEntity<?> downloadFile(
             @RequestParam("fileName") String fileName) { //with extension
@@ -527,12 +534,9 @@ public class AttachmentController {
                     apiErrorPojo.getResponseStatus()
             )).body(apiErrorPojo.getResponseMessage());
         }
-
-
-
-
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
     @GetMapping(path="/displayImage")
     public ResponseEntity<?> displayImage(@RequestParam("image") String imageData){
 //        int width = 134;
@@ -577,6 +581,7 @@ public class AttachmentController {
 //
 //        return stringLength;
 //    }
+
 
     private byte[] writeImageFile(String imageData) throws UnsupportedEncodingException {
         int width = 150;

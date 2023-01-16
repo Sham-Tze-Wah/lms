@@ -5,6 +5,7 @@ import com.rbtsb.lms.entity.LeaveEntity;
 import com.rbtsb.lms.pojo.ApiErrorPojo;
 import com.rbtsb.lms.pojo.LeavePojo;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface LeaveService {
@@ -16,14 +17,18 @@ public interface LeaveService {
 
     public String deleteLeaveById(String id);
 
-    ApiErrorPojo approveLeaveStatus(String id);
+    ApiErrorPojo approveLeaveStatus(String id, String bossId);
 
-    ApiErrorPojo rejectLeaveStatus(String id);
+    ApiErrorPojo rejectLeaveStatus(String id, String bossId);
 
     @Deprecated
     ApiErrorPojo checkDuplicateReason(LeaveDTO leaveDTO);
 
     List<LeaveDTO> getLeaveApplicationByEmpId(String empId);
 
-    String assignHR(String leaveId, String assignerId, String hrId);
+    String assignHR(String leaveId, String assignerId, String hrId) throws ParseException;
+
+    String validateLeave(String leaveId, String assignerId, String hrId, String rejectOrValidated);
+
+    List<LeaveDTO> getAssignedLeaveApplicationByHRId(String hrId);
 }

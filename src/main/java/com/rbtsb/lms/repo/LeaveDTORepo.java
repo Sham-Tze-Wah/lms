@@ -34,5 +34,7 @@ public interface LeaveDTORepo extends JpaRepository<LeaveEntity, String> {
     @Query(value = "SELECT * FROM leave_application l WHERE l.hr_id = ?1", nativeQuery = true)
     List<LeaveEntity> findByHRId(String hrId);
 
+    @Query(value = "SELECT * FROM leave_application ORDER BY start_date_leave", nativeQuery = true)
+    List<LeaveEntity> findByPriority();
 
 }

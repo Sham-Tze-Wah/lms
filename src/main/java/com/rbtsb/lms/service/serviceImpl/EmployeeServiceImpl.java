@@ -280,6 +280,37 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
+    @Override
+    public Optional<EmployeePojo> getEmployeeByEmail(String toEmail) {
+        Optional<EmployeeEntity> empEntity = employeeRepo.findByEmail(toEmail);
+        if(empEntity.isPresent()){
+            EmployeePojo employeePojo = EmployeeMapper.entityToPojo(empEntity.get());
+            if(employeePojo == null){
+                return null;
+            }
+            return Optional.of(employeePojo);
+        }
+        else{
+            return null;
+        }
+    }
+
+    @Override
+    public List<EmployeePojo> getEmployeeByRoleName(String roleName) {
+        List<EmployeeEntity> empEntityList = employeeRepo.findByRoleName(roleName);
+        List<EmployeePojo> employeePojoList = new ArrayList<>();
+        if(!empEntityList.isEmpty()){
+            for(EmployeeEntity empEntity: empEntityList){
+                EmployeePojo employeePojo = EmployeeMapper.entityToPojo(empEntity);
+                employeePojoList.add(employeePojo);
+            }
+            return employeePojoList;
+        }
+        else{
+            throw new NullPointerException("The role name does not assigned to anyone.");
+        }
+    }
+
 //    @Override
 //    public Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName) {
 //        return employeeRepo.findByName(employeeName);

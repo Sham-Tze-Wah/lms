@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,6 +34,7 @@ public class EducationController {
         this.employeeService = employeeService;
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @PostMapping("/post")
     public ResponseEntity<?> insertEducation(@RequestParam(value = "qualification", required = false) String qualification,
                                              @RequestParam(value = "institute", required = false) String institute,
@@ -78,16 +80,19 @@ public class EducationController {
 
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @GetMapping("/get/all")
     public ResponseEntity<?> getAllEducation(){
         return new ResponseEntity<>(educationService.getAllEducation(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @GetMapping("/get")
     public ResponseEntity<?> getEducationByEmpId(@RequestParam("id") String empId){
         return new ResponseEntity<>(educationService.getEducationByEmpId(empId), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @PatchMapping("/put/{id}")
     public ResponseEntity<?> updateEducationById(@PathVariable("id") String eduId,
                                                  @RequestParam(value = "qualification", required = false) String qualification,
@@ -98,6 +103,7 @@ public class EducationController {
         return new ResponseEntity<>(educationService.updateEducationByEmpId(eduId, qualification, institute, course, employeeId), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteEducationById(@PathVariable("id") String id){
         return new ResponseEntity<>(educationService.deleteEducationById(id), HttpStatus.OK);

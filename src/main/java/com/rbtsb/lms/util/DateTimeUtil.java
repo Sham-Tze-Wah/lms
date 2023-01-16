@@ -66,5 +66,26 @@ public class DateTimeUtil {
         return new Date(calendar.getTime().getTime());
     }
 
+    public static boolean compareDate(String startDateStr, String endDateStr) throws ParseException {
+
+        Date startDate = DateTimeUtil.stringToDate(startDateStr);
+        Date endDate = DateTimeUtil.stringToDate(endDateStr);
+        Date todayDate = DateTimeUtil.yyyyMMddDate(new Date());
+        if(todayDate.compareTo(startDate) <= 0){
+            return false;
+        } else{
+            return true;
+        }
+    }
+
+    public static long dayDifference(String startDateStr, String endDateStr) throws ParseException{
+        Date startDate = DateTimeUtil.stringToDate(startDateStr);
+        Date endDate = DateTimeUtil.stringToDate(endDateStr);
+        Date todayDate = DateTimeUtil.yyyyMMddDate(new Date());
+
+        long timeDiff = todayDate.getTime() - startDate.getTime();
+        return timeDiff/ (1000*60*60*24)%365;
+    }
+
     //public static String get
 }

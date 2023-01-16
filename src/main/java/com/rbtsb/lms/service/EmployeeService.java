@@ -29,5 +29,9 @@ public interface EmployeeService {
 
      Optional<EmployeePojo> getEmployeePojoById(String empId);
 
+    Optional<EmployeePojo> getEmployeeByEmail(String toEmail);
+
+    List<EmployeePojo> getEmployeeByRoleName(String roleName);
+
     //Optional<EmployeeEntity> getEmployeeByEmployeeName(String employeeName);
 }

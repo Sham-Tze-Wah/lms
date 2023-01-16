@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,6 +31,7 @@ public class WorkExperienceController {
 
     private Logger log = LoggerFactory.getLogger(WorkExperienceController.class);
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @PostMapping("/post")
     public ResponseEntity<?> insertWorkExperience(@RequestParam(value = "workTitle") String workTitle,
                                                   @RequestParam(value = "yearsOfExperience") String yearsOfExperience,
@@ -87,16 +89,19 @@ public class WorkExperienceController {
 
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @GetMapping("/get/all")
     public ResponseEntity<?> getAllWorkExperience(){
         return new ResponseEntity<>(workExperienceService.getAllWorkExperience(),HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @GetMapping("/get")
     public ResponseEntity<?> getWorkExperienceById(@RequestParam("id") String empId){
         return new ResponseEntity<>(workExperienceService.getWorkExperienceByEmpId(empId), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @PatchMapping("/put/{id}")
     public ResponseEntity<?> updateWorkExperience(@PathVariable("id") String workId,
                                                          @RequestParam(value = "workTitle") String workTitle,
@@ -108,6 +113,7 @@ public class WorkExperienceController {
         return new ResponseEntity<>(workExperienceService.updateWorkExperience(workId, workTitle, yearsOfExperience, companyName, dateJoined, dateResign, empId), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteWorkExperienceById(@PathVariable("id") String id){
         return new ResponseEntity<>(workExperienceService.deleteWorkExperienceById(id), HttpStatus.OK);

@@ -3,17 +3,11 @@ package com.rbtsb.lms.service.serviceImpl;
 import com.rbtsb.lms.constant.LeaveStatus;
 import com.rbtsb.lms.constant.LeaveType;
 import com.rbtsb.lms.dto.LeaveDTO;
-import com.rbtsb.lms.entity.AssignerEntity;
-import com.rbtsb.lms.entity.EmployeeEntity;
-import com.rbtsb.lms.entity.HREntity;
-import com.rbtsb.lms.entity.LeaveEntity;
+import com.rbtsb.lms.entity.*;
 import com.rbtsb.lms.pojo.ApiErrorPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.pojo.LeavePojo;
-import com.rbtsb.lms.repo.AssignerRepo;
-import com.rbtsb.lms.repo.EmployeeRepo;
-import com.rbtsb.lms.repo.HRRepo;
-import com.rbtsb.lms.repo.LeaveDTORepo;
+import com.rbtsb.lms.repo.*;
 import com.rbtsb.lms.service.LeaveService;
 import com.rbtsb.lms.service.mapper.AttachmentMapper;
 import com.rbtsb.lms.service.mapper.EmployeeMapper;
@@ -23,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,23 +41,24 @@ public class LeaveServiceImpl implements LeaveService {
     @Autowired
     private HRRepo hrRepo;
 
+    @Autowired
+    private BossRepo bossRepo;
+
     @Override
     public ApiErrorPojo insertLeave(LeaveDTO leaveDTO) {
         ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
 
-        try{
+        try {
 
             leaveDTORepo.saveAndFlush(
-                    leaveMapper.DTOToEntity("",leaveDTO)
+                    leaveMapper.DTOToEntity("", leaveDTO)
             );
             apiErrorPojo.setResponseStatus("200");
             apiErrorPojo.setResponseMessage("Insert successfully.");
-        }
-        catch(ParseException paEx){
+        } catch (ParseException paEx) {
             apiErrorPojo.setResponseStatus("400");
             apiErrorPojo.setResponseMessage(paEx.toString());
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             apiErrorPojo.setResponseStatus("400");
             apiErrorPojo.setResponseMessage(ex.toString());
         }
@@ -71,7 +67,7 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Deprecated
     @Override
-    public ApiErrorPojo checkDuplicateReason(LeaveDTO leaveDTO){
+    public ApiErrorPojo checkDuplicateReason(LeaveDTO leaveDTO) {
 //        Optional<LeaveEntity> leaveEntity = leaveDTORepo.findByEmployeeNameAndStartDateLeaveAndEndDateLeave(
 //          leaveDTO.getEmployeeName(),
 //          leaveDTO.getStartDateLeave(),
@@ -102,62 +98,153 @@ public class LeaveServiceImpl implements LeaveService {
     public List<LeaveDTO> getLeaveApplicationByEmpId(String empId) {
         List<LeaveDTO> leaveDTOList = new ArrayList<>();
         List<LeaveEntity> leaveEntityList = leaveDTORepo.findByEmpId(empId);
-        if(leaveEntityList != null && !leaveEntityList.isEmpty()){
-            for(LeaveEntity leaveEntity : leaveEntityList){
+        if (leaveEntityList != null && !leaveEntityList.isEmpty()) {
+            for (LeaveEntity leaveEntity : leaveEntityList) {
                 LeaveDTO leaveDTO = leaveMapper.entityToDTO(leaveEntity);
                 leaveDTOList.add(leaveDTO);
             }
 
             return leaveDTOList;
-        }
-        else{
+        } else {
             return null;
         }
     }
 
     @Override
-    public String assignHR(String leaveId, String assignerId, String hrId) {
-        Optional<LeaveEntity> leaveEntity = leaveDTORepo.findById(leaveId);
-        if(leaveEntity.isPresent()){
-            if(leaveEntity.get().getLeaveStatus() != null &&
-                    leaveEntity.get().getLeaveStatus().toString().equalsIgnoreCase("New")){
-                Optional<AssignerEntity> assignerEntity = assignerRepo.findById(assignerId);
-                if(assignerEntity.isPresent()){
-                    Optional<HREntity> hrEntity = hrRepo.findById(hrId);
-                    if(hrEntity.isPresent()){
-                        leaveDTORepo.saveAndFlush(leaveEntity.get());
-                        return "Assign successfully.";
+    public String assignHR(String leaveId, String assignerId, String hrId) throws ParseException {
+        try{
+            Optional<LeaveEntity> leaveEntity = leaveDTORepo.findById(leaveId);
+            if (leaveEntity.isPresent()) {
+                if (leaveEntity.get().getLeaveStatus() != null &&
+                        leaveEntity.get().getLeaveStatus().toString().equalsIgnoreCase("New")) {
+                    Optional<AssignerEntity> assignerEntity = assignerRepo.findById(assignerId);
+                    if (assignerEntity.isPresent()) {
+                        Optional<HREntity> hrEntity = hrRepo.findById(hrId);
+                        if (hrEntity.isPresent()) {
+                            boolean leaveIsNotExpired = DateTimeUtil.compareDate(DateTimeUtil.DateToString(leaveEntity.get().getStartDateLeave()), DateTimeUtil.DateToString(leaveEntity.get().getEndDateLeave()));
+                            if (leaveIsNotExpired) {
+                                HREntity assignedHREntity = leaveEntity.get().getHrEntity();
+                                if (assignedHREntity == null) {
+                                    AssignerEntity assignedAssignerEntity = leaveEntity.get().getAssignerEntity();
+                                    if(assignedAssignerEntity == null){
+                                        leaveEntity.get().setAssignerEntity(assignerEntity.get());
+                                    } //TODO check Assigner account whether it match with the existing acc in leave?
+                                    leaveEntity.get().setHrEntity(hrEntity.get());
+                                    leaveDTORepo.saveAndFlush(leaveEntity.get());
+                                    return "Assign successfully.";
+                                } else {
+                                    throw new NullPointerException("The hr is assigned to someone already.");
+                                }
+
+                            } else {
+                                leaveEntity.get().setLeaveStatus(LeaveStatus.Rejected);
+                                leaveDTORepo.saveAndFlush(leaveEntity.get());
+                                return "Rejected successfully due to expiration. Reapply if you think this is necessary.";
+                            }
+                        } else {
+                            throw new NullPointerException("The hr id is not exist.");
+                        }
+
+                    } else {
+                        throw new NullPointerException("The assigner id is not exist.");
                     }
-                    else{
-                        throw new NullPointerException("The hr id is not exist.");
-                    }
+                } else {
+                    throw new NullPointerException("This leave application cannot be assigned as it is not new.");
                 }
-                else{
-                    throw new NullPointerException("The assigner id is not exist.");
-                }
-            }
-            else{
-                throw new NullPointerException("This leave application cannot be assigned as it is not new.");
+            } else {
+                throw new NullPointerException("The leave id is not exist.");
             }
         }
-        else{
-            throw new NullPointerException("The leave id is not exist.");
+        catch(Exception ex){
+            return "Internal server error. Please contact system admin for help.";
         }
 
     }
 
+
+    @Override
+    public String validateLeave(String leaveId, String assignerId, String hrId, String rejectOrValidated) {
+        try {
+            Optional<LeaveEntity> leaveEntity = leaveDTORepo.findById(leaveId);
+            if (leaveEntity.isPresent()) {
+                if (leaveEntity.get().getLeaveStatus() != null &&
+                        leaveEntity.get().getLeaveStatus().toString().equalsIgnoreCase("New")) {
+                    Optional<AssignerEntity> assignerEntity = assignerRepo.findById(assignerId);
+                    if (assignerEntity.isPresent()) {
+                        Optional<HREntity> hrEntity = hrRepo.findById(hrId);
+                        if (hrEntity.isPresent()) {
+                            boolean leaveIsNotExpired = DateTimeUtil.compareDate(DateTimeUtil.DateToString(leaveEntity.get().getStartDateLeave()), DateTimeUtil.DateToString(leaveEntity.get().getEndDateLeave()));
+                            if (leaveIsNotExpired) {
+                                if(leaveEntity.get().getHrEntity() != null){
+                                    if(hrEntity.get().equals(leaveEntity.get().getHrEntity())){
+                                        if(rejectOrValidated.equalsIgnoreCase("Rejected") || rejectOrValidated.equalsIgnoreCase("Validated")){
+                                            leaveEntity.get().setLeaveStatus(LeaveStatus.valueOf(rejectOrValidated));
+                                            leaveDTORepo.saveAndFlush(leaveEntity.get());
+                                            //TODO send email to leave applier that his form is being validated
+                                            return "Validate successfully.";
+                                        }
+                                        else{
+                                            throw new NullPointerException("The leave status is invalid.");
+                                        }
+                                    }
+                                    else{
+                                        throw new NullPointerException("This leave is not assigned to you.");
+                                    }
+                                }
+                                else{
+                                    throw new NullPointerException("This leave is not assigned to anyone yet. Please contact an assigner to assign this leave first.");
+                                }
+
+                            } else {
+                                leaveEntity.get().setLeaveStatus(LeaveStatus.Rejected);
+                                leaveDTORepo.saveAndFlush(leaveEntity.get());
+                                return "Rejected successfully due to expiration. Reapply if you think this is necessary.";
+                            }
+                        } else {
+                            throw new NullPointerException("The hr id is not exist.");
+                        }
+                    } else {
+                        throw new NullPointerException("The assigner id is not exist.");
+                    }
+                } else {
+                    throw new NullPointerException("This leave application cannot be assigned as it is not new.");
+                }
+
+            } else {
+                throw new NullPointerException("leave id does not exist.");
+            }
+        } catch (Exception ex) {
+            return "Internal server error. Please contact system admin for help.";
+        }
+    }
+
+    @Override
+    public List<LeaveDTO> getAssignedLeaveApplicationByHRId(String hrId) {
+        List<LeaveEntity> leaveEntities = leaveDTORepo.findByHRId(hrId);
+        List<LeaveDTO> leaveDTOList = new ArrayList<>();
+        if(!leaveEntities.isEmpty()){
+            for(LeaveEntity leaveEntity : leaveEntities){
+                LeaveDTO leaveDTO = leaveMapper.entityToDTO(leaveEntity);
+                leaveDTOList.add(leaveDTO);
+            }
+            return leaveDTOList;
+        }
+        else{
+            throw new NullPointerException("The id does not exist.");
+        }
+    }
+
     @Override
     public List<LeaveDTO> getAllLeave() {
-        List<LeaveEntity> leaveEntities = leaveDTORepo.findAll();
+        List<LeaveEntity> leaveEntities = leaveDTORepo.findByPriority();
         List<LeaveDTO> leaveDTOList = new ArrayList<>();
         leaveEntities.forEach(leaveEntity -> {
             leaveDTOList.add(leaveMapper.entityToDTO(leaveEntity));
         });
 
-        if(!leaveDTOList.isEmpty()){
+        if (!leaveDTOList.isEmpty()) {
             return leaveDTOList;
-        }
-        else{
+        } else {
             return null;
         }
     }
@@ -165,35 +252,34 @@ public class LeaveServiceImpl implements LeaveService {
     @Override
     public ApiErrorPojo updateLeaveApplication(String id, String leaveStatus, String reason, String description, String leaveType, String startDateLeave, String endDateLeave, String employeeId) {
         ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
-        try{
-            if(id != null && !id.equalsIgnoreCase("")){
+        try {
+            if (id != null && !id.equalsIgnoreCase("")) {
                 Optional<LeaveEntity> leaveFromId = leaveDTORepo.findById(id);
 
-                if(leaveFromId.isPresent()){
+                if (leaveFromId.isPresent()) {
 
-                    if(reason != null && !reason.equalsIgnoreCase("")){
+                    if (reason != null && !reason.equalsIgnoreCase("")) {
 
-                        if(leaveStatus != null && !leaveStatus.equalsIgnoreCase("")){
+                        if (leaveStatus != null && !leaveStatus.equalsIgnoreCase("")) {
 
-                            if(leaveType != null && !leaveType.equalsIgnoreCase("")){
+                            if (leaveType != null && !leaveType.equalsIgnoreCase("")) {
 
-                                if(employeeId != null && !employeeId.equalsIgnoreCase("")){
+                                if (employeeId != null && !employeeId.equalsIgnoreCase("")) {
                                     Optional<EmployeeEntity> emp = employeeRepo.findById(employeeId);
 
-                                    if(emp.isPresent()){
-                                        if(startDateLeave != null && !startDateLeave.equalsIgnoreCase("")){
-                                            if(endDateLeave != null && !endDateLeave.equalsIgnoreCase("")){
+                                    if (emp.isPresent()) {
+                                        if (startDateLeave != null && !startDateLeave.equalsIgnoreCase("")) {
+                                            if (endDateLeave != null && !endDateLeave.equalsIgnoreCase("")) {
                                                 Optional<LeaveEntity> leaveEntityFromReqBody = leaveDTORepo.findById(id);
-                                                if(leaveEntityFromReqBody.isPresent()){
+                                                if (leaveEntityFromReqBody.isPresent()) {
                                                     LeaveEntity leaveEntity = leaveEntityFromReqBody.get();
                                                     leaveFromId.get().setLeaveId(id);
                                                     leaveFromId.get().setLeaveStatus(LeaveStatus.valueOf(leaveStatus));
                                                     leaveFromId.get().setLeaveType(LeaveType.valueOf(leaveType));
                                                     leaveFromId.get().setReason(reason);
-                                                    if(description == null || description.equalsIgnoreCase("")){
+                                                    if (description == null || description.equalsIgnoreCase("")) {
                                                         leaveFromId.get().setDescription(leaveFromId.get().getDescription());
-                                                    }
-                                                    else{
+                                                    } else {
                                                         leaveFromId.get().setDescription(description);
                                                     }
                                                     leaveFromId.get().setStartDateLeave(DateTimeUtil.stringToDate(startDateLeave));
@@ -202,65 +288,53 @@ public class LeaveServiceImpl implements LeaveService {
                                                     leaveDTORepo.saveAndFlush(leaveFromId.get());
                                                     apiErrorPojo.setResponseMessage("Updated successfully.");
                                                     apiErrorPojo.setResponseStatus("200");
-                                                }
-                                                else{
+                                                } else {
                                                     apiErrorPojo.setResponseMessage("The id is not exist.");
                                                     apiErrorPojo.setResponseStatus("422");
                                                 }
 
-                                            }
-                                            else{
+                                            } else {
                                                 apiErrorPojo.setResponseMessage("The end leave date must be provided.");
                                                 apiErrorPojo.setResponseStatus("422");
                                             }
 
-                                        }
-                                        else{
+                                        } else {
                                             apiErrorPojo.setResponseMessage("The start leave date must be provided.");
                                             apiErrorPojo.setResponseStatus("422");
                                         }
-                                    }
-                                    else{
+                                    } else {
                                         apiErrorPojo.setResponseMessage("The given employee must belongs to the company.");
                                         apiErrorPojo.setResponseStatus("422");
                                     }
 
-                                }
-                                else{
+                                } else {
                                     apiErrorPojo.setResponseMessage("leave application must belongs to at least one employee.");
                                     apiErrorPojo.setResponseStatus("422");
                                 }
-                            }
-                            else{
+                            } else {
                                 apiErrorPojo.setResponseMessage("leave type cannot be null");
                                 apiErrorPojo.setResponseStatus("422");
                             }
-                        }
-                        else{
+                        } else {
                             apiErrorPojo.setResponseMessage("leave status cannot be null");
                             apiErrorPojo.setResponseStatus("422");
                         }
-                    }
-                    else{
+                    } else {
                         apiErrorPojo.setResponseMessage("reason cannot be null");
                         apiErrorPojo.setResponseStatus("422");
                     }
-                }
-                else{
+                } else {
                     apiErrorPojo.setResponseMessage("Please apply the new leave first before update.");
                     apiErrorPojo.setResponseStatus("422");
                 }
-            }
-            else{
+            } else {
                 apiErrorPojo.setResponseMessage("The id is null.");
                 apiErrorPojo.setResponseStatus("422");
             }
-        }
-        catch(ParseException paEx){
+        } catch (ParseException paEx) {
             apiErrorPojo.setResponseMessage("date time conversion error. Please contact system admin.");
             apiErrorPojo.setResponseStatus("400");
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             apiErrorPojo.setResponseMessage("Internal server error occurs. Please contact system admin.");
             apiErrorPojo.setResponseStatus("400");
         }
@@ -271,34 +345,43 @@ public class LeaveServiceImpl implements LeaveService {
     public String deleteLeaveById(String id) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
 
-        if(leave.isPresent()){
+        if (leave.isPresent()) {
             leaveDTORepo.deleteById(id);
             return "Deleted successfully";
-        }
-        else{
+        } else {
             return "the id provided is not exist";
         }
     }
 
     @Override
-    public ApiErrorPojo approveLeaveStatus(String id) {
+    public ApiErrorPojo approveLeaveStatus(String id, String bossId) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
         ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
 
-        if(leave.isPresent()){
-            if(!leave.get().getLeaveStatus().toString().equalsIgnoreCase("Approved")
-            && !leave.get().getLeaveStatus().toString().equalsIgnoreCase("Rejected")){
-                leave.get().setLeaveStatus(LeaveStatus.Approved);
-                leaveDTORepo.saveAndFlush(leave.get());
-                apiErrorPojo.setResponseStatus("200");
-                apiErrorPojo.setResponseMessage("Approved status updated successfully.");
-            }
-            else{
+        if (leave.isPresent()) {
+            if (leave.get().getLeaveStatus().toString().equalsIgnoreCase("Validated")) {
+                Optional<BossEntity> bossEntity = bossRepo.findById(bossId);
+                if(bossEntity.isPresent()){
+                    leave.get().setBossEntity(bossEntity.get());
+                    leave.get().setLeaveStatus(LeaveStatus.Approved);
+                    leaveDTORepo.saveAndFlush(leave.get());
+                    apiErrorPojo.setResponseStatus("200");
+                    apiErrorPojo.setResponseMessage("Approved status updated successfully.");
+                }
+                else{
+                    apiErrorPojo.setResponseStatus("422");
+                    apiErrorPojo.setResponseMessage("the boss id does not exist.");
+                }
+            } else if(leave.get().getLeaveStatus().toString().equalsIgnoreCase("Approved")
+                    || leave.get().getLeaveStatus().toString().equalsIgnoreCase("Rejected")){
                 apiErrorPojo.setResponseStatus("422");
                 apiErrorPojo.setResponseMessage("the leave status has been approved or rejected.");
             }
-        }
-        else{
+            else{
+                apiErrorPojo.setResponseStatus("422");
+                apiErrorPojo.setResponseMessage("the leave status haven't been validated yet.");
+            }
+        } else {
             apiErrorPojo.setResponseStatus("422");
             apiErrorPojo.setResponseMessage("the id provided is not exist");
         }
@@ -306,25 +389,37 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public ApiErrorPojo rejectLeaveStatus(String id) {
+    public ApiErrorPojo rejectLeaveStatus(String id, String bossId) {
         Optional<LeaveEntity> leave = leaveDTORepo.findById(id);
         ApiErrorPojo apiErrorPojo = new ApiErrorPojo();
 
-        if(leave.isPresent()){
-            if(!leave.get().getLeaveStatus().toString().equalsIgnoreCase("Approved")
-                    && !leave.get().getLeaveStatus().toString().equalsIgnoreCase("Rejected")){
-                leave.get().setLeaveStatus(LeaveStatus.Rejected);
-                leaveDTORepo.saveAndFlush(leave.get());
-                apiErrorPojo.setResponseStatus("200");
-                apiErrorPojo.setResponseMessage("Rejected status updated successfully.");
+        if (leave.isPresent()) {
+            if (leave.get().getLeaveStatus().toString().equalsIgnoreCase("Validated")) {
+                Optional<BossEntity> bossEntity = bossRepo.findById(bossId);
+                if(bossEntity.isPresent()){
+                    leave.get().setBossEntity(bossEntity.get());
+                    leave.get().setLeaveStatus(LeaveStatus.Rejected);
+                    leaveDTORepo.saveAndFlush(leave.get());
+                    apiErrorPojo.setResponseStatus("200");
+                    apiErrorPojo.setResponseMessage("Rejected status updated successfully.");
+                }
+                else{
+                    apiErrorPojo.setResponseStatus("422");
+                    apiErrorPojo.setResponseMessage("the boss id does not exist.");
+                }
+
             }
-            else{
+            else if(leave.get().getLeaveStatus().toString().equalsIgnoreCase("Approved")
+                    || leave.get().getLeaveStatus().toString().equalsIgnoreCase("Rejected")){
                 apiErrorPojo.setResponseStatus("422");
                 apiErrorPojo.setResponseMessage("the leave status has been approved or rejected.");
             }
+            else{
+                apiErrorPojo.setResponseStatus("422");
+                apiErrorPojo.setResponseMessage("the leave status haven't been validated yet.");
+            }
 
-        }
-        else{
+        } else {
             apiErrorPojo.setResponseStatus("422");
             apiErrorPojo.setResponseMessage("the id provided is not exist");
         }

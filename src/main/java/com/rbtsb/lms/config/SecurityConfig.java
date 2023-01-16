@@ -229,11 +229,11 @@ public class SecurityConfig {
 //
 ////        http.formLogin();
 ////        http.httpBasic();
-
+//5,7,8
         // We don't need CSRF for this example
         http.csrf().disable()
                 // dont authenticate this particular request
-                .authorizeRequests().antMatchers("/api/authenticate", "/api/login").permitAll().
+                .authorizeRequests().antMatchers(WHITE_LIST_URLS_FOR_EVERYONE).permitAll().
                 // all other requests need to be authenticated
                         anyRequest().permitAll().and()
                 // make sure we use stateless session; session won't be used to

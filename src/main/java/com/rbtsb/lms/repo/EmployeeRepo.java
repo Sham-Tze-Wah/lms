@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -38,4 +39,7 @@ public interface EmployeeRepo extends JpaRepository<EmployeeEntity, String> {
     );
 
     Optional<EmployeeEntity> findByEmail(String username);
+
+    @Query(value = "SELECT * FROM employee e, roles r, app_user au, user_roles ur WHERE au.emp_id = e.emp_id AND au.app_user_id = ur.id AND ur.role_id = r.role_id AND r.role_name = ?1", nativeQuery = true)
+    List<EmployeeEntity> findByRoleName(String roleName);
 }
