@@ -9,16 +9,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AppUserMapper {
 
     public static AppUserEntity pojoToEntity(AppUserPojo appUserPojo){
         AppUserEntity appUserEntity = new AppUserEntity();
-        List<RoleEntity> roleEntityList = new ArrayList<>();
+        Set<RoleEntity> roleEntityList = new HashSet<>();
         appUserEntity.setId(appUserPojo.getId());
         appUserEntity.setUsername(appUserPojo.getUsername());
         appUserEntity.setPassword(appUserPojo.getPassword());

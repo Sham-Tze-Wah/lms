@@ -19,6 +19,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -63,6 +65,7 @@ public class JwtAthFilter extends OncePerRequestFilter {
 
         String username = null;
         String jwtToken = null;
+        String[] apiPaths = APIPath.WHITE_LIST_URLS_FOR_ANNOYMOUS;
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
@@ -76,7 +79,12 @@ public class JwtAthFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
             }
-        } else {
+        }else if(Arrays.stream(apiPaths).anyMatch(path -> path.contains(request.getRequestURI()))){
+            log.info("The url provided can be access without token...");
+            filterChain.doFilter(request, response);
+            return;
+        }
+        else {
             log.info("Token : " + requestTokenHeader);
             logger.warn("JWT Token does not begin with Bearer String");
             filterChain.doFilter(request, response);

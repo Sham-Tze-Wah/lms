@@ -53,7 +53,7 @@ public class LeaveApplicationController {
 
     private final Logger log = LoggerFactory.getLogger(LeaveApplicationController.class);
 
-    @PreAuthorize("hasAnyAuthority('USER', 'ASSIGNER', 'BOSS', 'HR')")
+    //@PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ASSIGNER', 'ROLE_BOSS', 'ROLE_HR')")
     @PostMapping("/post")
     public ResponseEntity<?> insertLeaveApplication(@RequestParam(value = "leaveStatus", required = false) String leaveStatus,
                                                     @RequestParam(value = "reason", required = false) String reason,
@@ -124,13 +124,13 @@ public class LeaveApplicationController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('BOSS')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BOSS')")
     @GetMapping("/get/all")
     public ResponseEntity<?> getAllLeaveApplication(){
         return new ResponseEntity<>(leaveService.getAllLeave(), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER')")
     @GetMapping("/get")
     public ResponseEntity<?> getLeaveApplicationByEmpId(@RequestParam(value = "id", required = false) String empId){
         if(empId != null && !empId.equalsIgnoreCase("")){
@@ -142,7 +142,7 @@ public class LeaveApplicationController {
 
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_ASSIGNER')")
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getLeaveApplicationByHRId(@RequestParam(value = "id", required = false) String hrId){
 
@@ -155,7 +155,7 @@ public class LeaveApplicationController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER')")
     @PatchMapping("/put/{id}")
     public ResponseEntity<?> updateLeaveApplicationByLeaveId(@PathVariable("id") String leaveId,
                                                              @RequestParam(value = "leaveStatus") String leaveStatus,
@@ -171,7 +171,7 @@ public class LeaveApplicationController {
         ));
     }
 
-    @PreAuthorize("hasAnyAuthority('ASSIGNER', 'BOSS', 'HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ASSIGNER', 'ROLE_BOSS', 'ROLE_HR')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteLeaveApplicationById(@PathVariable("id") String id){
         String response = leaveService.deleteLeaveById(id);
@@ -184,7 +184,7 @@ public class LeaveApplicationController {
     }
 
     //for manager
-    @PreAuthorize("hasAnyAuthority('ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ASSIGNER')")
     @PatchMapping("/assign")
     public ResponseEntity<?> assignHR(@RequestParam(value = "leaveId", required = false) String leaveId,
                                       @RequestParam(value = "assignerId", required = false) String assignerId,
@@ -219,7 +219,7 @@ public class LeaveApplicationController {
 
     //TODO check for the date so that it is not expired (max 5 working days) Done
     // for HR
-    @PreAuthorize("hasAnyAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR')")
     @PatchMapping("/validate")
     public ResponseEntity<?> validateLeave(@RequestParam(value = "leaveId", required = false) String leaveId,
                                            @RequestParam(value = "assignerId", required = false) String assignerId,
@@ -317,7 +317,7 @@ public class LeaveApplicationController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('BOSS')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BOSS')")
     @PatchMapping("/approve/{id}")
     public ResponseEntity<?> approveLeaveApplication(@PathVariable("id") String id,
                                                      @RequestParam(value = "bossId") String bossId,
@@ -419,7 +419,7 @@ public class LeaveApplicationController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('BOSS')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BOSS')")
     @PatchMapping(path = "/reject/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> rejectLeaveApplication(@PathVariable("id") String id,
                                                     @RequestParam(value = "bossId", required = false) String bossId,

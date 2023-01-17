@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Set;
 import java.util.UUID;
 
 @NamedNativeQuery(name = "RoleEntity.findByRoleName", query = "SELECT role_id as id, role_name as name FROM roles r WHERE r.role_name = ?1", resultSetMapping = "Mapping.RolePojo")
@@ -30,5 +31,6 @@ public class RoleEntity {
     @Column(name="role_name", nullable = false, unique = true, length= SqlDataType.VARCHAR100)
     private String roleName;
 
-
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    Set<AppUserEntity> appUsers;
 }

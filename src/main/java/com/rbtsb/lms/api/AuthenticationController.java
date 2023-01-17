@@ -24,7 +24,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:8080", exposedHeaders = "token")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AuthenticationController {
 
     @Autowired
@@ -104,6 +104,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponsePojo> authenticate(
             @RequestBody AuthenticationRequestPojo request
     ) throws Exception {
+        log.info("Auth controller is called..");
         return ResponseEntity.ok(service.authenticate(request));
     }
 }

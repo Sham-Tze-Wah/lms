@@ -37,7 +37,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PreAuthorize("hasAnyAuthority('HR')")
+    //@PreAuthorize("hasAnyAuthority('ROLE_HR')")
     @PostMapping("/add")
     public ResponseEntity<?> addEmployee(@RequestParam(value="name", required = false) String name,
                                          @RequestParam(value="phoneNo", required = false) String phoneNo,
@@ -107,25 +107,25 @@ public class EmployeeController {
         //return new ResponseEntity<>(employeeService.insertEmployee(employeePojo),HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR')")
     @GetMapping("/get/all")
     public ResponseEntity<?> getAllEmployee(){
         return new ResponseEntity<>(employeeService.getAllEmployee(), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR')")
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable("id") String id){
         return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR')")
     @GetMapping("/get")
     public ResponseEntity<?> getEmployeeByName(@RequestParam(value="empName") String name){
         return new ResponseEntity<>(employeeService.getEmployeeByName(name), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR')")
     @PatchMapping("/put/{id}")
     public ResponseEntity<?> updateEmployeeById(@PathVariable("id") String id,
                                                 @RequestParam(value="name", required = false) String name,
@@ -138,13 +138,13 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.updateEmployeeById(id, name, phoneNo, email, address, position, dateJoined, dateLeave), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteEmployeeById(@PathVariable("id") String id){
         return new ResponseEntity<>(employeeService.deleteEmployeeById(id), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR')")
     //TODO find a solution to solve timestamp
     @GetMapping("/testDate")
     public ResponseEntity<?> getDateTime() throws ParseException {
@@ -152,7 +152,7 @@ public class EmployeeController {
     }
 
     //TODO get all user belong to 1 role
-    @PreAuthorize("hasAnyAuthority('BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BOSS', 'ROLE_ASSIGNER')")
     @PostMapping(path = "/get/allByRole")
     public ResponseEntity<?> getAllEmployeeByRole(@RequestParam(value = "roleName", required = false) String roleName){
         if(roleName != null && !roleName.equalsIgnoreCase(""))

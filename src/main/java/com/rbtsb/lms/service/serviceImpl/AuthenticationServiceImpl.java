@@ -41,7 +41,7 @@ public class AuthenticationServiceImpl {
 //        }
 
     public AuthenticationResponsePojo authenticate(AuthenticationRequestPojo request) throws Exception {
-        log.info("Start to authenticating...");
+        log.info("Start to authenticate...");
         try {
             log.info("Username : " + request.getUsername());
             log.info("Credentials: " + request.getPassword());

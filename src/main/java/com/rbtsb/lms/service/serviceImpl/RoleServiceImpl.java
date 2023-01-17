@@ -1,15 +1,11 @@
 package com.rbtsb.lms.service.serviceImpl;
 
 import com.rbtsb.lms.dto.LoginDTO;
-import com.rbtsb.lms.entity.AppUserEntity;
-import com.rbtsb.lms.entity.EmployeeEntity;
-import com.rbtsb.lms.entity.RoleEntity;
+import com.rbtsb.lms.entity.*;
 import com.rbtsb.lms.pojo.AppUserPojo;
 import com.rbtsb.lms.pojo.EmployeePojo;
 import com.rbtsb.lms.pojo.RolePojo;
-import com.rbtsb.lms.repo.AppUserRepo;
-import com.rbtsb.lms.repo.EmployeeRepo;
-import com.rbtsb.lms.repo.RoleRepo;
+import com.rbtsb.lms.repo.*;
 import com.rbtsb.lms.service.RoleService;
 import com.rbtsb.lms.service.mapper.AppUserMapper;
 import com.rbtsb.lms.service.mapper.RoleMapper;
@@ -35,6 +31,15 @@ public class RoleServiceImpl implements RoleService {
     @Autowired
     private EmployeeRepo employeeRepo;
 
+    @Autowired
+    private HRRepo hrRepo;
+
+    @Autowired
+    private BossRepo bossRepo;
+
+    @Autowired
+    private AssignerRepo assignerRepo;
+
     @Override
     public String insertRole(RolePojo rolePojo) {
         try{
@@ -56,6 +61,8 @@ public class RoleServiceImpl implements RoleService {
             return ex.toString() + ".Internal server error occurs.";
         }
     }
+
+
 
     @Override
     public Set<RolePojo> getAllRoles() {
@@ -108,6 +115,57 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
+    private HREntity createHRDetails(String empId){
+        Optional<EmployeeEntity> emp = employeeRepo.findById(empId);
+        if(emp.isPresent()){
+            HREntity hrEntity = new HREntity();
+            hrEntity.setEmployeeEntity(emp.get());
+            hrRepo.save(hrEntity);
+            return hrEntity;
+        }
+        else{
+            throw new NullPointerException("empId is not exist");
+        }
+    }
+
+    private BossEntity createBossDetails(String empId){
+        Optional<EmployeeEntity> emp = employeeRepo.findById(empId);
+        if(emp.isPresent()){
+            BossEntity bossEntity = new BossEntity();
+            bossEntity.setEmployeeEntity(emp.get());
+            bossRepo.save(bossEntity);
+            return bossEntity;
+        }
+        else{
+            throw new NullPointerException("empId is not exist");
+        }
+    }
+
+    private AssignerEntity createAssignerDetails(String empId){
+        Optional<EmployeeEntity> emp = employeeRepo.findById(empId);
+        if(emp.isPresent()){
+            AssignerEntity assignerEntity = new AssignerEntity();
+            assignerEntity.setEmployeeEntity(emp.get());
+            assignerRepo.save(assignerEntity);
+            return assignerEntity;
+        }
+        else{
+            throw new NullPointerException("empId is not exist");
+        }
+    }
+
+    private void createRolesEntityBasedOnRoleName(String role, String empId){
+        if(role.equalsIgnoreCase("hr")){
+            createHRDetails(empId);
+        }
+        else if(role.equalsIgnoreCase("boss")){
+            createBossDetails(empId);
+        }
+        else if(role.equalsIgnoreCase("assigner")){
+            createAssignerDetails(empId);
+        }
+    }
+
     @Override
     public String assignRole(String role, String empId) {
         if(empId != null && !empId.equalsIgnoreCase("")){
@@ -131,15 +189,22 @@ public class RoleServiceImpl implements RoleService {
 
                     }
                     else{
-                        appUserEntity.setUsername(appUserEntity.getUsername());
-                        appUserEntity.setPassword(appUserEntity.getPassword());
-                        appUserEntity.setMatchingPassword(appUserEntity.getMatchingPassword());
+                        appUserEntity = appUserRepo.findByUsername(employeeEntity.get().getEmail());
+                        if(appUserEntity != null){
+                            appUserEntity.setUsername(appUserEntity.getUsername());
+                            appUserEntity.setPassword(appUserEntity.getPassword());
+                            appUserEntity.setMatchingPassword(appUserEntity.getMatchingPassword());
 
-                        Set<RoleEntity> roleEntitySet = new HashSet<>();
-                        roleEntitySet.add(roleEntity);
-                        appUserEntity.setRoles(roleEntitySet);
-                        appUserEntity.setEmployeeEntity(employeeEntity.get());
+                            Set<RoleEntity> roleEntitySet = new HashSet<>();
+                            roleEntitySet.add(roleEntity);
+                            appUserEntity.setRoles(roleEntitySet);
+                            appUserEntity.setEmployeeEntity(employeeEntity.get());
+                        }
+                        else{
+                            throw new NullPointerException("the emp id provided is invalid.");
+                        }
                     }
+                    createRolesEntityBasedOnRoleName(role, empId);
                     appUserRepo.save(appUserEntity);
                     return appUserEntity + "assign role successfully.";
                 }
@@ -153,6 +218,51 @@ public class RoleServiceImpl implements RoleService {
         }
         else{
             throw new NullPointerException("id is null");
+        }
+    }
+
+    private HREntity deleteHRDetails(String empId){
+        Optional<HREntity> hr = hrRepo.findByEmpId(empId);
+        if(hr.isPresent()){
+            hrRepo.delete(hr.get());
+            return hr.get();
+        }
+        else{
+            throw new NullPointerException("empId is not exist");
+        }
+    }
+
+    private BossEntity deleteBossDetails(String empId){
+        Optional<BossEntity> boss = bossRepo.findByEmpId(empId);
+        if(boss.isPresent()){
+            bossRepo.delete(boss.get());
+            return boss.get();
+        }
+        else{
+            throw new NullPointerException("empId is not exist");
+        }
+    }
+
+    private AssignerEntity deleteAssignerDetails(String empId){
+        Optional<AssignerEntity> assigner = assignerRepo.findByEmpId(empId);
+        if(assigner.isPresent()){
+            assignerRepo.delete(assigner.get());
+            return assigner.get();
+        }
+        else{
+            throw new NullPointerException("empId is not exist");
+        }
+    }
+
+    private void deleteRolesEntityBasedOnRoleName(String role, String empId){
+        if(role.equalsIgnoreCase("hr")){
+            deleteHRDetails(empId);
+        }
+        else if(role.equalsIgnoreCase("boss")){
+            deleteBossDetails(empId);
+        }
+        else if(role.equalsIgnoreCase("assigner")){
+            deleteAssignerDetails(empId);
         }
     }
 
@@ -181,6 +291,7 @@ public class RoleServiceImpl implements RoleService {
                         appUserEntityFromDB.setRoles(roleEntitySet);
 //                        appUserEntityToBeSaved.setEmployeeEntity(employeeEntity.get());
 
+                        deleteRolesEntityBasedOnRoleName(role, empId);
                         appUserRepo.save(appUserEntityFromDB);
                         return appUserEntityFromDB + "unassign role successfully.";
                     }

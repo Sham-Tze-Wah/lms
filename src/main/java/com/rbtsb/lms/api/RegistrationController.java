@@ -9,11 +9,13 @@ import com.rbtsb.lms.pojo.PasswordPojo;
 import com.rbtsb.lms.pojo.RolePojo;
 import com.rbtsb.lms.pojo.VerificationTokenPojo;
 import com.rbtsb.lms.service.AppUserService;
+import com.rbtsb.lms.service.RoleService;
 import com.rbtsb.lms.service.mapper.RoleMapper;
 import com.rbtsb.lms.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,9 +39,13 @@ public class RegistrationController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private RoleService roleService;
+
     @PostMapping("/register")
     public String registerUser(@RequestBody LoginDTO loginDTO, final HttpServletRequest request){
         AppUserPojo user = appUserService.registerUser(loginDTO);
+
         publisher.publishEvent(new RegistrationCompleteEvent(
                 user,
                 applicationUrl(request)
@@ -90,6 +96,7 @@ public class RegistrationController {
         log.info("click the link to verify your account: {}", url);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ASSIGNER', 'ROLE_BOSS', 'ROLE_HR')")
     @PostMapping("/resetPassword")
     public String resetPassword(@RequestBody PasswordPojo passwordPojo, HttpServletRequest request){
         AppUserPojo userEmp = appUserService.findByUsername(passwordPojo.getEmail());
@@ -102,6 +109,7 @@ public class RegistrationController {
         return url;
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ASSIGNER', 'ROLE_BOSS', 'ROLE_HR')")
     @PostMapping("/savePassword")
     public String savePassword(@RequestParam("token") String token,
                                @RequestBody PasswordPojo passwordPojo){
@@ -121,6 +129,7 @@ public class RegistrationController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ASSIGNER', 'ROLE_BOSS', 'ROLE_HR')")
     @PostMapping("/changePassword")
     public String changePassword(@RequestBody PasswordPojo passwordPojo){
         AppUserPojo userEmp = appUserService.findByUsername(passwordPojo.getEmail());

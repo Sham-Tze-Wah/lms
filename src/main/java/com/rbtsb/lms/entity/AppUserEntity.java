@@ -2,17 +2,14 @@ package com.rbtsb.lms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rbtsb.lms.util.SqlDataType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.context.support.BeanDefinitionDsl;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
-
 
 
 @Entity
@@ -44,10 +41,12 @@ public class AppUserEntity {
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(
-                    name = "id", referencedColumnName = "app_user_id"),
+                    name = "app_user_id", referencedColumnName = "app_user_id"),
             inverseJoinColumns = @JoinColumn(
-                    name = "roleId", referencedColumnName = "role_id"))
-    private Collection<RoleEntity> roles;
+                    name = "role_id", referencedColumnName = "role_id"))
+    private Set<RoleEntity> roles;
+//    @OneToMany(mappedBy = "appUserEntity")
+//    private Set<UserRolesEntity> roleUserEntity;
 
     @OneToOne
     @JoinColumn(name="empId", referencedColumnName="emp_id")

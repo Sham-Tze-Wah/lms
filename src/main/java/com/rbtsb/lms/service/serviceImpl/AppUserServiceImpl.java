@@ -54,32 +54,38 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     @Override
     public AppUserPojo registerUser(LoginDTO loginDTO) {
         AppUserEntity appUserEntity = new AppUserEntity();
-        List<RoleEntity> roleEntityList = new ArrayList<>();
+        Set<RoleEntity> roleEntityList = new HashSet<>();
         //AppUserPojo validatedAppUserPojo = AppUserPojoValidation.validation(loginDTO);
 
         // TODO validation
-        appUserEntity.setUsername(loginDTO.getUsername());
-        appUserEntity.setPassword(passwordEncoder.encode(loginDTO.getPassword()));
-        appUserEntity.setMatchingPassword(passwordEncoder.encode(loginDTO.getMatchingPassword()));
-        RolePojo rolePojo = roleRepo.findByRoleName("USER"); //Role.Employee.toString() //TODO Checking on the proper role
+        AppUserEntity appUserEntity1 = appUserRepo.findByEmail(loginDTO.getUsername());
+        if(appUserEntity1 == null){
+            appUserEntity.setUsername(loginDTO.getUsername());
+            appUserEntity.setPassword(passwordEncoder.encode(loginDTO.getPassword()));
+            appUserEntity.setMatchingPassword(passwordEncoder.encode(loginDTO.getMatchingPassword()));
 
-        RoleEntity roleEntity = RoleMapper.pojoToEntity(rolePojo);
-        roleEntityList.add(roleEntity);
-        appUserEntity.setRoles(roleEntityList);
+            RolePojo rolePojo = roleRepo.findByRoleName("USER"); //Role.Employee.toString() //TODO Checking on the proper role
+            RoleEntity roleEntity = RoleMapper.pojoToEntity(rolePojo);
+            roleEntityList.add(roleEntity);
 
-        Optional<EmployeeEntity> emp = employeeRepo.findByEmail(loginDTO.getUsername());
-        if (emp.isPresent()) {
-            appUserEntity.setEmployeeEntity(emp.get());
-            //appUserEntity.setEmployeeEntity();
+            appUserEntity.setRoles(roleEntityList);
 
-            appUserEntity.setPassword(appUserEntity.getPassword());
-            appUserRepo.save(appUserEntity);
-            AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
-            return appUserPojo;
-        } else {
+            Optional<EmployeeEntity> emp = employeeRepo.findByEmail(loginDTO.getUsername());
+            if (emp.isPresent()) {
+                appUserEntity.setEmployeeEntity(emp.get());
+                //appUserEntity.setEmployeeEntity();
+
+                appUserEntity.setPassword(appUserEntity.getPassword());
+                appUserRepo.save(appUserEntity);
+                AppUserPojo appUserPojo = AppUserMapper.entityToPojo(appUserEntity);
+                return appUserPojo;
+            } else {
+                throw new NullPointerException("username is not found.");
+            }
+        }
+        else{
             throw new NullPointerException("username is not found.");
         }
-
     }
 
     @Override

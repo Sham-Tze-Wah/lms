@@ -98,7 +98,7 @@ public class AttachmentController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER', 'ROLE_BOSS', 'ROLE_ASSIGNER')")
     @PostMapping("/post")
     public ResponseEntity<?> insertAttachments(//@RequestParam("fileName") String fileName,
                                                //@RequestParam("fileType") FileType fileType,
@@ -253,7 +253,7 @@ public class AttachmentController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER', 'ROLE_BOSS', 'ROLE_ASSIGNER')")
     @GetMapping(path = "/get/all")//, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE,MediaType.IMAGE_JPEG_VALUE})
     public ResponseEntity<?> getAllAttachment() throws UnsupportedEncodingException {
         List<VisibleAttachmentDTO> empList = attachmentService.getAllAttachment();
@@ -283,7 +283,7 @@ public class AttachmentController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER', 'ROLE_BOSS', 'ROLE_ASSIGNER')")
     @GetMapping(path = "/get")
     public ResponseEntity<?> getAttachmentByEmpNameAndDate(@RequestParam(value = "id", required = false) String id,
                                                          @RequestParam(value = "startLeaveData", required = false) String startLeaveDate,
@@ -291,7 +291,7 @@ public class AttachmentController {
         return new ResponseEntity(attachmentService.getAttachmentByEmpIdAndDate(id, startLeaveDate, endLeaveDate), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER', 'ROLE_BOSS', 'ROLE_ASSIGNER')")
     @PatchMapping("/put")
     public ResponseEntity<?> updateAnAttachmentByAttachmentId(@RequestParam(value = "id", required = false) String id,
                                                     //@RequestParam("fileName") String fileName,
@@ -379,7 +379,7 @@ public class AttachmentController {
 
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER', 'ROLE_BOSS', 'ROLE_ASSIGNER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteAnAttachmentById(@PathVariable("id") String id) {
         return new ResponseEntity<>(attachmentService.deleteAttachmentById(id), HttpStatus.OK);
@@ -464,7 +464,7 @@ public class AttachmentController {
 //
 //    }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER', 'ROLE_BOSS', 'ROLE_ASSIGNER')")
     @PostMapping(path = "/post/download")
     public ResponseEntity<?> downloadFile(
             @RequestParam("fileName") String fileName) { //with extension
@@ -536,7 +536,7 @@ public class AttachmentController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER', 'BOSS', 'ASSIGNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER', 'ROLE_BOSS', 'ROLE_ASSIGNER')")
     @GetMapping(path="/displayImage")
     public ResponseEntity<?> displayImage(@RequestParam("image") String imageData){
 //        int width = 134;

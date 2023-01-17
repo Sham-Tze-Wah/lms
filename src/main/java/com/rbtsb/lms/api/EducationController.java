@@ -34,7 +34,7 @@ public class EducationController {
         this.employeeService = employeeService;
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
+    //@PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER')")
     @PostMapping("/post")
     public ResponseEntity<?> insertEducation(@RequestParam(value = "qualification", required = false) String qualification,
                                              @RequestParam(value = "institute", required = false) String institute,
@@ -80,19 +80,19 @@ public class EducationController {
 
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER')")
     @GetMapping("/get/all")
     public ResponseEntity<?> getAllEducation(){
         return new ResponseEntity<>(educationService.getAllEducation(), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER')")
     @GetMapping("/get")
     public ResponseEntity<?> getEducationByEmpId(@RequestParam("id") String empId){
         return new ResponseEntity<>(educationService.getEducationByEmpId(empId), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER')")
     @PatchMapping("/put/{id}")
     public ResponseEntity<?> updateEducationById(@PathVariable("id") String eduId,
                                                  @RequestParam(value = "qualification", required = false) String qualification,
@@ -103,7 +103,7 @@ public class EducationController {
         return new ResponseEntity<>(educationService.updateEducationByEmpId(eduId, qualification, institute, course, employeeId), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('HR', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR', 'ROLE_USER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteEducationById(@PathVariable("id") String id){
         return new ResponseEntity<>(educationService.deleteEducationById(id), HttpStatus.OK);
