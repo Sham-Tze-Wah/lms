@@ -25,7 +25,7 @@ public class AssignerEntity { //for the manager
     private Date date;
 
     @OneToOne
-    @JoinColumn(name="emp_id", referencedColumnName = "emp_id")
+    @JoinColumn(name="emp_id", referencedColumnName = "emp_id", unique = true)
     private EmployeeEntity employeeEntity; //Assigner details
 
 }

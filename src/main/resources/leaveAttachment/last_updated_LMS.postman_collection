@@ -1,0 +1,2061 @@
+{
+	"info": {
+		"_postman_id": "791b5f29-5faf-47db-b240-3a29dc77a601",
+		"name": "LMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Employee",
+			"item": [
+				{
+					"name": "PostEmployee",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/emp/add?name= Ali&phoneNo= 0123476789&email= ali@gmail.com&address= Jalan Kota&position= BackEnd&role= Employee&dateJoined= 2022-12-21",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"add"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": " Ali"
+								},
+								{
+									"key": "phoneNo",
+									"value": " 0123476789"
+								},
+								{
+									"key": "email",
+									"value": " ali@gmail.com"
+								},
+								{
+									"key": "address",
+									"value": " Jalan Kota"
+								},
+								{
+									"key": "position",
+									"value": " BackEnd"
+								},
+								{
+									"key": "role",
+									"value": " Employee"
+								},
+								{
+									"key": "dateJoined",
+									"value": " 2022-12-21"
+								},
+								{
+									"key": "dateLeave",
+									"value": "2022-12-31",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostEmployee user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/emp/add?name= Ali&phoneNo= 0123476789&email= ali@gmail.com&address= Jalan Kota&position= BackEnd&role= Employee&dateJoined= 2022-12-21",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"add"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": " Ali"
+								},
+								{
+									"key": "phoneNo",
+									"value": " 0123476789"
+								},
+								{
+									"key": "email",
+									"value": " ali@gmail.com"
+								},
+								{
+									"key": "address",
+									"value": " Jalan Kota"
+								},
+								{
+									"key": "position",
+									"value": " BackEnd"
+								},
+								{
+									"key": "role",
+									"value": " Employee"
+								},
+								{
+									"key": "dateJoined",
+									"value": " 2022-12-21"
+								},
+								{
+									"key": "dateLeave",
+									"value": "2022-12-31",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostEmployee admin A",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/emp/add?name= Ali&phoneNo= 0123476789&email= ali@gmail.com&address= Jalan Kota&position= BackEnd&role= Employee&dateJoined= 2022-12-21",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"add"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": " Ali"
+								},
+								{
+									"key": "phoneNo",
+									"value": " 0123476789"
+								},
+								{
+									"key": "email",
+									"value": " ali@gmail.com"
+								},
+								{
+									"key": "address",
+									"value": " Jalan Kota"
+								},
+								{
+									"key": "position",
+									"value": " BackEnd"
+								},
+								{
+									"key": "role",
+									"value": " Employee"
+								},
+								{
+									"key": "dateJoined",
+									"value": " 2022-12-21"
+								},
+								{
+									"key": "dateLeave",
+									"value": "2022-12-31",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEmployeeByName",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "empName",
+									"value": "Ali",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/emp/get/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"get",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/emp/delete/65e03459-7bd4-4e5b-a8b3-9393f50a2a4f",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"delete",
+								"65e03459-7bd4-4e5b-a8b3-9393f50a2a4f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update employee by id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/emp/put/5dfc0b13-f675-41c7-b358-48046c228140?name=Ali&phoneNo=012347678&email=ali@gmail.com&address=Jalan Kota&position=BackEnd&role=Employee&dateJoined=2022-12-21&dateLeave=2022-12-31",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"put",
+								"5dfc0b13-f675-41c7-b358-48046c228140"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Ali"
+								},
+								{
+									"key": "phoneNo",
+									"value": "012347678"
+								},
+								{
+									"key": "email",
+									"value": "ali@gmail.com"
+								},
+								{
+									"key": "address",
+									"value": "Jalan Kota"
+								},
+								{
+									"key": "position",
+									"value": "BackEnd"
+								},
+								{
+									"key": "role",
+									"value": "Employee"
+								},
+								{
+									"key": "dateJoined",
+									"value": "2022-12-21"
+								},
+								{
+									"key": "dateLeave",
+									"value": "2022-12-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/emp/get/5dfc0b13-f675-41c7-b358-48046c228140",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"get",
+								"5dfc0b13-f675-41c7-b358-48046c228140"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Employee",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/emp/get/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"get",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Employee 2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/emp/add?name=Abu&phoneNo=0123476782&email=abu@gmail.com&address=Jalan Kota&position=BackEnd&role=Employee&dateJoined=2022-12-21",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"emp",
+								"add"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Abu"
+								},
+								{
+									"key": "phoneNo",
+									"value": "0123476782"
+								},
+								{
+									"key": "email",
+									"value": "abu@gmail.com"
+								},
+								{
+									"key": "address",
+									"value": "Jalan Kota"
+								},
+								{
+									"key": "position",
+									"value": "BackEnd"
+								},
+								{
+									"key": "role",
+									"value": "Employee"
+								},
+								{
+									"key": "dateJoined",
+									"value": "2022-12-21"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Education",
+			"item": [
+				{
+					"name": "Get All Education",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/education/get/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"education",
+								"get",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostEducation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"qualification\":\"Degree\",\r\n    \"institute\":\"UTAR\",\r\n    \"course\":\"ComputerScience\",\r\n    \"employeePojo\":{\r\n        \"emp_id\" : \"1\",\r\n        \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n    }\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/education/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"education",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostEducation2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"qualification\":\"Degree\",\r\n    \"institute\":\"TARUC\",\r\n    \"course\":\"ComputerScience\",\r\n    \"employeePojo\":{\r\n        \"emp_id\" : \"1\",\r\n        \"name\" : \"Ahmad\",\r\n    \"phoneNo\" : \"0123456789\",\r\n    \"email\" : \"ahmad@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n    }\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/education/post/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"education",
+								"post",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostEducation User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/education/post/?qualification=Degree&institute=TARUC&course=ComputerScience&employeeId=1ad0f109-0262-40ff-96a3-ba83823fb006",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"education",
+								"post",
+								""
+							],
+							"query": [
+								{
+									"key": "qualification",
+									"value": "Degree"
+								},
+								{
+									"key": "institute",
+									"value": "TARUC"
+								},
+								{
+									"key": "course",
+									"value": "ComputerScience"
+								},
+								{
+									"key": "employeePojo",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "employeeId",
+									"value": "1ad0f109-0262-40ff-96a3-ba83823fb006"
+								},
+								{
+									"key": "name",
+									"value": " Ahmad",
+									"disabled": true
+								},
+								{
+									"key": "phoneNo",
+									"value": " 0123456789",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": " ahmad@gmail.com",
+									"disabled": true
+								},
+								{
+									"key": "address",
+									"value": " Jalan Kota",
+									"disabled": true
+								},
+								{
+									"key": "position",
+									"value": " BackEnd",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": " Employee",
+									"disabled": true
+								},
+								{
+									"key": "dateJoined",
+									"value": " 2022-12-21",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostEducation Admin A",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/education/post/?qualification=Degree&institute=TARUC&course=ComputerScience&employeeId=1ad0f109-0262-40ff-96a3-ba83823fb006",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"education",
+								"post",
+								""
+							],
+							"query": [
+								{
+									"key": "qualification",
+									"value": "Degree"
+								},
+								{
+									"key": "institute",
+									"value": "TARUC"
+								},
+								{
+									"key": "course",
+									"value": "ComputerScience"
+								},
+								{
+									"key": "employeePojo",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "employeeId",
+									"value": "1ad0f109-0262-40ff-96a3-ba83823fb006"
+								},
+								{
+									"key": "name",
+									"value": " Ahmad",
+									"disabled": true
+								},
+								{
+									"key": "phoneNo",
+									"value": " 0123456789",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": " ahmad@gmail.com",
+									"disabled": true
+								},
+								{
+									"key": "address",
+									"value": " Jalan Kota",
+									"disabled": true
+								},
+								{
+									"key": "position",
+									"value": " BackEnd",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": " Employee",
+									"disabled": true
+								},
+								{
+									"key": "dateJoined",
+									"value": " 2022-12-21",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get education by emp id",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Update education",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/education/put/8ad8643d-a46e-4234-81ce-df035dcf4a6e?qualification=Degree&institute=UTAR&course=ComputerScience&employeeId=17ce171f-b57f-4170-b376-185989c8a935",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"education",
+								"put",
+								"8ad8643d-a46e-4234-81ce-df035dcf4a6e"
+							],
+							"query": [
+								{
+									"key": "qualification",
+									"value": "Degree"
+								},
+								{
+									"key": "institute",
+									"value": "UTAR"
+								},
+								{
+									"key": "course",
+									"value": "ComputerScience"
+								},
+								{
+									"key": "employeeId",
+									"value": "17ce171f-b57f-4170-b376-185989c8a935"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Work Exp",
+			"item": [
+				{
+					"name": "PostWorkExp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workTitle\" : \"BackEnd\",\r\n    \"yearsOfExperience\" : \"3 years\",\r\n    \"companyName\" : \"Swiss Log Sdn Bhd\",\r\n    \"dateJoined\" : \"2019-11-21\",\r\n    \"dateResign\" : \"2022-11-21\",\r\n    \"employeePojo\" :{\r\n        \"emp_id\" : \"1\",\r\n        \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n    }\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/workexp/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"workexp",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostWorkExp User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workTitle\" : \"BackEnd\",\r\n    \"yearsOfExperience\" : \"3 years\",\r\n    \"companyName\" : \"Swiss Log Sdn Bhd\",\r\n    \"dateJoined\" : \"2019-11-21\",\r\n    \"dateResign\" : \"2022-11-21\",\r\n    \"employeePojo\" :{\r\n        \"emp_id\" : \"1\",\r\n        \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n    }\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/workexp/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"workexp",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostWorkExp Admin A",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workTitle\" : \"BackEnd\",\r\n    \"yearsOfExperience\" : \"3 years\",\r\n    \"companyName\" : \"Swiss Log Sdn Bhd\",\r\n    \"dateJoined\" : \"2019-11-21\",\r\n    \"dateResign\" : \"2022-11-21\",\r\n    \"employeePojo\" :{\r\n        \"emp_id\" : \"1\",\r\n        \"name\" : \"Ali\",\r\n    \"phoneNo\" : \"0123476789\",\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"address\" : \"Jalan Kota\",\r\n    \"position\" : \"BackEnd\",\r\n    \"role\" : \"Employee\",\r\n    \"dateJoined\" : \"2022-12-21\"\r\n    }\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/workexp/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"workexp",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch work exp",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/workexp/put/60b06e45-e67e-44a3-82f6-4e5dce3554ca?workTitle=BackEnd&yearsOfExperience=3 years&companyName=Swiss Log Sdn Bhd&dateJoined=2019-11-21&dateResign=2022-11-21&empId=17ce171f-b57f-4170-b376-185989c8a935",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"workexp",
+								"put",
+								"60b06e45-e67e-44a3-82f6-4e5dce3554ca"
+							],
+							"query": [
+								{
+									"key": "workTitle",
+									"value": "BackEnd"
+								},
+								{
+									"key": "yearsOfExperience",
+									"value": "3 years"
+								},
+								{
+									"key": "companyName",
+									"value": "Swiss Log Sdn Bhd"
+								},
+								{
+									"key": "dateJoined",
+									"value": "2019-11-21"
+								},
+								{
+									"key": "dateResign",
+									"value": "2022-11-21"
+								},
+								{
+									"key": "empId",
+									"value": "17ce171f-b57f-4170-b376-185989c8a935"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Leave",
+			"item": [
+				{
+					"name": "PostLeave",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "localhost:8080/api/leave/post?leaveStatus=New&reason=Stomachache&description=Eat dirty food.&leaveType=Sick_Leave&startDateLeave=2023-01-05&endDateLeave=2023-01-05&empId=17ce171f-b57f-4170-b376-185989c8a935",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"post"
+							],
+							"query": [
+								{
+									"key": "leaveStatus",
+									"value": "New"
+								},
+								{
+									"key": "reason",
+									"value": "Stomachache"
+								},
+								{
+									"key": "description",
+									"value": "Eat dirty food."
+								},
+								{
+									"key": "leaveType",
+									"value": "Sick_Leave"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"disabled": true
+								},
+								{
+									"key": "startDateLeave",
+									"value": "2023-01-05"
+								},
+								{
+									"key": "endDateLeave",
+									"value": "2023-01-05"
+								},
+								{
+									"key": "empId",
+									"value": "17ce171f-b57f-4170-b376-185989c8a935"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostLeave Admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/leave/post?leaveStatus=New&reason=Stomachache&description=Eat dirty food.&leaveType=Sick_Leave&startDateLeave=2023-01-05&endDateLeave=2023-01-05&empId=17ce171f-b57f-4170-b376-185989c8a935",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"post"
+							],
+							"query": [
+								{
+									"key": "leaveStatus",
+									"value": "New"
+								},
+								{
+									"key": "reason",
+									"value": "Stomachache"
+								},
+								{
+									"key": "description",
+									"value": "Eat dirty food."
+								},
+								{
+									"key": "leaveType",
+									"value": "Sick_Leave"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"disabled": true
+								},
+								{
+									"key": "startDateLeave",
+									"value": "2023-01-05"
+								},
+								{
+									"key": "endDateLeave",
+									"value": "2023-01-05"
+								},
+								{
+									"key": "empId",
+									"value": "17ce171f-b57f-4170-b376-185989c8a935"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all leave application",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/leave/get/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"get",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update leave application by leave id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \"leaveStatus\": \"New\",\r\n        \"reason\": \"Stomachache\",\r\n        \"description\": \"Eat dirty food.\",\r\n        \"leaveType\": \"Sick_Leave\",\r\n        \"startDateLeave\": \"2023-01-03T16:00:00.000+00:00\",\r\n        \"endDateLeave\": \"2023-01-03T16:00:00.000+00:00\",\r\n        \"employeeName\": \"Ali\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/leave/put/3b473885-e310-40f3-9161-88f549d0dde0",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"put",
+								"3b473885-e310-40f3-9161-88f549d0dde0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete leave application by leave id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/leave/delete/103934d5-f673-4f86-8fe4-a423dd3a4d0b",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"delete",
+								"103934d5-f673-4f86-8fe4-a423dd3a4d0b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve leave application",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/leave/approve/3b473885-e310-40f3-9161-88f549d0dde0",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"approve",
+								"3b473885-e310-40f3-9161-88f549d0dde0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject leave application",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/leave/reject/3b473885-e310-40f3-9161-88f549d0dde0",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"reject",
+								"3b473885-e310-40f3-9161-88f549d0dde0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate leave",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsZW9uZ2t4a2luZ0BnbWFpbC5jb20iLCJleHAiOjE2NzQwMjQ1MDcsImlhdCI6MTY3MzkzODEwNywiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfSFIifV19.6Z6PPiSu2Ksudh-37DhllW_BB3ZNBz9cBUJt-G8ljLc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/leave/validate?leaveId=1d1a3e13-c3ee-401b-9a3f-4a19c2703013&assignerId=a8fc0f62-3361-4c2d-a711-97bdc0e13048&HRId=a8fc0f62-3361-4c2d-a711-97bdc0e13048&fromEmail=leongkxking@gmail.com&toEmail=hockanj@gmail.com&subject=Validation Result From HR&body=Your leave application is validated by HR. Please wait for a few days for approval or rejection from boss.",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"leave",
+								"validate"
+							],
+							"query": [
+								{
+									"key": "leaveId",
+									"value": "1d1a3e13-c3ee-401b-9a3f-4a19c2703013"
+								},
+								{
+									"key": "assignerId",
+									"value": "a8fc0f62-3361-4c2d-a711-97bdc0e13048"
+								},
+								{
+									"key": "HRId",
+									"value": "a8fc0f62-3361-4c2d-a711-97bdc0e13048"
+								},
+								{
+									"key": "fromEmail",
+									"value": "leongkxking@gmail.com"
+								},
+								{
+									"key": "toEmail",
+									"value": "hockanj@gmail.com"
+								},
+								{
+									"key": "subject",
+									"value": "Validation Result From HR"
+								},
+								{
+									"key": "body",
+									"value": "Your leave application is validated by HR. Please wait for a few days for approval or rejection from boss."
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attachment",
+			"item": [
+				{
+					"name": "PostAttachment (image)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fileName",
+									"value": "bear.jpg",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "fileType",
+									"value": "Image",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "directory",
+									"value": "C:\\Practice\\lms\\src\\main\\resources\\leaveAttachment\\bear.jpg",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "leaveReason",
+									"value": "Stomachache",
+									"type": "text"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"type": "text"
+								},
+								{
+									"key": "startDateLeave",
+									"value": "2023-01-04",
+									"type": "text"
+								},
+								{
+									"key": "endDateLeave",
+									"value": "2023-01-05",
+									"type": "text"
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": "/C:/Practice/lms/src/main/resources/leaveAttachment/bear.jpg"
+								},
+								{
+									"key": "leaveType",
+									"value": "Sick_Leave",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"post"
+							],
+							"query": [
+								{
+									"key": "image",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Attachment (json file)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fileName",
+									"value": "LMS.postman_collection.json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "fileType",
+									"value": "Image",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "directory",
+									"value": "C:\\Practice\\lms\\src\\main\\resources\\leaveAttachment\\bear.jpg",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "leaveReason",
+									"value": "Low salary pay",
+									"type": "text"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"type": "text"
+								},
+								{
+									"key": "dateLeave",
+									"value": "2022-12-27",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Practice/lms/src/main/resources/leaveAttachment/LMS.postman_collection2.json"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Attachment (zip file)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "leaveReason",
+									"value": "Low salary pay",
+									"type": "text"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"type": "text"
+								},
+								{
+									"key": "dateLeave",
+									"value": "2022-12-27",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Practice/lms/src/main/resources/leaveAttachment/LMS.postman_collection.zip"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Attachment (zip file)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fileName",
+									"value": "LMS.postman_collection.json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "fileType",
+									"value": "Image",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "directory",
+									"value": "C:\\Practice\\lms\\src\\main\\resources\\leaveAttachment\\bear.jpg",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "leaveReason",
+									"value": "Stomachache",
+									"type": "text"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"type": "text"
+								},
+								{
+									"key": "startDateLeave",
+									"value": "2023-01-04",
+									"type": "text"
+								},
+								{
+									"key": "endDateLeave",
+									"value": "2023-01-04",
+									"type": "text"
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": "/C:/Practice/lms/src/main/resources/leaveAttachment/LMS.postman_collection.zip"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/post/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"post",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all attachment",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "ea486b16-cf3b-49f6-843e-903ff2895ba5",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/attachment/get/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"get",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Attachment by attachment id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "33300bf0-d6cd-4869-bdbd-e76fb5a05b7f",
+									"type": "text"
+								},
+								{
+									"key": "leaveReason",
+									"value": "Stomachache",
+									"type": "text"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"type": "text"
+								},
+								{
+									"key": "startDateLeave",
+									"value": "2023-01-04",
+									"type": "text"
+								},
+								{
+									"key": "endDateLeave",
+									"value": "2023-01-05",
+									"type": "text"
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/put",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"put"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an attachment by attachment id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/attachment/delete/84eb2928-7815-4296-ab98-d79a71cfc62f",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"delete",
+								"84eb2928-7815-4296-ab98-d79a71cfc62f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload File into db",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "33300bf0-d6cd-4869-bdbd-e76fb5a05b7f",
+									"type": "text"
+								},
+								{
+									"key": "leaveReason",
+									"value": "Stomachache",
+									"type": "text"
+								},
+								{
+									"key": "employeeName",
+									"value": "Ali",
+									"type": "text"
+								},
+								{
+									"key": "startDateLeave",
+									"value": "2023-01-04",
+									"type": "text"
+								},
+								{
+									"key": "endDateLeave",
+									"value": "2023-01-05",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/upload",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fileName",
+									"value": "LMS.postman_collection.json",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/post/download",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"post",
+								"download"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Download File 2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fileName",
+									"value": "LMS.postman_collection.zip",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/post/download/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"post",
+								"download",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cannot download image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fileName",
+									"value": "bear.jpg",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/attachment/post/download",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"post",
+								"download"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get image by image byte array",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/attachment/displayImage?image=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",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"displayImage"
+							],
+							"query": [
+								{
+									"key": "image",
+									"value": "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"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Disp image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/attachment/displayImage?image=/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAIYAhgMBIgACEQEDEQH/xAAcAAEAAgIDAQAAAAAAAAAAAAAAAQIGBwQFCAP/xAA7EAABAwMDAgQEAQkJAQAAAAABAAIDBAURBiExEkEHE1FhInGBkaEUFSMyQnKCsdEzNFJiY5KywdIk/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAEC/8QAGxEBAQEBAAMBAAAAAAAAAAAAAAERAhIhMWH/2gAMAwEAAhEDEQA/ANcKw4QgKqAeVZvCDCg+yA5Go33R3sgkqo5UhScYQM7KqKxAQT2VCisMYQG8KHcoedkb7oDVLuFDvZAghFfARBTJVsbJhRlAJUjdAMqOEA7IN1kWh9K1Grbt+TMeYaSEB9ROG56W9gOxcd/sT7HddNoPSFFAyF9loJSBjzKqMSPd83O3QecyMKMreOqPCq03CmfNYQKCsAyxgcTDJ7EHPTn1H2K1vafDzVF0yWWw0rQ4tL6x/ljI523J+YGCgxfCjK2bF4M3Z7R515ooj3DYHP8Axy1UqfBm8RsJprrQzuHAex8f/pBrbGyglZTUeHuqaaup6WW2EieQRieJ3mRNyeXEcDvuAtr2Dwz03aqZv5dSRXKoxmSWrYHMJ/ysOWgfc+6DQAGRlQdivRlz0BpW507o2WmkpXEbTUUbYnNPr8IwfrlaL1Xp6p01epbdVnrAAfDMBgSxnOHY9diCPUIOnG6k7KDsnKBkopwiCMpjumFOUEZwnKsxrXPaHPDGk4LyCQ0euBv9lnl88PorVpGlvJvNG4hrpJZB1Fk4fgxCPHfHtv1Z2AQZt4JUsUOkJZ2D9LPVvMh/dAaB8sD8SsndTzVVZL7OILjwAtYeCd6rYbrNZWU7pqScGd7wf7u4ADqPsdhjnOPdbqACz1z5N8d3jcfKmp2wRBgJIHqV9kRakxi3boiIgjC+FXTCoj6SS3G4wuQilmrLnt1FFFNS1gjcD0OB44K1/wCPUMQo7NU9I88Tviz36C3qP4tH3W1sBefPFi6XGv1ZNSXCLyIqL4KaIHILHb+Znv1YHyxjsVOefGYvfXldrDOUxhOEJytMmUTpUoGVGFGFbIwgdiCuyrNQXivpH0VVXyy0jxG0wOx0NDCCzpaBhuMDjGe+V1rekPaZGF7MjqaHdJI+fZdtqqqs1TcPN09RyUlI2IAskPxOeMgu5IwQGnbG5OUG3/BeyNt+mPzjI3/6Li8ydR7RgkMA9ju7+JbBXW6aiZDp21xx46WUkQGOP1AuxQSiwTxL8QRooUccNEKypqA6QsdIWBsbcZOcHck7LNqWZtRTRTtBDZGB4B5wRlB9UXQa3uN3tenaqusFNT1FVAOtzagkNEY3ccZGSB2yF2FkluE1ppZbzDFBXujBnihd1Ma70BQc9FwL7cW2iyV9zex0jaSnknLG7F3S0nH4LHvDnWw1lbqmWSlFLVU0oZJG1/U0gjLSDge4+YQZgtXeONlbLbKS9xMHm00ghmI7xu4P0dj/AHFbQWNeJUbZdB3sOH6tK54+bfiH4gIPNx3QbINuVJ34QMqVTCILlU7orDhAzhQ4fZZv4U2i2XPUkE1XceiqpnmWKhMP9sAOevONjvjGdvRffxT05ZdM1FLFa6WojlrXSTEul/RRtBHwMb83D5DHqg2f4Z3ll50fQPDh51MwU07e4cwYH3GD9V3dzfOxrfJyATuW8haH8LbndKPV1JSWwh0Va7oqYnjLSwAku9iANj747r0Mp1NmNc3LrFdQaKterJbfV3uOUzUmR0sd0iRpIJa4emwWU8N2GAFEjxGxzjnAGdl8PyczNLpj8RGzeQz6dyp+J99unqLHXVtFLbam7GS2y9TXgRkVDoz+wZOrHtnpzj33X2jo7o2SnZXXiF1PE4Od5UBjlnxwHO6iMcZwBn2Gy535OKd4kZ8I6g3pHcH19eUipxMBI85JJ6vvt/RNvxcjkzRR1FO+GZjZIpGFr2u3DmkYIWMWDSNBo6irG2MTk1MgfIZX9ZaAMAD2H33WRugMQLqfA/0/2T/RfeN3WwOwRkcFL7mEuXXHtzpX0+Zs9WdieSFhPjNeo6HS/wCbQQZ7i8MDc7iNp6nO+Wwb/Esu1FdWWOy1dzlhkmZTRl5jjx1O+/HzXmzUl8rdRXaW43B4Mj9mRt/ViYOGt9v5kkqyZEt2661yNRql3CqJRURBc4VEyrY2Qcu03KrtFWKy3y+TUtY5jZAMlocMEj3wV86mvramFkNVW1VRExxcxk8zpAwnkjqJxnv6rjlSBnlBsjwJo2S6guNW4ZNPStY32L3b/wDD8Vu5aH8F7rFb9VyUcxDW3CDoYT3kYeoD6gu/Bb4QEREHzlj8zp3IAcD88JDH5YcM5BcSB6ZX0RAREQca5Ukdfb6qjmaHRVEL4ntPcOBB/mvLFDRS1dbDQslhZNLIImvncWs6jsMkA4yfbuvT2o7rDZLJWXKoPwwRFwGd3O/ZaPcnA+q8th8jXh4cWyA9XU04IPOQUHc6wsD9M3p9tkqY5yGh7HMBB6DnHVkYzseMrpQpBLsdTicbDJzhDsgnZFTKlBOFGUymO6CQMqDsmcIBlBLHOa9r2Oc17CHNc04LSOCD2K3X4d+I7rxPT2a8RO/OD8tjqIx8MuAT8Q/ZOAfY+y0nwufYLpJZr1RXOJvU6lmDy3/E3hw+oJCD1QixKh8QtM1tP5zbxS03wgmOrd5T2nO+c8/TKwnX/ifJJPBSaRrpIxG7rmrGxtIk2wGtDwcjuTj0x3QbjRed2eJesG83Zrv3qWL/AKaFybV4p6khulNLcqwVNE1/6eBsEbS9pGDggZyM5G/bCDf66nUuoKDTdtNfcnPEXUGNbG3qc9xzgAfQ87LjQavsNVRNq4LxQiFzc5lmDCw9gWncfJao8WtYUWoJ6S32qXz6WlcZXzN2a+QjA6fUAE7+6Dq9X6tu+tq1lPTUkopY3ZgooAXuc7gOfjk7/IZ+q6rUOmbrp6pfHcqZ7IhJ5cdQB+jlOM/Ce+323XHsFzms15o7jTySs8iZjpBE7pMkYcC5nyIyN12estXVGrJaWWspIqeSmD2t8qRxaWuIOCD3GOe/oEGOHZOU5TGEE4UquUQMJlTlRhAxlAcKc4UHdA5ThBsh3QM5TGExhTnIQMqMJhTlBG3oEwmFOcIIBwnJTlBsgcJnKHdOEDpUp1KUFFccIiCp5Ut4REEORvKlEB3CqOURBfsqIiC/ZUKIgs3hQ7lEQGqXcKUQUREQf//Z",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attachment",
+								"displayImage"
+							],
+							"query": [
+								{
+									"key": "image",
+									"value": "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"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Registration",
+			"item": [
+				{
+					"name": "Registration",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"ali@gmail.com\",\r\n    \"password\" : \"1234\",\r\n    \"matchingPassword\" : \"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/register",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registration Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"ali@gmail.com\",\r\n    \"password\" : \"1234\",\r\n    \"matchingPassword\" : \"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/register",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Registration",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/verifyRegistration?token=87768688-6ff9-494c-a941-d5094783e56d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"verifyRegistration"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "87768688-6ff9-494c-a941-d5094783e56d"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend Verify Registration",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"oldPassword\" : \"1234\",\r\n    \"newPassword\" : \"6789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/resetPassword",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"resetPassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"oldPassword\" : \"1234\",\r\n    \"newPassword\" : \"6789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/savePassword?token=0c4b8489-6bf2-45b2-9b15-b43d63efc9e6",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"savePassword"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "0c4b8489-6bf2-45b2-9b15-b43d63efc9e6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change password (useless)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"ali@gmail.com\",\r\n    \"oldPassword\" : \"6789\",\r\n    \"newPassword\" : \"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/changePassword",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"changePassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role",
+			"item": [
+				{
+					"name": "Add role",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"roleName\" : \"ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/role/post",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"role",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsZW9uZ2t4a2luZ0BnbWFpbC5jb20iLCJleHAiOjE2NzQwMjA5OTksImlhdCI6MTY3MzkzNDU5OSwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQk9TUyJ9XX0.BNaqIYaQrJ-VGfwwZNhlhx8HJW8QyrqdU03-MC3j_Nk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/role/assignRole?role=HR&empId=6813056e-c43d-44ab-9163-d29a3eccd9e1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"role",
+								"assignRole"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "HR"
+								},
+								{
+									"key": "empId",
+									"value": "6813056e-c43d-44ab-9163-d29a3eccd9e1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unassign Role",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/role/unassignRole?role=BOSS&id=6813056e-c43d-44ab-9163-d29a3eccd9e1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"role",
+								"unassignRole"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "BOSS"
+								},
+								{
+									"key": "id",
+									"value": "6813056e-c43d-44ab-9163-d29a3eccd9e1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer a4d2329a-6a68-426c-aa62-b7dc119e6892",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\" : \"ali@gmail.com\",\r\n    \"password\" : \"1234\",\r\n    \"matchingPassword\" : \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authenticate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login (Replaced with registration to get auth token)",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

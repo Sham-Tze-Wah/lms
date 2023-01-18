@@ -33,6 +33,9 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     @Autowired
     private AppUserRepo appUserRepo;
 
+//    @Autowired
+//    private UserRolesRepo userRolesRepo;
+
     @Autowired
     private VerificationTokenRepo verificationTokenRepository;
 

@@ -22,7 +22,7 @@ public class HREntity {
     private String hrId = UUID.randomUUID().toString();
 
     @OneToOne()
-    @JoinColumn(name="emp_id", referencedColumnName = "emp_id")
+    @JoinColumn(name="emp_id", referencedColumnName = "emp_id", unique = true)
     private EmployeeEntity employeeEntity; //HR details
 
 //    private //assigned by who (manager) - one HR to

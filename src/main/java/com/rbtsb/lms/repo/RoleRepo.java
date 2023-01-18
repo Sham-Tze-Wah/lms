@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RoleRepo extends JpaRepository<RoleEntity, String> {
 
+
+    //already define in the role entity
     @Query(nativeQuery = true)
     RolePojo findByRoleName(String roleName);
 }

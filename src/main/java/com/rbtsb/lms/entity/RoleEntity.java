@@ -31,6 +31,6 @@ public class RoleEntity {
     @Column(name="role_name", nullable = false, unique = true, length= SqlDataType.VARCHAR100)
     private String roleName;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    Set<AppUserEntity> appUsers;
+//    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+//    Set<AppUserEntity> appUsers;
 }

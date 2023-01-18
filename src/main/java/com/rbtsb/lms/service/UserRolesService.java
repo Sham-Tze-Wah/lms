@@ -1,4 +1,4 @@
-package com.rbtsb.lms.service;
-
-public interface UserRolesService {
-}
+//package com.rbtsb.lms.service;
+//
+//public interface UserRolesService {
+//}
