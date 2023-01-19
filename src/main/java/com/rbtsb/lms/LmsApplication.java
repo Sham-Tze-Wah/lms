@@ -1,5 +1,7 @@
 package com.rbtsb.lms;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
+@OpenAPIDefinition(info = @Info(title = "LMS API", version = "2.0", description = "LMS info"))
 public class LmsApplication {
 
 	//this is the application
